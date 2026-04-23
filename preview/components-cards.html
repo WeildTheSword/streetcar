@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Components · Cards</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:24px 28px;}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:14px;}
+  .stack{display:flex;flex-direction:column;gap:16px;}
+
+  /* Cartouche card */
+  .card{position:relative;border:1px solid var(--brass);background:rgba(255,255,255,0.5);padding:20px 24px;}
+  .cartouche{position:absolute;top:-9px;left:18px;background:var(--cream);padding:0 12px;font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.4em;font-size:9px;color:var(--brass-deep);}
+  .card .name{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--espresso);line-height:1.15;margin-top:4px;}
+  .card .body{font-family:var(--font-body);font-style:italic;font-weight:500;font-size:14px;color:var(--muted);line-height:1.4;margin-top:4px;}
+
+  /* Quote card — hero pull quote on one line */
+  .quote{
+    position:relative;
+    border-left:3px solid var(--brass);
+    padding:24px 28px;
+    background:rgba(255,255,255,0.45);
+  }
+  .q-text{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-style:italic;
+    font-size:36px;
+    color:var(--espresso);
+    line-height:1.1;
+    letter-spacing:0.002em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .q-attr{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;font-size:9px;color:var(--brass-deep);margin-top:14px;}
+  .q-attr b{font-family:var(--font-display);font-weight:700;color:var(--espresso);text-transform:none;letter-spacing:0.02em;font-size:11px;margin-right:6px;}
+</style></head><body>
+<div class="heading">Cards · Flat Playbill · No Shadows · No Radii</div>
+<div class="stack">
+
+  <div class="card"><div class="cartouche">Module One</div>
+    <div class="name">Alumni Radar</div>
+    <div class="body">Scans target cities for new alumni role announcements and relocations — surfaces them into the consultant's pre-brief.</div>
+  </div>
+
+  <div class="quote">
+    <div class="q-text">"For me, information is king."</div>
+    <div class="q-attr"><b>Bill Washington</b>Freeman Career Consultant · Field Interview · Oct 2025</div>
+  </div>
+
+</div>
+</body></html>

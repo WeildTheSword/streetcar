@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Colors · Semantic</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:22px 28px;}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:14px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  td{padding:7px 10px;border-bottom:1px solid var(--rule-soft);vertical-align:middle;}
+  tr:last-child td{border-bottom:0;}
+  .tok{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.22em;font-size:10px;color:var(--brass-deep);}
+  .val{font-family:var(--font-display);font-weight:700;color:var(--espresso);font-size:13px;}
+  .desc{font-family:var(--font-body);font-style:italic;color:var(--muted);font-size:12px;}
+  .chip{width:24px;height:24px;border:1px solid rgba(42,26,18,0.15);display:inline-block;vertical-align:middle;}
+  .band{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;font-size:9px;color:var(--brass-deep);padding-top:14px;padding-bottom:4px;}
+  .band-first{padding-top:4px;}
+</style></head><body>
+<div class="heading">Semantic Tokens</div>
+<table>
+  <tr><td colspan="4" class="band band-first">Surface &amp; Foreground</td></tr>
+  <tr><td><span class="chip" style="background:#F5EDE0"></span></td><td class="tok">--bg</td><td class="val">#F5EDE0</td><td class="desc">Primary cream surface · every page.</td></tr>
+  <tr><td><span class="chip" style="background:#FAF4E8"></span></td><td class="tok">--bg-hi</td><td class="val">#FAF4E8</td><td class="desc">Radial highlight at composition center.</td></tr>
+  <tr><td><span class="chip" style="background:#E8DCC4"></span></td><td class="tok">--bg-tint</td><td class="val">#E8DCC4</td><td class="desc">Outer radial falloff · aged paper edge.</td></tr>
+  <tr><td><span class="chip" style="background:#2A1A12"></span></td><td class="tok">--fg</td><td class="val">#2A1A12</td><td class="desc">Primary text · all display headlines.</td></tr>
+  <tr><td><span class="chip" style="background:#6E5A48"></span></td><td class="tok">--fg-2</td><td class="val">#6E5A48</td><td class="desc">Muted body copy · secondary captions.</td></tr>
+  <tr><td><span class="chip" style="background:#8A6B3C"></span></td><td class="tok">--fg-metal</td><td class="val">#8A6B3C</td><td class="desc">Cinzel labels, page numbers, citations.</td></tr>
+
+  <tr><td colspan="4" class="band">Accent &amp; Rule</td></tr>
+  <tr><td><span class="chip" style="background:#5A1F2B"></span></td><td class="tok">--accent</td><td class="val">#5A1F2B</td><td class="desc">Italic subtitles, pull-quotes, big stats.</td></tr>
+  <tr><td><span class="chip" style="background:#B8935A"></span></td><td class="tok">--rule</td><td class="val">#B8935A</td><td class="desc">Every 1px hairline, card frame, double-rule.</td></tr>
+
+  <tr><td colspan="4" class="band">Mardi Gras · from brand illustrations</td></tr>
+  <tr><td><span class="chip" style="background:#6B2E82"></span></td><td class="tok">--mg-purple</td><td class="val">#6B2E82</td><td class="desc">Faith. Intros, alumni tags, faculty pipelines.</td></tr>
+  <tr><td><span class="chip" style="background:#4A1F5C"></span></td><td class="tok">--mg-purple-deep</td><td class="val">#4A1F5C</td><td class="desc">Darkened purple for text on cream.</td></tr>
+  <tr><td><span class="chip" style="background:#2F6B3E"></span></td><td class="tok">--mg-green</td><td class="val">#2F6B3E</td><td class="desc">Justice. Success states, on-track chips, completed actions.</td></tr>
+  <tr><td><span class="chip" style="background:#E8C547"></span></td><td class="tok">--mg-gold</td><td class="val">#E8C547</td><td class="desc">Power. Featured callouts, ribbons on milestone moments.</td></tr>
+  <tr><td><span class="chip" style="background:#C29A3E"></span></td><td class="tok">--mg-gold-deep</td><td class="val">#C29A3E</td><td class="desc">Readable gold on cream — labels, hatch strokes.</td></tr>
+</table>
+<div style="font-family:var(--font-body);font-style:italic;font-size:12px;color:var(--muted);margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:10px;">
+  Mardi Gras tokens are available in chrome — not just illustration — but use one at a time. A screen with a green success chip should not also carry a purple intro ribbon. Burgundy remains the default editorial accent.
+</div>
+</body></html>

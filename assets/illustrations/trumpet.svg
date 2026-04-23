@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <title>Trumpet · Streetcar</title>
+  <defs>
+    <pattern id="hatch-tpt" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#2A1A12" stroke-width="0.6" opacity="0.3"></line>
+    </pattern>
+  </defs>
+
+  <circle cx="300" cy="300" r="268" fill="none" stroke="#B8935A" stroke-width="1" opacity="0.55"></circle>
+  <circle cx="300" cy="300" r="254" fill="none" stroke="#B8935A" stroke-width="0.6" opacity="0.3"></circle>
+
+  
+  <g opacity="0.20" stroke="#2A1A12" stroke-width="0.8" fill="none">
+    <path d="M 100 210 Q 300 140 500 210"></path>
+    <path d="M 100 232 Q 300 162 500 232"></path>
+    <path d="M 100 254 Q 300 184 500 254"></path>
+    <path d="M 100 276 Q 300 206 500 276"></path>
+    <path d="M 100 298 Q 300 228 500 298"></path>
+  </g>
+
+  <g stroke="#2A1A12" stroke-linecap="round" stroke-linejoin="round">
+
+    
+    <rect x="105" y="330" width="280" height="18" fill="#D4B47A" stroke-width="2.2"></rect>
+    <rect x="105" y="330" width="280" height="18" fill="url(#hatch-tpt)" stroke="none"></rect>
+
+    
+    <rect x="155" y="262" width="230" height="18" fill="#D4B47A" stroke-width="2.2"></rect>
+    <rect x="155" y="262" width="230" height="18" fill="url(#hatch-tpt)" stroke="none"></rect>
+
+    
+    <path d="M 105 332&#xA;             L 85 330 L 75 333 L 75 345 L 85 348 L 105 346 Z" fill="#8A6B3C" stroke-width="2"></path>
+
+    
+    <path d="M 155 262&#xA;             L 145 262&#xA;             C 115 262 105 278 105 300&#xA;             C 105 318 115 330 140 330&#xA;             L 155 330&#xA;             L 155 348&#xA;             L 140 348&#xA;             C 100 348 85 326 85 300&#xA;             C 85 270 105 244 145 244&#xA;             L 155 244 Z" fill="#D4B47A" stroke-width="2.2"></path>
+    <path d="M 155 262&#xA;             L 145 262&#xA;             C 115 262 105 278 105 300&#xA;             C 105 318 115 330 140 330&#xA;             L 155 330&#xA;             L 155 348&#xA;             L 140 348&#xA;             C 100 348 85 326 85 300&#xA;             C 85 270 105 244 145 244&#xA;             L 155 244 Z" fill="url(#hatch-tpt)" stroke="none"></path>
+
+    
+    <path d="M 190 348&#xA;             L 190 378&#xA;             C 190 388 198 390 208 390&#xA;             L 258 390&#xA;             C 268 390 276 388 276 378&#xA;             L 276 348&#xA;             L 266 348&#xA;             L 266 376&#xA;             C 266 380 264 382 259 382&#xA;             L 207 382&#xA;             C 202 382 200 380 200 376&#xA;             L 200 348 Z" fill="#D4B47A" stroke-width="1.6"></path>
+
+    
+    <rect x="285" y="270" width="100" height="80" fill="#D4B47A" stroke-width="2.4"></rect>
+    <rect x="285" y="270" width="100" height="80" fill="url(#hatch-tpt)" stroke="none"></rect>
+    
+    <g stroke-width="1" fill="none" opacity="0.7">
+      <line x1="285" y1="278" x2="385" y2="278"></line>
+      <line x1="285" y1="342" x2="385" y2="342"></line>
+    </g>
+
+    
+    <g fill="#D4B47A" stroke-width="2">
+      <rect x="294" y="230" width="18" height="40" rx="2"></rect>
+      <rect x="326" y="230" width="18" height="40" rx="2"></rect>
+      <rect x="358" y="230" width="18" height="40" rx="2"></rect>
+    </g>
+    <g fill="#8A6B3C" stroke-width="1.5">
+      <ellipse cx="303" cy="228" rx="11" ry="5"></ellipse>
+      <ellipse cx="335" cy="228" rx="11" ry="5"></ellipse>
+      <ellipse cx="367" cy="228" rx="11" ry="5"></ellipse>
+    </g>
+    
+    <g fill="#2A1A12">
+      <circle cx="303" cy="219" r="4"></circle>
+      <circle cx="335" cy="219" r="4"></circle>
+      <circle cx="367" cy="219" r="4"></circle>
+    </g>
+
+    
+    <path d="M 385 330&#xA;             C 410 330 430 324 450 314&#xA;             L 525 258&#xA;             C 538 248 552 252 545 268&#xA;             L 510 310&#xA;             C 495 330 475 348 452 348&#xA;             L 385 348 Z" fill="#D4B47A" stroke-width="2.4"></path>
+    <path d="M 385 330&#xA;             C 410 330 430 324 450 314&#xA;             L 525 258&#xA;             C 538 248 552 252 545 268&#xA;             L 510 310&#xA;             C 495 330 475 348 452 348&#xA;             L 385 348 Z" fill="url(#hatch-tpt)" stroke="none"></path>
+
+    
+    <path d="M 520 260 Q 535 254 545 262 Q 548 272 538 275" fill="#8A6B3C" stroke-width="1.6"></path>
+
+    
+    <g stroke="#8A6B3C" stroke-width="0.8" fill="none" opacity="0.7">
+      <path d="M 460 320 L 515 270"></path>
+      <path d="M 470 332 L 525 282"></path>
+      <path d="M 482 342 L 535 294"></path>
+    </g>
+
+    
+    <g stroke="#8A6B3C" stroke-width="0.9" fill="none" opacity="0.9">
+      <path d="M 472 292 Q 477 282 485 286"></path>
+      <path d="M 485 286 Q 493 282 498 292"></path>
+      <circle cx="485" cy="292" r="1.6" fill="#8A6B3C"></circle>
+      <path d="M 485 290 L 485 298"></path>
+    </g>
+
+    
+    <path d="M 240 348 L 237 358 L 250 358 L 247 348 Z" fill="#8A6B3C" stroke-width="1.2"></path>
+
+    
+    <g stroke-width="0.8" fill="none" opacity="0.5">
+      <line x1="155" y1="262" x2="155" y2="280"></line>
+      <line x1="155" y1="330" x2="155" y2="348"></line>
+      <line x1="385" y1="262" x2="385" y2="280"></line>
+    </g>
+  </g>
+
+  
+  <g fill="#6B2E82" stroke="#6B2E82" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(450 130)">
+      <ellipse cx="0" cy="20" rx="6" ry="4.5" transform="rotate(-15)"></ellipse>
+      <line x1="5" y1="18" x2="5" y2="-15" stroke-width="1.8"></line>
+      <ellipse cx="22" cy="14" rx="6" ry="4.5" transform="rotate(-15)"></ellipse>
+      <line x1="27" y1="12" x2="27" y2="-21" stroke-width="1.8"></line>
+      <line x1="5" y1="-15" x2="27" y2="-21" stroke-width="3"></line>
+      <line x1="5" y1="-8" x2="27" y2="-14" stroke-width="2"></line>
+    </g>
+    <g transform="translate(408 105)">
+      <ellipse cx="0" cy="20" rx="5.5" ry="4" transform="rotate(-15)"></ellipse>
+      <line x1="4" y1="18" x2="4" y2="-10" stroke-width="1.6"></line>
+      <path d="M 4 -10 Q 18 -6 16 6" fill="none" stroke-width="1.8"></path>
+    </g>
+  </g>
+</svg>

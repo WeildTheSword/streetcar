@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Components · Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:22px 28px;}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:14px;}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+  .btn{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.28em;font-size:11px;padding:12px 22px;cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);border:none;}
+  .btn-primary{background:var(--espresso);color:var(--cream);}
+  .btn-primary:hover{background:var(--burgundy);}
+  .btn-secondary{background:transparent;color:var(--espresso);border:1px solid var(--brass);}
+  .btn-secondary:hover{background:var(--brass);color:var(--cream);}
+  .btn-ghost{background:transparent;color:var(--brass-deep);padding:12px 6px;}
+  .btn-ghost:hover{color:var(--burgundy);}
+  .arrow{width:32px;height:32px;border:1px solid var(--brass);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--brass-deep);cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);}
+  .arrow:hover{background:var(--brass);color:var(--cream);transform:scale(1.08);}
+  .cap{font-family:var(--font-body);font-style:italic;font-size:12px;color:var(--muted);margin-top:4px;}
+  .band{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;font-size:9px;color:var(--brass-deep);margin:18px 0 8px;}
+
+  /* Audio button — playbill listening card */
+  .audio {
+    display:flex; align-items:center; gap:16px;
+    border: 1px solid var(--brass); background: rgba(255,255,255,0.5);
+    padding: 14px 18px 14px 14px; width: 460px; max-width: 100%;
+    cursor: pointer; transition: background 200ms cubic-bezier(0.16,1,0.3,1);
+    text-decoration: none; color: inherit;
+  }
+  .audio:hover { background: rgba(255,255,255,0.75); }
+  .audio .play {
+    width: 44px; height: 44px; border: 1px solid var(--brass); border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--espresso); color: var(--cream); flex-shrink: 0;
+    transition: all 200ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .audio:hover .play { background: var(--burgundy); transform: scale(1.06); }
+  .audio .play svg { width: 14px; height: 14px; margin-left: 2px; }
+  .audio .body { flex: 1; min-width: 0; }
+  .audio .eyebrow { font-family: var(--font-label); text-transform:uppercase; letter-spacing: 0.35em; font-size: 9px; color: var(--brass-deep); }
+  .audio .title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--espresso); line-height:1.2; margin-top: 3px; }
+  .audio .sub { font-family: var(--font-body); font-style: italic; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .audio .meta { font-family: var(--font-label); text-transform:uppercase; letter-spacing: 0.28em; font-size: 9px; color: var(--brass-deep); flex-shrink: 0; }
+  .native { margin-top: 10px; width: 460px; max-width: 100%; }
+  .native audio { width: 100%; height: 36px; filter: sepia(0.2) saturate(0.9); }
+</style></head><body>
+<div class="heading">Buttons · Small-Caps Labels Only</div>
+
+<div class="band">Standard</div>
+<div class="row">
+  <button class="btn btn-primary">Request Access</button>
+  <button class="btn btn-secondary">View the Deck</button>
+  <button class="btn btn-ghost">Learn More →</button>
+  <span class="arrow"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2 L9 6 L4.5 10"/></svg></span>
+  <span class="arrow"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2 L3 6 L7.5 10"/></svg></span>
+</div>
+
+<div class="band">Listen · Interview Audio Button</div>
+<a class="audio" href="#" onclick="document.getElementById('a1').scrollIntoView({block:'nearest'}); var a=document.getElementById('a1'); if(a.paused){a.play();}else{a.pause();} return false;">
+  <div class="play"><svg viewBox="0 0 12 14" fill="currentColor"><path d="M1 1 L11 7 L1 13 Z"/></svg></div>
+  <div class="body">
+    <div class="eyebrow">Consultant Interview · Field Recording</div>
+    <div class="title">"For me, information is king."</div>
+    <div class="sub">Bill Washington · Freeman Career Consultant</div>
+  </div>
+  <div class="meta">04:21</div>
+</a>
+<div class="native">
+  <audio id="a1" controls preload="none">
+    <source src="../assets/audio/bill-washington-interview.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+<div class="cap">Drop-in pattern for any interview or oral-history clip. Primary click toggles playback in the native player below; pattern links to <code>assets/audio/*.mp3</code>. Use the full card on research-heavy slides; the native bar on admin / inspection pages.</div>
+
+</body></html>

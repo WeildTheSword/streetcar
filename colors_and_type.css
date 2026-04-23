@@ -1,0 +1,310 @@
+/* ============================================================
+   STREETCAR · Colors + Type foundations
+   Heritage New Orleans palette. Three serifs, never sans.
+   ============================================================ */
+
+/* ---- Webfonts (local, with web-safe fallbacks) ------------- */
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('fonts/playfair-display-v40-latin-regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('fonts/playfair-display-v40-latin-italic.ttf') format('truetype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('fonts/playfair-display-v40-latin-700.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('fonts/playfair-display-v40-latin-800.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('fonts/playfair-display-v40-latin-900.ttf') format('truetype');
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-italic.ttf') format('truetype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-500.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-500italic.ttf') format('truetype');
+  font-weight: 500; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-600.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-v21-latin-700.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('fonts/cinzel-v26-latin-regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('fonts/cinzel-v26-latin-500.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('fonts/cinzel-v26-latin-600.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('fonts/cinzel-v26-latin-700.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+/* ---- Tokens ------------------------------------------------ */
+:root {
+  /* Core palette */
+  --espresso:    #2A1A12;
+  --espresso-2:  #140B06;
+  --ink:         #1C120C;
+  --cream:       #F5EDE0;
+  --cream-2:     #EDE2CF;
+  --cream-3:     #E8DCC4;
+  --cream-hi:    #FAF4E8;
+  --brass:       #B8935A;
+  --brass-light: #D4B47A;
+  --brass-deep:  #8A6B3C;
+  --burgundy:    #5A1F2B;
+  --burgundy-2:  #3E1119;
+  --burgundy-ink:#2B0D13;
+  --muted:       #6E5A48;
+
+  /* Mardi Gras — now first-class, pulled from brand illustrations.
+     Purple · Green · Gold. Use on cream; never all three at once in UI chrome. */
+  --mg-purple:       #6B2E82;
+  --mg-purple-deep:  #4A1F5C;
+  --mg-purple-soft:  #8E55A6;
+  --mg-green:        #2F6B3E;
+  --mg-green-deep:   #1E4A2A;
+  --mg-green-soft:   #5A9368;
+  --mg-gold:         #E8C547;
+  --mg-gold-deep:    #C29A3E;
+  --mg-gold-soft:    #F2DB88;
+
+  /* Semantic foreground / background */
+  --bg:          var(--cream);
+  --bg-hi:       var(--cream-hi);
+  --bg-tint:     var(--cream-3);
+  --fg:          var(--espresso);
+  --fg-1:        var(--ink);
+  --fg-2:        var(--muted);
+  --fg-metal:    var(--brass-deep);
+  --accent:      var(--burgundy);
+  --rule:        rgba(184, 147, 90, 0.45);
+  --rule-soft:   rgba(184, 147, 90, 0.22);
+
+  /* Font families */
+  --font-display:  'Playfair Display', 'Didot', 'Bodoni MT', Georgia, serif;
+  --font-body:     'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  --font-label:    'Cinzel', 'Trajan Pro', 'Optima', Georgia, serif;
+  --font-serif:    var(--font-body);
+
+  /* Motion */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    220ms;
+  --dur-med:     450ms;
+  --dur-slow:    900ms;
+
+  /* Spacing scale (editorial, 4-based) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* Borders (thin brass hairlines) */
+  --hair: 1px solid var(--brass);
+  --hair-soft: 1px solid var(--rule);
+
+  /* We don't round corners. These are provided only for consistency
+     if ever needed; defaults are hard corners. */
+  --radius-0: 0;
+  --radius-1: 2px;
+
+  /* Type scale */
+  --fs-display-xl: 118px;
+  --fs-display-l:  84px;
+  --fs-display:    56px;
+  --fs-h1:         44px;
+  --fs-h2:         34px;
+  --fs-h3:         26px;
+  --fs-h4:         22px;
+  --fs-body-l:     20px;
+  --fs-body:       17px;
+  --fs-body-s:     15px;
+  --fs-label:      13px;
+  --fs-label-s:    11px;
+}
+
+/* ---- Semantic element styles ------------------------------- */
+.sc-body, .sc {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background: var(--bg);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.sc h1, .sc-h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-display-l);
+  line-height: 1.02;
+  letter-spacing: 0.015em;
+  color: var(--espresso);
+  margin: 0;
+}
+.sc h2, .sc-h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-h1);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  color: var(--espresso);
+  margin: 0;
+}
+.sc h3, .sc-h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  line-height: 1.15;
+  color: var(--espresso);
+  margin: 0;
+}
+.sc h4, .sc-h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  color: var(--espresso);
+  margin: 0;
+}
+.sc p, .sc-p {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--fg-1);
+  margin: 0;
+}
+
+/* Italic pull-quote / human voice / subtitle */
+.sc-italic, .sc-subtitle, .sc blockquote {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--fs-h4);
+  line-height: 1.35;
+  color: var(--accent);
+  margin: 0;
+}
+
+/* Cinzel small-caps label / eyebrow / numeric caption */
+.sc-label, .sc-eyebrow {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: var(--fs-label-s);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: var(--brass-deep);
+  line-height: 1;
+}
+
+.sc-label--lg {
+  font-size: var(--fs-label);
+  letter-spacing: 0.4em;
+}
+
+/* Big stat numeral (Playfair) */
+.sc-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--burgundy);
+}
+
+/* Supporting / muted body */
+.sc-muted {
+  color: var(--fg-2);
+}
+
+/* Hairline rules */
+.sc-rule {
+  height: 1px;
+  background: var(--brass);
+  opacity: 0.45;
+  border: 0;
+  margin: 0;
+}
+
+/* Double-rule playbill frame (use with position:relative parent) */
+.sc-frame {
+  position: absolute; inset: 60px;
+  border: 1px solid var(--brass);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.sc-frame-inner {
+  position: absolute; inset: 72px;
+  border: 1px solid var(--brass);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+/* Paper grain overlay — drop on any container */
+.sc-grain::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='11'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.65 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  z-index: 9999;
+}
+
+/* Radial cream background */
+.sc-paper {
+  background: radial-gradient(ellipse at 50% 45%,
+    var(--cream-hi) 0%, var(--cream) 55%, var(--cream-3) 100%);
+}

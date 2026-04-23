@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Components · Stats</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+  :root{
+    --ink:#0f1011;
+    --ink-2:#2a2a2a;
+    --muted:#6b6b6b;
+    --border:#ececec;
+    --bg:#ffffff;
+    --canvas:#fafaf9;
+    --blue:#2563eb;
+    --blue-soft:#eff4ff;
+    --green:#059669;
+    --green-soft:#ecfdf5;
+    --rose:#e11d48;
+    --rose-soft:#fff1f2;
+    --amber:#d97706;
+    --amber-soft:#fffbeb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--canvas);}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-feature-settings:'ss01','cv11';
+    color:var(--ink);
+    padding:28px 32px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1{
+    font-size:28px;font-weight:700;letter-spacing:-0.025em;
+    margin:0 0 6px;color:var(--ink);
+  }
+  .lede{
+    font-size:15px;color:var(--muted);margin:0 0 28px;line-height:1.5;max-width:680px;
+  }
+  .band{
+    font-size:12px;font-weight:600;color:var(--muted);
+    letter-spacing:0.04em;text-transform:uppercase;
+    margin:32px 0 12px;
+  }
+
+  /* ---------------- HERO ---------------- */
+  .hero{
+    display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center;
+    background:var(--bg);border:1px solid var(--border);border-radius:14px;
+    padding:32px 36px;position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:var(--blue);
+  }
+  .ring{position:relative;width:200px;height:200px;flex-shrink:0;}
+  .ring svg{display:block;transform:rotate(-90deg);}
+  .ring .num{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .ring .big{
+    font-size:56px;font-weight:700;color:var(--ink);
+    letter-spacing:-0.035em;line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .ring .big .pct{font-size:0.45em;font-weight:600;color:var(--blue);margin-left:2px;}
+  .ring .floor{
+    font-size:11px;font-weight:500;color:var(--muted);
+    letter-spacing:0.02em;margin-top:8px;
+  }
+  .hero-body .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:600;color:var(--blue);
+    background:var(--blue-soft);padding:4px 10px;border-radius:999px;
+    margin-bottom:12px;
+  }
+  .hero-body .tag::before{
+    content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);
+  }
+  .hero-body h2{
+    font-size:32px;font-weight:700;letter-spacing:-0.025em;
+    color:var(--ink);line-height:1.15;margin:0 0 10px;
+  }
+  .hero-body p{
+    font-size:15px;color:var(--ink-2);line-height:1.5;margin:0 0 16px;max-width:560px;
+  }
+  .hero-body .src{
+    font-size:12px;color:var(--muted);font-weight:500;
+    padding-top:12px;border-top:1px solid var(--border);
+  }
+
+  /* ---------------- SUPPORTING ---------------- */
+  .evidence{
+    background:var(--bg);border:1px solid var(--border);border-radius:14px;
+    padding:24px 28px;
+  }
+  .evidence-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:8px;
+  }
+  .evidence-head h3{
+    font-size:18px;font-weight:700;letter-spacing:-0.015em;color:var(--ink);margin:0;
+  }
+  .evidence-head p{
+    font-size:13px;color:var(--muted);margin:4px 0 0;
+  }
+  .evidence-head .link{
+    font-size:13px;font-weight:600;color:var(--blue);text-decoration:none;
+  }
+
+  .row{
+    display:grid;grid-template-columns:48px 120px 1fr;gap:20px;align-items:center;
+    padding:18px 0;border-bottom:1px solid var(--border);
+  }
+  .row:last-child{border-bottom:0;}
+
+  .ico{
+    width:40px;height:40px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .ico svg{width:20px;height:20px;}
+  .ico.rose{background:var(--rose-soft);color:var(--rose);}
+  .ico.green{background:var(--green-soft);color:var(--green);}
+  .ico.amber{background:var(--amber-soft);color:var(--amber);}
+
+  .stat-num{
+    font-size:40px;font-weight:700;color:var(--ink);
+    letter-spacing:-0.035em;line-height:1;
+    font-variant-numeric:tabular-nums;
+    text-align:left;
+  }
+  .stat-num .u{font-size:0.55em;font-weight:600;color:var(--muted);margin-left:1px;}
+  .stat-num.rose{color:var(--rose);}
+  .stat-num.green{color:var(--green);}
+  .stat-num.amber{color:var(--amber);}
+
+  .stat-body .phrase{
+    font-size:15px;font-weight:500;color:var(--ink);line-height:1.4;
+  }
+  .stat-body .phrase b{font-weight:700;}
+  .track{
+    height:6px;background:#f3f3f1;border-radius:999px;
+    margin-top:10px;overflow:hidden;position:relative;
+  }
+  .track > span{
+    display:block;height:100%;border-radius:999px;
+  }
+  .track > span.rose{background:var(--rose);}
+  .track > span.green{background:var(--green);}
+  .track > span.amber{background:var(--amber);}
+  .stat-body .src{
+    font-size:11.5px;color:var(--muted);font-weight:500;margin-top:8px;
+  }
+
+  /* ---------------- KPI ROW ---------------- */
+  .kpi-row{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  .kpi{
+    background:var(--bg);border:1px solid var(--border);border-radius:12px;
+    padding:18px 20px;position:relative;
+  }
+  .kpi .label{
+    font-size:13px;color:var(--muted);font-weight:500;margin-bottom:6px;
+  }
+  .kpi .v{
+    font-size:28px;font-weight:700;letter-spacing:-0.025em;color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .kpi .delta{
+    display:inline-flex;align-items:center;gap:4px;
+    font-size:12px;font-weight:600;margin-top:6px;
+    padding:2px 8px;border-radius:999px;
+  }
+  .kpi .delta.up{color:var(--green);background:var(--green-soft);}
+  .kpi .delta.down{color:var(--rose);background:var(--rose-soft);}
+</style></head><body>
+
+<h1>Stats</h1>
+<p class="lede">Data primitives built to be legible at a glance.</p>
+
+<div class="band">Hero stat</div>
+<div class="hero">
+  <div class="ring">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="86" fill="none" stroke="#eef2ff" stroke-width="12"/>
+      <circle cx="100" cy="100" r="86" fill="none" stroke="#2563eb" stroke-width="12"
+              stroke-dasharray="229.55 540.35" stroke-linecap="round"/>
+    </svg>
+    <div class="num">
+      <div class="big">42.5<span class="pct">%</span></div>
+      <div class="floor">of 22 to 27 year olds</div>
+    </div>
+  </div>
+  <div class="hero-body">
+    <div class="tag">The Problem</div>
+    <h2>Recent graduates are underemployed.</h2>
+    <p>Working in jobs that don't require their degree.</p>
+    <div class="src">Federal Reserve Bank of New York · Labor Market for Recent College Graduates · Q4 2025</div>
+  </div>
+</div>
+
+<div class="band">KPI row</div>
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">Active students</div>
+    <div class="v">1,247</div>
+    <div class="delta up">↑ 8.4%</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Placement rate</div>
+    <div class="v">73.2%</div>
+    <div class="delta up">↑ 4.1 pts</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Time to first offer</div>
+    <div class="v">94 days</div>
+    <div class="delta down">↓ 12 days</div>
+  </div>
+</div>
+
+<div class="band">Supporting evidence</div>
+<div class="evidence">
+  <div class="evidence-head">
+    <div>
+      <h3>Why cold applications don't work</h3>
+      <p>Three unrelated stats. One clear conclusion.</p>
+    </div>
+    <a class="link">View sources →</a>
+  </div>
+
+  <div class="row">
+    <div class="ico rose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+    </div>
+    <div class="stat-num rose">0.2<span class="u">%</span></div>
+    <div class="stat-body">
+      <div class="phrase">of <b>cold applications</b> convert to an interview.</div>
+      <div class="track"><span class="rose" style="width:0.5%"></span></div>
+      <div class="src">Jobvite Recruiter Nation · 2024</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="ico green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 2-5 6-5M22 20c0-3-2-5-6-5M10 11h4"/></svg>
+    </div>
+    <div class="stat-num green">40<span class="u">%</span></div>
+    <div class="stat-body">
+      <div class="phrase">of <b>referred applicants</b> reach an interview. A 200× multiplier.</div>
+      <div class="track"><span class="green" style="width:40%"></span></div>
+      <div class="src">LinkedIn Talent Trends · 2024</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="ico amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg>
+    </div>
+    <div class="stat-num amber">90<span class="u">%</span></div>
+    <div class="stat-body">
+      <div class="phrase">of <b>employers</b> rank problem-solving as the skill they value most.</div>
+      <div class="track"><span class="amber" style="width:90%"></span></div>
+      <div class="src">NACE Job Outlook · 2025</div>
+    </div>
+  </div>
+</div>
+
+</body></html>

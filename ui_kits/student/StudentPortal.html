@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Student Portal · Streetcar</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --canvas: #fafaf9;
+    --sidebar: #f7f7f5;
+    --border: #eceae5;
+    --border-strong: #d9d6cf;
+    --ink: #0f1011;
+    --ink-2: #2a2a2a;
+    --muted: #6b6b6b;
+    --muted-2: #8a8a85;
+    --accent: #5a1f2b;
+    --accent-2: #b8935a;
+    --mint: #10b981;
+    --rose: #e11d48;
+    --amber: #f59e0b;
+    --violet: #7c3aed;
+    --sky: #0ea5e9;
+    --highlight: #fff8ea;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px 24px;
+    display: flex; flex-direction: column; gap: 4px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px 18px;
+    font-weight: 600; font-size: 15px;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .side-section {
+    font-size: 11px; color: var(--muted-2);
+    padding: 14px 10px 6px; font-weight: 500;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px; font-weight: 450;
+    text-decoration: none; cursor: pointer;
+    transition: background 120ms var(--ease);
+  }
+  .nav-item:hover { background: #efedea; }
+  .nav-item.active { background: #ebe9e5; font-weight: 500; }
+  .nav-item svg { width: 17px; height: 17px; color: var(--muted); flex-shrink: 0; }
+  .nav-item.active svg { color: var(--ink); }
+  .nav-item .count {
+    margin-left: auto; font-size: 11px; color: var(--muted-2);
+    background: #fff; border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px;
+  }
+
+  main { padding: 32px 40px 64px; overflow-x: hidden; }
+
+  /* Top row */
+  .page-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-head h1 {
+    font-size: 22px; font-weight: 600; margin: 0; letter-spacing: -0.015em;
+  }
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    background: #fff; border: 1px solid var(--border-strong); color: var(--ink);
+    cursor: pointer; text-decoration: none;
+    transition: background 120ms var(--ease), border-color 120ms var(--ease);
+    font-family: inherit;
+  }
+  .btn:hover { background: #fafaf9; border-color: #c4c0b9; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn.primary:hover { background: #222; }
+  .btn.small { padding: 5px 10px; font-size: 12px; }
+
+  /* Intro line */
+  .intro-eyebrow {
+    font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 0.06em;
+    text-transform: uppercase; margin: 4px 2px 8px;
+  }
+  .intro-head {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+    margin: 0 2px 22px;
+  }
+  .intro-head .title {
+    font-size: 44px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.04;
+    color: var(--ink);
+  }
+  .intro-head .sub { font-size: 14px; color: var(--muted); margin-top: 10px; max-width: 640px; line-height: 1.5; }
+  .intro-deck {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 19px; line-height: 1.45; color: var(--ink-2);
+    margin-top: 12px; max-width: 720px; letter-spacing: -0.005em;
+  }
+  .intro-deck em { font-style: italic; color: var(--ink); }
+  .intro-head a { color: var(--ink); font-weight: 500; text-decoration: none; font-size: 14px; white-space: nowrap; border-bottom: 1px solid transparent; }
+  .intro-head a:hover { border-bottom-color: var(--ink); }
+
+  /* ============ HERO: target role + fingerprint ============ */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 140px 1fr 280px;
+    gap: 32px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 50%, var(--amber) 100%);
+    opacity: 0.7;
+  }
+  .ring {
+    width: 140px; height: 140px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ring svg.dial { width: 140px; height: 140px; transform: rotate(-90deg); }
+  .ring .v {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .ring .v span { font-size: 16px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+
+  /* analyst glyph — the role icon that rides beside the ring */
+  .ring-group {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .role-glyph {
+    width: 44px; height: 56px; position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .role-glyph svg { width: 100%; height: 100%; display: block; }
+  .role-glyph .glyph-label {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; font-weight: 600; color: var(--muted-2);
+    text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap;
+  }
+
+  .hero-copy .eyebrow {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-copy .eyebrow::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--mint);
+  }
+  .hero-copy .title {
+    font-size: 32px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.05;
+    color: var(--ink);
+  }
+  .hero-copy .desc {
+    font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5;
+    max-width: 520px;
+  }
+  .hero-copy .src {
+    font-size: 11px; color: var(--muted-2); margin-top: 8px;
+  }
+
+  .hero-alts {
+    border-left: 1px solid var(--border); padding-left: 24px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .hero-alts .label {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .alt-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 13px;
+  }
+  .alt-row .t { color: var(--ink-2); font-weight: 500; }
+  .alt-row .n { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  /* ============ PATH STEPS ============ */
+  .path-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+  .path-step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px 16px;
+    position: relative;
+  }
+  .path-step .rn {
+    font-size: 11px; font-weight: 600; color: var(--muted-2);
+    letter-spacing: 0.12em;
+  }
+  .path-step .t {
+    font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em;
+    margin-top: 4px; line-height: 1.25;
+  }
+  .path-step .m {
+    font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+  }
+  .path-step .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px;
+    margin-top: 12px;
+    background: #f4f3f0; color: var(--muted);
+  }
+  .path-step .chip.up { background: #ecfdf5; color: #047857; }
+  .path-step .chip.up::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--mint); }
+  .path-step .chip.crit { background: #fef2f2; color: #991b1b; }
+  .path-step .chip.crit::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--rose); }
+  .path-step .chip.warm { background: #eff6ff; color: #1e40af; }
+  .path-step .chip.warm::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--sky); }
+
+  /* Concern boxes — Sophia expressing worries */
+  .path-step.concern { display: flex; flex-direction: column; }
+  .path-step.concern .rn { color: var(--muted-2); }
+  .path-step.concern .t {
+    font-size: 14px; font-weight: 600; color: var(--ink);
+    font-style: italic; margin-top: 4px;
+  }
+  .worry-list {
+    list-style: none; margin: 10px 0 0; padding: 0;
+    display: flex; flex-direction: column; gap: 8px;
+    flex: 1;
+  }
+  .worry-list.no-heading { margin-top: 14px; }
+  .worry-list li {
+    font-size: 12px; color: var(--muted); line-height: 1.45;
+    padding-left: 14px; position: relative;
+  }
+  .worry-list li::before {
+    content: ''; position: absolute; left: 2px; top: 7px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--muted-2);
+  }
+  .worry-list li b { color: var(--ink-2); font-weight: 600; }
+
+  /* Firm list — top firms */
+  .firm-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .firm { display: grid; grid-template-columns: 32px 1fr 16px; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
+  .firm.is-fav { background: #fff8ea; border-color: #f3e7c4; }
+  .firm-mark { width: 32px; height: 32px; border-radius: 7px; background: #0b2340; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+  .firm-mark.ms { background: #0a3973; }
+  .firm-mark.sf { background: #1f3a5f; }
+  .firm-body { min-width: 0; }
+  .firm-name { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; line-height: 1.2; }
+  .firm-sub { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+  .firm .star { width: 14px; height: 14px; color: #d9a441; }
+
+  /* Strategies list */
+  .strat-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .strat-list li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 8px; background: #fff; border: 1px solid var(--border); }
+  .strat-list .sn { font-size: 11px; font-weight: 700; color: var(--muted-2); letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
+  .strat-list .st { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .concern-cta {
+    font-size: 11.5px; font-weight: 500; color: var(--accent);
+    margin-top: 12px; text-decoration: none;
+    padding-top: 10px; border-top: 1px dashed var(--border);
+  }
+  .concern-cta:hover { text-decoration: underline; }
+
+  /* Mind icon — single thought-bubble motif */
+  .mind-head {
+    display: flex; justify-content: center;
+    margin: 10px 0 6px;
+  }
+  .mind-icon {
+    width: 44px; height: 44px; color: var(--accent);
+    opacity: 0.85;
+  }
+
+  /* Step 01 becomes the next-meeting card */
+  .path-step.meeting {
+    display: flex; flex-direction: column; gap: 10px;
+    background: #fff8ea; border-color: #f3e7c4;
+    padding: 14px 16px;
+  }
+  .path-step.meeting .rn { color: var(--accent); }
+  .path-step.meeting .meet-head {
+    display: flex; align-items: center; gap: 10px; margin-top: 2px;
+  }
+  .path-step.meeting .meet-head .bh {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #3d3a35; color: #f4efe2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .path-step.meeting .meet-head .nm {
+    font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em;
+    line-height: 1.2;
+  }
+  .path-step.meeting .meet-head .sb {
+    font-size: 11.5px; color: var(--muted); margin-top: 1px;
+  }
+  .path-step.meeting .when {
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.45;
+    padding-top: 8px; border-top: 1px dashed #eacf96;
+  }
+  .path-step.meeting .when b { color: var(--ink); font-weight: 600; }
+  .two-col {
+    display: grid; grid-template-columns: 1fr 360px; gap: 24px;
+  }
+  section.panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .panel-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .panel-head .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .panel-head-left { display: flex; align-items: baseline; gap: 12px; }
+
+  /* Courses table */
+  table.courses {
+    width: 100%; border-collapse: collapse;
+  }
+  .courses th {
+    text-align: left; padding: 10px 20px;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border); background: #fafaf9;
+  }
+  .courses td {
+    padding: 14px 20px; font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-2); vertical-align: middle;
+  }
+  .courses tr:last-child td { border-bottom: 0; }
+  .courses tr:hover td { background: #fafaf9; }
+  .courses .code {
+    font-size: 11.5px; color: var(--muted); font-weight: 500; letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .courses .cname { font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .courses .cwhy { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .courses .prof { font-size: 12px; color: var(--muted); }
+  .courses .fit {
+    font-size: 16px; font-weight: 600; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .courses .fit .l { font-size: 11px; font-weight: 500; color: var(--muted-2); margin-left: 4px; }
+
+  /* ============ SIDE COLUMN ============ */
+  .side-col { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Intro card */
+  .intro-card { padding: 18px 20px; }
+  .intro-card .label {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .intro-card .label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); }
+  .alum { display: flex; align-items: flex-start; gap: 12px; }
+  .av {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #efeee9; color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .av.sm { width: 28px; height: 28px; border-radius: 8px; font-size: 11px; }
+  .alum h4 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .alum p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .alum .meta {
+    display: flex; align-items: center; gap: 6px; margin-top: 6px;
+    font-size: 11.5px; color: var(--muted-2);
+  }
+  .alum .meta::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--mint); }
+
+  .draft {
+    font-size: 13px; color: var(--ink-2); line-height: 1.5;
+    background: #fafaf9; border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; margin: 14px 0 12px;
+  }
+  .btn-row { display: flex; gap: 8px; }
+
+  /* Alumni conversation list */
+  .convo-list { display: flex; flex-direction: column; gap: 8px; }
+  .convo {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 12px;
+    align-items: flex-start;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color 120ms var(--ease), background 120ms var(--ease);
+  }
+  .convo:hover { border-color: var(--border-strong); background: #fdfcfa; }
+  .convo .av {
+    width: 36px; height: 36px; border-radius: 10px; font-size: 12px;
+    margin-top: 1px;
+  }
+  .convo-body { min-width: 0; }
+  .convo-head {
+    display: flex; align-items: baseline; gap: 8px;
+    font-size: 13.5px;
+  }
+  .convo-head .name {
+    font-weight: 600; color: var(--ink); letter-spacing: -0.005em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  }
+  .convo-head .role {
+    font-size: 11.5px; color: var(--muted-2);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .convo-snip {
+    font-size: 12.5px; color: var(--muted); line-height: 1.45;
+    margin-top: 3px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .convo-snip .you { color: var(--muted-2); font-weight: 500; margin-right: 4px; }
+  .convo-meta {
+    display: flex; align-items: center; gap: 6px; margin-top: 6px;
+    font-size: 11px; color: var(--muted-2);
+  }
+  .convo-meta .chip-s {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 1px 7px; border-radius: 999px;
+    background: #f4f3f0; color: var(--muted); font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .convo-meta .chip-s.warm { background: #fef2f2; color: #991b1b; }
+  .convo-meta .chip-s.draft-s { background: #fff8ea; color: #8a5a00; }
+  .convo-meta .chip-s.reply { background: #ecfdf5; color: #065f46; }
+  .convo-meta .chip-s .d {
+    width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.7;
+  }
+  .convo-side {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 8px; flex-shrink: 0;
+  }
+  .convo-time {
+    font-size: 11px; color: var(--muted-2);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .convo .unread {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  }
+  .convo.is-active {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(90, 31, 43, 0.06);
+  }
+
+  /* Actions */
+  .action-list { padding: 4px 0; }
+  .action-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+  }
+  .action-row:last-child { border-bottom: 0; }
+  .check {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--border-strong); margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; background: #fff;
+  }
+  .check.done { background: var(--ink); border-color: var(--ink); }
+  .check.done svg { width: 11px; height: 11px; color: #fff; }
+  .action-body { flex: 1; min-width: 0; }
+  .action-body h5 {
+    margin: 0; font-size: 13.5px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.005em; line-height: 1.3;
+  }
+  .action-row.done h5 { color: var(--muted); text-decoration: line-through; }
+  .action-body p { margin: 3px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .action-body .meta {
+    font-size: 11.5px; color: var(--muted-2); margin-top: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .action-body .meta .sep { color: var(--border-strong); }
+
+  /* Counselor */
+  .cons-card { padding: 18px 20px; }
+  .cons-head { display: flex; align-items: center; gap: 12px; }
+  .cons-head h4 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .cons-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+  .cons-next {
+    font-size: 13px; color: var(--ink-2); line-height: 1.5; margin: 14px 0 12px;
+    padding: 12px 14px; background: var(--highlight); border: 1px solid #f3e7c4;
+    border-radius: 8px;
+  }
+  .cons-next b { font-weight: 600; color: var(--ink); }
+
+  /* Footer */
+  .foot {
+    margin-top: 36px; padding: 18px 2px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    font-size: 11.5px; color: var(--muted-2);
+  }
+
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns: 140px 1fr; }
+    .hero-alts { display: none; }
+    .path-row { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">S</div>
+      Streetcar
+    </div>
+
+    <a class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      My Path
+    </a>
+
+    <div class="side-section">Plan</div>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      Courses
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>
+      Alumni
+      <span class="count">3</span>
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+      Appointments
+      <span class="count">1</span>
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+      Applications
+      <span class="count">14</span>
+    </a>
+
+    <div class="side-section">Me</div>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      Fingerprint
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>
+      Resume
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/></svg>
+      Settings
+    </a>
+
+    <div style="margin-top:auto; padding: 12px 10px 4px; display:flex; align-items:center; gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#d7d2c8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#3d3a35;">SP</div>
+      <div style="font-size:12.5px; line-height:1.2;">
+        <div style="font-weight:600;">Morgan A. Thibodaux</div>
+        <div style="color:var(--muted); font-size:11.5px;">Finance + CS · Junior</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <div class="page-head">
+      <h1>My Path</h1>
+      <div class="head-right">
+        <button class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Log a move
+        </button>
+        <button class="btn primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+          Book with Bill
+        </button>
+      </div>
+    </div>
+
+    <div class="intro-eyebrow">November 18 · 26 weeks to graduation</div>
+    <div class="intro-head">
+      <div>
+        <div class="title">Welcome back, Morgan.</div>
+        <div class="intro-deck">The first job is a ten-year bet — <em>and most graduates lose it.</em> Let's make sure you don't.</div>
+      </div>
+      <a href="#">View fingerprint →</a>
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <div class="hero">
+      <div class="ring">
+        <svg class="dial" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="58" fill="none" stroke="#efefec" stroke-width="8"/>
+          <circle cx="70" cy="70" r="58" fill="none" stroke="#10b981" stroke-width="8"
+                  stroke-dasharray="258 365" stroke-linecap="round"/>
+        </svg>
+        <div class="v">87<span>%</span></div>
+      </div>
+      <div class="hero-copy">
+        <div class="eyebrow">Target role · locked</div>
+        <div class="title">Investment Banker</div>
+        <div class="desc">Based on GPA 3.89, ACCN-2010 (A+), and three other signals. NYC-weighted. 5 Freeman '24 alumni placed in IB out of 73% of the cohort. Morgan's fit: 87%.</div>
+        <div class="src">Source: 12Twenty · Freeman outcomes Q3 '25 · Tulane alumni hiring data</div>
+      </div>
+      <div class="hero-alts">
+        <div class="label">Adjacent paths</div>
+        <div class="alt-row"><span class="t">Private Equity Analyst</span><span class="n">79% fit</span></div>
+        <div class="alt-row"><span class="t">M&amp;A Consultant</span><span class="n">71% fit</span></div>
+        <div class="alt-row"><span class="t">Corporate Strategy</span><span class="n">64% fit</span></div>
+        <div class="alt-row"><span class="t">Hedge Fund Research</span><span class="n">58% fit</span></div>
+      </div>
+    </div>
+
+    <!-- ============ PATH STEPS ============ -->
+    <div class="path-row">
+      <div class="path-step meeting">
+        <div class="rn">YOUR NEXT ADVISING MEETING</div>
+        <div class="meet-head">
+          <div class="bh">BH</div>
+          <div>
+            <div class="nm">Bill Hudlow</div>
+            <div class="sb">Freeman Career Consultant · Your navigator</div>
+          </div>
+        </div>
+        <div class="when">
+          <b>Today · 11:30</b> · Goldring-Woldenberg 340. Pre-brief auto-loaded; bring questions on Goldman Round 2.
+        </div>
+      </div>
+      <div class="path-step concern mind">
+        <div class="rn">WHAT'S ON YOUR MIND</div>
+        <div class="mind-head">
+          <svg class="mind-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M24 44c-6-2-10-7-10-14 0-9 8-16 18-16s18 7 18 16c0 4-1.5 7.5-4 10v6c0 2-1.5 3-3 3h-3v4"/>
+            <path d="M24 44v8c0 1.5 1 2.5 2.5 2.5H30"/>
+            <circle cx="50" cy="48" r="2"/>
+            <circle cx="55" cy="54" r="1.3"/>
+            <circle cx="58.5" cy="59" r="0.9"/>
+          </svg>
+        </div>
+        <ul class="worry-list no-heading">
+          <li><b>The technical screen.</b> Froze on an LBO walk-through in my last mock — need reps before Goldman Round 2.</li>
+          <li><b>NYC cost of living.</b> No family support for move-in; rent + signing-bonus math isn't adding up.</li>
+          <li><b>Feels "non-traditional."</b> Finance+CS, not pure Wharton pedigree — am I reading the room right?</li>
+          <li><b>Consulting fallback.</b> MBB apps still warm — worth keeping, or full send on banking?</li>
+        </ul>
+        <a class="concern-cta" href="#">Articulate your concerns →</a>
+      </div>
+      <div class="path-step concern">
+        <div class="rn">MY TOP FIRMS</div>
+        <ul class="firm-list">
+          <li class="firm is-fav">
+            <div class="firm-mark">GS</div>
+            <div class="firm-body">
+              <div class="firm-name">Goldman Sachs</div>
+              <div class="firm-sub">IB Summer Analyst · NYC · 5 Freeman alumni</div>
+            </div>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </li>
+          <li class="firm is-fav">
+            <div class="firm-mark ms">MS</div>
+            <div class="firm-body">
+              <div class="firm-name">Morgan Stanley</div>
+              <div class="firm-sub">M&amp;A Analyst · NYC · 3 Freeman alumni</div>
+            </div>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </li>
+          <li class="firm is-fav">
+            <div class="firm-mark sf">SF</div>
+            <div class="firm-body">
+              <div class="firm-name">Stifel</div>
+              <div class="firm-sub">IB Analyst · Midwest · Freeman pipeline school</div>
+            </div>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </li>
+        </ul>
+        <a class="concern-cta" href="#">Refine your target list →</a>
+      </div>
+      <div class="path-step concern">
+        <div class="rn">STRATEGIES FOR ME</div>
+        <ul class="strat-list">
+          <li><span class="sn">01</span><span class="st">LBO drill w/ Sarah Kim</span></li>
+          <li><span class="sn">02</span><span class="st">Reframe Finance+CS as edge</span></li>
+          <li><span class="sn">03</span><span class="st">Send NYC housing + stipend info</span></li>
+        </ul>
+        <a class="concern-cta" href="#">Open full playbook →</a>
+      </div>
+    </div>
+
+    <!-- ============ TWO COL ============ -->
+    <div class="two-col">
+
+      <!-- Courses -->
+      <section class="panel">
+        <div class="panel-head">
+          <div class="panel-head-left">
+            <h2>Courses for Spring</h2>
+            <span class="sub">Ranked by fit to your target — not by what's popular.</span>
+          </div>
+          <a class="btn small" href="#">See all 8 →</a>
+        </div>
+        <table class="courses">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Code</th>
+              <th>Course</th>
+              <th style="width: 150px;">Instructor</th>
+              <th style="width: 90px; text-align: right;">Fit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="code">FINE 4150</td>
+              <td>
+                <div class="cname">Advanced Corporate Valuation</div>
+                <div class="cwhy">LBO, DCF, and M&amp;A modeling — exactly what Goldman Round 2 will screen for.</div>
+              </td>
+              <td class="prof">Dr. Pham<br><span style="color:var(--muted-2);font-size:11.5px;">TR 9:30</span></td>
+              <td style="text-align:right;"><span class="fit">A+<span class="l">fit</span></span></td>
+            </tr>
+            <tr>
+              <td class="code">ACCN 3100</td>
+              <td>
+                <div class="cname">Financial Statement Analysis</div>
+                <div class="cwhy">Extends your ACCN-2010 A+ — writing-intensive, strengthens the banker narrative.</div>
+              </td>
+              <td class="prof">Dr. Okonkwo<br><span style="color:var(--muted-2);font-size:11.5px;">W 14:00</span></td>
+              <td style="text-align:right;"><span class="fit">A<span class="l">fit</span></span></td>
+            </tr>
+            <tr>
+              <td class="code">CMPS 3240</td>
+              <td>
+                <div class="cname">Quantitative Methods in Finance</div>
+                <div class="cwhy">Your Finance+CS edge — Python/SQL for trading desks. 4 Goldman alumni took this.</div>
+              </td>
+              <td class="prof">Prof. Arroyo<br><span style="color:var(--muted-2);font-size:11.5px;">MW 11:00</span></td>
+              <td style="text-align:right;"><span class="fit">A−<span class="l">fit</span></span></td>
+            </tr>
+            <tr>
+              <td class="code">FINE 3320</td>
+              <td>
+                <div class="cname">Mergers, Acquisitions &amp; Restructuring</div>
+                <div class="cwhy">M&amp;A Consultant adjacent path (71% fit) — hedge if banking Round 2 stalls.</div>
+              </td>
+              <td class="prof">Dr. Varma<br><span style="color:var(--muted-2);font-size:11.5px;">TR 13:00</span></td>
+              <td style="text-align:right;"><span class="fit">B+<span class="l">fit</span></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Side column -->
+      <div class="side-col">
+
+        <!-- Alumni conversations -->
+        <section class="panel intro-card">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <h2>Alumni conversations</h2>
+              <span class="sub">4 active · sorted by most recent</span>
+            </div>
+            <a class="btn small" href="#">Inbox →</a>
+          </div>
+          <div class="convo-list">
+
+            <!-- 1. Most recent — just replied -->
+            <div class="convo is-active">
+              <div class="av">SK</div>
+              <div class="convo-body">
+                <div class="convo-head">
+                  <span class="name">Sarah Kim</span>
+                  <span class="role">Freeman '16 · Goldman IBD</span>
+                </div>
+                <div class="convo-snip">
+                  Happy to chat — Thursday 3pm ET works. I can walk you through how I prepped for my LBO round and what stumped me my first pass.
+                </div>
+                <div class="convo-meta">
+                  <span class="chip-s reply"><span class="d"></span>Replied</span>
+                  <span>NYC · 1st degree</span>
+                </div>
+              </div>
+              <div class="convo-side">
+                <div class="convo-time">12 min</div>
+                <div class="unread"></div>
+              </div>
+            </div>
+
+            <!-- 2. You sent earlier today -->
+            <div class="convo">
+              <div class="av">DC</div>
+              <div class="convo-body">
+                <div class="convo-head">
+                  <span class="name">David Chen</span>
+                  <span class="role">Freeman '20 · JPM M&amp;A</span>
+                </div>
+                <div class="convo-snip">
+                  <span class="you">You:</span>Thanks for the modeling tips — I finished the case prep and would love your read before Goldman Round 2 on Jan 14.
+                </div>
+                <div class="convo-meta">
+                  <span class="chip-s">Sent</span>
+                  <span>NYC · Warm intro via Bill</span>
+                </div>
+              </div>
+              <div class="convo-side">
+                <div class="convo-time">4h</div>
+              </div>
+            </div>
+
+            <!-- 3. Draft ready -->
+            <div class="convo">
+              <div class="av">RP</div>
+              <div class="convo-body">
+                <div class="convo-head">
+                  <span class="name">Rachel Pham</span>
+                  <span class="role">Freeman '19 · Evercore M&amp;A</span>
+                </div>
+                <div class="convo-snip">
+                  <span class="you">Draft:</span>Hi Rachel — Bill mentioned your path from Freeman into Evercore. I'm targeting IB for Summer '26 and would love 20 minutes to hear how you framed Finance+CS.
+                </div>
+                <div class="convo-meta">
+                  <span class="chip-s draft-s"><span class="d"></span>Draft ready</span>
+                  <span>NYC · 2nd degree</span>
+                </div>
+              </div>
+              <div class="convo-side">
+                <div class="convo-time">Yesterday</div>
+              </div>
+            </div>
+
+            <!-- 4. Older thread — waiting on you -->
+            <div class="convo">
+              <div class="av">MO</div>
+              <div class="convo-body">
+                <div class="convo-head">
+                  <span class="name">Marcus Okafor</span>
+                  <span class="role">Freeman '21 · Analyst Goldman TMT</span>
+                </div>
+                <div class="convo-snip">
+                  Glad the coffee chat helped. Let me know once you hear back from the Goldman recruiter — happy to ping her a second time if it goes quiet.
+                </div>
+                <div class="convo-meta">
+                  <span class="chip-s warm"><span class="d"></span>Reply owed</span>
+                  <span>NYC · 1st degree</span>
+                </div>
+              </div>
+              <div class="convo-side">
+                <div class="convo-time">3d</div>
+              </div>
+            </div>
+
+          </div>
+          <div class="btn-row" style="padding: 14px 0 0; border-top: 1px solid var(--border); margin-top: 14px;">
+            <button class="btn primary">Open Sarah's reply</button>
+            <button class="btn">Send Rachel's draft</button>
+          </div>
+        </section>
+
+        <!-- This week actions -->
+        <section class="panel">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <h2>This week</h2>
+              <span class="sub">4 actions</span>
+            </div>
+            <span style="font-size:12px;color:var(--muted);">1 of 4 done</span>
+          </div>
+          <div class="action-list">
+            <div class="action-row done">
+              <div class="check done">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="action-body">
+                <h5>Update resume headline</h5>
+                <p>Swapped "aspiring" for "Finance + CS analyst — IB track."</p>
+                <div class="meta">Done Nov 12</div>
+              </div>
+            </div>
+            <div class="action-row">
+              <div class="check"></div>
+              <div class="action-body">
+                <h5>Submit 4 more IB applications</h5>
+                <p>Cohort median is 23 by end of November; you're at 14.</p>
+                <div class="meta">Due Fri <span class="sep">·</span> via 12Twenty</div>
+              </div>
+            </div>
+            <div class="action-row">
+              <div class="check"></div>
+              <div class="action-body">
+                <h5>Pre-register FINE 4150</h5>
+                <p>Spring enrollment opens tomorrow — Dr. Pham's valuation section fills fast.</p>
+                <div class="meta">Due Wed <span class="sep">·</span> Registrar</div>
+              </div>
+            </div>
+            <div class="action-row">
+              <div class="check"></div>
+              <div class="action-body">
+                <h5>Review Sarah's reply with Bill</h5>
+                <p>Your next appointment is scheduled for 11:30 today.</p>
+                <div class="meta">Today <span class="sep">·</span> 11:30</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>Tulane University Pilot · New Orleans, LA</span>
+      <span>FERPA opt-in · You control what is shared</span>
+      <span>Student Portal · v0.4</span>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

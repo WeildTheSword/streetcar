@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Motion</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:22px 28px;}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:14px;}
+  .easing{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--espresso);}
+  .code{font-family:'Courier New',monospace;font-size:12px;color:var(--brass-deep);margin-top:4px;}
+  .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border:0;}
+  .rule{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.22em;font-size:10px;color:var(--brass-deep);}
+  .val{font-family:var(--font-body);font-style:italic;color:var(--muted);font-size:13px;}
+  .demo{margin-top:12px;height:22px;position:relative;background:var(--rule-soft);overflow:hidden;}
+  .dot{position:absolute;width:16px;height:16px;background:var(--burgundy);top:3px;left:0;animation:slide 2.4s cubic-bezier(0.16,1,0.3,1) infinite;}
+  @keyframes slide{0%{left:0;opacity:0;} 30%{opacity:1;} 100%{left:calc(100% - 16px);opacity:1;}}
+</style></head><body>
+<div class="heading">Motion · Easing &amp; Timing</div>
+<div class="easing">Slow exit · confident arrivals.</div>
+<div class="code">cubic-bezier(0.16, 1, 0.3, 1)</div>
+<div class="demo"><div class="dot"></div></div>
+<div class="row"><div class="rule">Rise-fade</div><div class="val">900–1200 ms · translateY(18px)+opacity</div></div>
+<div class="row"><div class="rule">Ring draw</div><div class="val">1600 ms · stroke-dasharray 0 → fill%</div></div>
+<div class="row"><div class="rule">Counter tick</div><div class="val">1500 ms · cubic ease-out</div></div>
+<div class="row"><div class="rule">Stagger</div><div class="val">150–200 ms increments</div></div>
+<div class="row"><div class="rule">Forbidden</div><div class="val">Springs, bounces, parallax, wobble.</div></div>
+</body></html>

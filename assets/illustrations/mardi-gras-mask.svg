@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <title>Mardi Gras Mask · Streetcar</title>
+  <defs>
+    <pattern id="hatch-mask" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(-35)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#2A1A12" stroke-width="0.7" opacity="0.3"></line>
+    </pattern>
+    
+    <g id="feather">
+      
+      <path d="M 0 0&#xA;               C -6 -30 -10 -60 -18 -90&#xA;               C -22 -110 -20 -130 -6 -140&#xA;               C 8 -130 10 -110 6 -90&#xA;               C 4 -60 6 -30 0 0 Z" fill="#6B2E82" fill-opacity="0.25" stroke="#2A1A12" stroke-width="1.4"></path>
+      
+      <path d="M 0 0 C -2 -40 -6 -90 -10 -135" fill="none" stroke="#2A1A12" stroke-width="1.2"></path>
+      
+      <g stroke="#2A1A12" stroke-width="0.6" opacity="0.75" fill="none">
+        <path d="M -2 -15 L -10 -10"></path>
+        <path d="M -3 -30 L -14 -25"></path>
+        <path d="M -4 -45 L -16 -42"></path>
+        <path d="M -5 -60 L -18 -58"></path>
+        <path d="M -6 -75 L -19 -74"></path>
+        <path d="M -7 -90 L -20 -90"></path>
+        <path d="M -8 -105 L -20 -107"></path>
+        <path d="M -9 -120 L -18 -124"></path>
+        
+        <path d="M -1 -15 L 8 -12"></path>
+        <path d="M -2 -30 L 10 -28"></path>
+        <path d="M -3 -45 L 11 -44"></path>
+        <path d="M -4 -60 L 12 -61"></path>
+        <path d="M -5 -75 L 11 -78"></path>
+        <path d="M -6 -90 L 10 -94"></path>
+        <path d="M -7 -105 L 8 -112"></path>
+      </g>
+    </g>
+  </defs>
+
+  <circle cx="300" cy="300" r="268" fill="none" stroke="#B8935A" stroke-width="1" opacity="0.55"></circle>
+  <circle cx="300" cy="300" r="254" fill="none" stroke="#B8935A" stroke-width="0.6" opacity="0.3"></circle>
+
+  
+  <g transform="translate(215 290) rotate(-35)">
+    <use href="#feather"></use>
+  </g>
+  <g transform="translate(195 300) rotate(-55)">
+    <use href="#feather"></use>
+  </g>
+  <g transform="translate(235 275) rotate(-15)">
+    <use href="#feather"></use>
+  </g>
+
+  
+  <g transform="translate(385 290) rotate(35) scale(-1 1)">
+    <use href="#feather"></use>
+  </g>
+  <g transform="translate(405 300) rotate(55) scale(-1 1)">
+    <use href="#feather"></use>
+  </g>
+  <g transform="translate(365 275) rotate(15) scale(-1 1)">
+    <use href="#feather"></use>
+  </g>
+
+  
+  <g stroke="#2A1A12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 300 258&#xA;             C 240 240 195 262 180 305&#xA;             C 172 340 208 378 252 382&#xA;             C 278 383 292 368 300 353&#xA;             C 308 368 322 383 348 382&#xA;             C 392 378 428 340 420 305&#xA;             C 405 262 360 240 300 258 Z" fill="#F5EDE0" stroke-width="2.4"></path>
+    <path d="M 300 258&#xA;             C 240 240 195 262 180 305&#xA;             C 172 340 208 378 252 382&#xA;             C 278 383 292 368 300 353&#xA;             C 308 368 322 383 348 382&#xA;             C 392 378 428 340 420 305&#xA;             C 405 262 360 240 300 258 Z" fill="url(#hatch-mask)" stroke="none"></path>
+
+    
+    <path d="M 200 290 Q 250 272 300 278 Q 350 272 400 290" fill="none" stroke-width="1"></path>
+
+    
+    <ellipse cx="243" cy="317" rx="24" ry="14" fill="#2A1A12" stroke-width="1.6"></ellipse>
+    <ellipse cx="357" cy="317" rx="24" ry="14" fill="#2A1A12" stroke-width="1.6"></ellipse>
+
+    
+    <path d="M 222 300 L 218 294" stroke-width="1.2"></path>
+    <path d="M 243 298 L 243 291" stroke-width="1.2"></path>
+    <path d="M 264 300 L 268 294" stroke-width="1.2"></path>
+    <path d="M 336 300 L 332 294" stroke-width="1.2"></path>
+    <path d="M 357 298 L 357 291" stroke-width="1.2"></path>
+    <path d="M 378 300 L 382 294" stroke-width="1.2"></path>
+
+    
+    <path d="M 238 262 C 228 244 244 232 258 242" stroke-width="1.4" fill="none"></path>
+    <path d="M 362 262 C 372 244 356 232 342 242" stroke-width="1.4" fill="none"></path>
+
+    
+    <circle cx="300" cy="280" r="9" fill="#C29A3E" stroke="#8A6B3C" stroke-width="1.2"></circle>
+    <circle cx="300" cy="280" r="3.5" fill="#6B2E82"></circle>
+
+    
+    <path d="M 208 362&#xA;             Q 225 378 242 362&#xA;             Q 259 378 276 362&#xA;             Q 293 378 300 362&#xA;             Q 307 378 324 362&#xA;             Q 341 378 358 362&#xA;             Q 375 378 392 362" fill="none" stroke-width="1.4"></path>
+
+    
+    <g fill="#2F6B3E" stroke="#2F6B3E" stroke-width="1">
+      <path d="M 178 310 L 164 298 L 168 318 L 178 310 Z"></path>
+      <path d="M 422 310 L 436 298 L 432 318 L 422 310 Z"></path>
+    </g>
+
+    
+    <g fill="#2A1A12">
+      <circle cx="230" cy="276" r="1.8"></circle><circle cx="252" cy="268" r="1.8"></circle>
+      <circle cx="276" cy="263" r="1.8"></circle><circle cx="300" cy="262" r="1.8"></circle>
+      <circle cx="324" cy="263" r="1.8"></circle><circle cx="348" cy="268" r="1.8"></circle>
+      <circle cx="370" cy="276" r="1.8"></circle>
+    </g>
+
+    
+    <path d="M 180 312 Q 150 380 130 450" fill="none" stroke="#2A1A12" stroke-width="1.4"></path>
+    <path d="M 420 312 Q 450 380 470 450" fill="none" stroke="#2A1A12" stroke-width="1.4"></path>
+    <path d="M 180 312 Q 160 380 140 450" fill="none" stroke="#6B2E82" stroke-width="1" opacity="0.7"></path>
+    <path d="M 420 312 Q 440 380 460 450" fill="none" stroke="#6B2E82" stroke-width="1" opacity="0.7"></path>
+  </g>
+</svg>

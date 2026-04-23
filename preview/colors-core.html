@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Colors · Core Palette</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:22px 28px;}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:6px;}
+  .sub{font-family:var(--font-body);font-style:italic;font-size:13px;color:var(--muted);margin-bottom:18px;}
+  .feature{margin-bottom:18px;}
+  .feature .chip{width:100%;height:76px;border:1px solid rgba(42,26,18,0.15);}
+  .feature .label{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;}
+  .feature .name{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--espresso);}
+  .feature .hex{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.3em;font-size:10px;color:var(--brass-deep);}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .sw{border:1px solid var(--brass);background:rgba(255,255,255,0.4);padding:10px 12px;}
+  .sw .chip{width:100%;height:48px;margin-bottom:8px;border:1px solid rgba(42,26,18,0.15);}
+  .sw .name{font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--espresso);line-height:1.15;}
+  .sw .hex{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.22em;font-size:9px;color:var(--brass-deep);margin-top:2px;}
+  .band-label{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;font-size:9px;color:var(--brass-deep);margin:22px 0 10px;}
+  .band-label:first-of-type{margin-top:0;}
+  .caption{font-family:var(--font-body);font-style:italic;font-size:12px;color:var(--muted);margin-top:12px;border-top:1px solid var(--rule-soft);padding-top:10px;}
+</style></head><body>
+<div class="heading">Core Palette</div>
+<div class="sub">Cream is the page — paper for every surface. Espresso + brass carry the UI. Burgundy, and the three Mardi Gras pigments pulled from the brand illustrations, supply the accents.</div>
+
+<div class="feature">
+  <div class="chip" style="background:linear-gradient(to right,#FAF4E8 0%,#F5EDE0 55%,#E8DCC4 100%);"></div>
+  <div class="label"><div class="name">Cream Paper · the canvas</div><div class="hex">#FAF4E8 → #F5EDE0 → #E8DCC4</div></div>
+</div>
+
+<div class="band-label">Ink &amp; Metal · UI foundation</div>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#2A1A12"></div><div class="name">Espresso</div><div class="hex">#2A1A12</div></div>
+  <div class="sw"><div class="chip" style="background:#1C120C"></div><div class="name">Ink</div><div class="hex">#1C120C</div></div>
+  <div class="sw"><div class="chip" style="background:#6E5A48"></div><div class="name">Muted Tan</div><div class="hex">#6E5A48</div></div>
+  <div class="sw"><div class="chip" style="background:#B8935A"></div><div class="name">Brass</div><div class="hex">#B8935A</div></div>
+  <div class="sw"><div class="chip" style="background:#8A6B3C"></div><div class="name">Brass Deep</div><div class="hex">#8A6B3C</div></div>
+</div>
+
+<div class="band-label">Editorial Accent</div>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#5A1F2B"></div><div class="name">Burgundy</div><div class="hex">#5A1F2B</div></div>
+  <div class="sw"><div class="chip" style="background:#3E1119"></div><div class="name">Burgundy Deep</div><div class="hex">#3E1119</div></div>
+  <div class="sw" style="background:rgba(90,31,43,0.08);"><div class="chip" style="background:rgba(90,31,43,0.35);border-color:rgba(90,31,43,0.5)"></div><div class="name">Burgundy Wash</div><div class="hex">35% · rule fill</div></div>
+  <div class="sw"><div class="chip" style="background:#5A1F2B;position:relative;"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-style:italic;color:#F5EDE0;font-size:12px;">"voice"</span></div><div class="name">On Cream</div><div class="hex">Italic pull-quote</div></div>
+  <div class="sw"><div class="chip" style="background:#F5EDE0;border-color:#5A1F2B;position:relative;"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);color:#5A1F2B;font-size:22px;font-weight:800;">42.5%</span></div><div class="name">Stat Numeral</div><div class="hex">Big numbers</div></div>
+</div>
+
+<div class="band-label">Mardi Gras · from the brand illustrations</div>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#6B2E82"></div><div class="name">Purple</div><div class="hex">#6B2E82 · Faith</div></div>
+  <div class="sw"><div class="chip" style="background:#4A1F5C"></div><div class="name">Purple Deep</div><div class="hex">#4A1F5C</div></div>
+  <div class="sw"><div class="chip" style="background:#2F6B3E"></div><div class="name">Green</div><div class="hex">#2F6B3E · Justice</div></div>
+  <div class="sw"><div class="chip" style="background:#E8C547"></div><div class="name">Gold</div><div class="hex">#E8C547 · Power</div></div>
+  <div class="sw"><div class="chip" style="background:#C29A3E"></div><div class="name">Gold Deep</div><div class="hex">#C29A3E</div></div>
+</div>
+
+<div class="caption">Cream dominates every surface (~80% of any screen). Espresso + brass carry chrome. Burgundy is the single editorial accent. Mardi Gras pigments appear one at a time — most often as a section accent, a chart fill, or an intro-card ribbon — and never compete with burgundy in the same composition.</div>
+
+</body></html>

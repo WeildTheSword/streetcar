@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <title>Fleur-de-Lis · Streetcar</title>
+  <defs>
+    <pattern id="hatch-flr" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#2A1A12" stroke-width="0.7" opacity="0.35"></line>
+    </pattern>
+  </defs>
+
+  
+  <circle cx="300" cy="300" r="268" fill="none" stroke="#B8935A" stroke-width="1" opacity="0.55"></circle>
+  <circle cx="300" cy="300" r="254" fill="none" stroke="#B8935A" stroke-width="0.6" opacity="0.3"></circle>
+
+  <g fill="none" stroke="#2A1A12" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 230 360 Q 300 350 370 360 L 370 400 Q 300 420 230 400 Z" fill="#F5EDE0" stroke-width="2.4"></path>
+    <path d="M 230 375 Q 300 368 370 375" stroke-width="1"></path>
+
+    
+    <path d="M 300 360&#xA;             C 280 330 220 320 200 280&#xA;             C 185 250 195 220 225 215&#xA;             C 210 245 215 275 245 295&#xA;             C 235 270 245 240 275 240&#xA;             C 260 265 265 295 285 320&#xA;             C 280 300 285 285 300 275" stroke-width="2.4" fill="url(#hatch-flr)"></path>
+
+    
+    <path d="M 300 360&#xA;             C 320 330 380 320 400 280&#xA;             C 415 250 405 220 375 215&#xA;             C 390 245 385 275 355 295&#xA;             C 365 270 355 240 325 240&#xA;             C 340 265 335 295 315 320&#xA;             C 320 300 315 285 300 275" stroke-width="2.4" fill="url(#hatch-flr)"></path>
+
+    
+    <path d="M 300 360&#xA;             C 300 320 270 280 280 220&#xA;             C 285 190 295 170 300 150&#xA;             C 305 170 315 190 320 220&#xA;             C 330 280 300 320 300 360 Z" stroke-width="2.4" fill="#F5EDE0"></path>
+    
+    <path d="M 293 150 Q 300 132 307 150" stroke-width="1.6" fill="none"></path>
+
+    
+    <path d="M 300 170 L 300 330" stroke-width="1" opacity="0.6"></path>
+
+    
+    <path d="M 230 370 C 195 380 180 410 215 425 Q 235 425 240 400" stroke-width="2" fill="#F5EDE0"></path>
+    <path d="M 370 370 C 405 380 420 410 385 425 Q 365 425 360 400" stroke-width="2" fill="#F5EDE0"></path>
+
+    
+    <path d="M 260 410&#xA;             C 265 450 285 470 300 475&#xA;             C 315 470 335 450 340 410" stroke-width="2.4" fill="url(#hatch-flr)"></path>
+    <path d="M 285 440 Q 300 460 315 440" stroke-width="1"></path>
+
+    
+    <circle cx="300" cy="385" r="6" fill="#C29A3E" stroke="#8A6B3C" stroke-width="1"></circle>
+  </g>
+
+  
+  <g stroke="#8A6B3C" fill="none" opacity="0.7">
+    <path d="M 120 300 Q 140 290 150 300" stroke-width="1"></path>
+    <path d="M 450 300 Q 460 290 480 300" stroke-width="1"></path>
+    <circle cx="110" cy="300" r="2" fill="#8A6B3C"></circle>
+    <circle cx="490" cy="300" r="2" fill="#8A6B3C"></circle>
+  </g>
+</svg>

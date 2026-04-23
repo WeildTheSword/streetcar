@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <title>Streetcar Route Map · Streetcar (Career path motif)</title>
+  <defs>
+    <pattern id="hatch-r" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#2A1A12" stroke-width="0.5" opacity="0.22"></line>
+    </pattern>
+  </defs>
+
+  <circle cx="300" cy="300" r="268" fill="none" stroke="#B8935A" stroke-width="1" opacity="0.55"></circle>
+  <circle cx="300" cy="300" r="254" fill="none" stroke="#B8935A" stroke-width="0.6" opacity="0.3"></circle>
+
+  <g stroke="#2A1A12" stroke-linecap="round" stroke-linejoin="round">
+    
+    <rect x="90" y="130" width="420" height="340" fill="#F5EDE0" stroke-width="2.2"></rect>
+    <rect x="98" y="138" width="404" height="324" fill="none" stroke-width="0.8" opacity="0.45"></rect>
+
+    
+    <rect x="170" y="142" width="260" height="30" fill="#F5EDE0" stroke-width="1.4"></rect>
+    <text x="300" y="163" text-anchor="middle" font-family="Cinzel, serif" font-weight="700" font-size="14" fill="#2A1A12" letter-spacing="4">NOUVELLE-ORLÉANS</text>
+
+    
+    <g stroke="#8A6B3C" stroke-width="0.4" opacity="0.35">
+      <line x1="140" y1="180" x2="140" y2="455"></line>
+      <line x1="200" y1="180" x2="200" y2="455"></line>
+      <line x1="260" y1="180" x2="260" y2="455"></line>
+      <line x1="320" y1="180" x2="320" y2="455"></line>
+      <line x1="380" y1="180" x2="380" y2="455"></line>
+      <line x1="440" y1="180" x2="440" y2="455"></line>
+      <line x1="100" y1="220" x2="500" y2="220"></line>
+      <line x1="100" y1="265" x2="500" y2="265"></line>
+      <line x1="100" y1="310" x2="500" y2="310"></line>
+      <line x1="100" y1="355" x2="500" y2="355"></line>
+      <line x1="100" y1="400" x2="500" y2="400"></line>
+    </g>
+
+    
+    <path d="M 90 405&#xA;             C 160 395 220 420 280 415&#xA;             C 340 410 400 380 460 385&#xA;             C 485 388 500 392 510 400" fill="none" stroke="#2A1A12" stroke-width="3.4" opacity="0.85"></path>
+    <path d="M 90 412&#xA;             C 160 402 220 427 280 422&#xA;             C 340 417 400 387 460 392&#xA;             C 485 395 500 399 510 407" fill="none" stroke="#2A1A12" stroke-width="1" opacity="0.6"></path>
+    
+    <g stroke="#2A1A12" stroke-width="0.5" fill="none" opacity="0.5">
+      <path d="M 140 420 Q 155 417 170 420"></path>
+      <path d="M 230 428 Q 245 425 260 428"></path>
+      <path d="M 330 412 Q 345 409 360 412"></path>
+      <path d="M 410 395 Q 425 392 440 395"></path>
+    </g>
+    <text x="440" y="440" font-family="Cormorant Garamond, serif" font-style="italic" font-size="11" fill="#6E5A48">Mississippi</text>
+
+    
+    <path d="M 120 360&#xA;             C 160 310 200 280 260 270&#xA;             C 310 262 330 240 360 220&#xA;             C 390 200 420 205 450 225" fill="none" stroke="#2A1A12" stroke-width="4"></path>
+
+    
+    <g stroke-width="1.2" fill="none">
+      <path d="M 122 352 L 128 368"></path>
+      <path d="M 135 340 L 144 355"></path>
+      <path d="M 152 326 L 161 340"></path>
+      <path d="M 173 310 L 180 322"></path>
+      <path d="M 195 294 L 200 307"></path>
+      <path d="M 222 281 L 226 294"></path>
+      <path d="M 252 274 L 254 286"></path>
+      <path d="M 282 262 L 286 275"></path>
+      <path d="M 312 246 L 318 258"></path>
+      <path d="M 338 232 L 344 244"></path>
+      <path d="M 365 218 L 371 230"></path>
+      <path d="M 392 208 L 398 220"></path>
+      <path d="M 418 208 L 424 220"></path>
+      <path d="M 440 218 L 446 230"></path>
+    </g>
+
+    
+    <g stroke-width="1.6">
+      
+      <circle cx="120" cy="360" r="9" fill="#C29A3E" stroke="#2A1A12"></circle>
+      <circle cx="120" cy="360" r="4" fill="#2A1A12"></circle>
+      <text x="80" y="385" font-family="Cormorant Garamond, serif" font-style="italic" font-size="12" fill="#2A1A12">Start</text>
+
+      
+      <circle cx="215" cy="290" r="7" fill="#F5EDE0" stroke="#2A1A12"></circle>
+      <circle cx="215" cy="290" r="2.4" fill="#2A1A12"></circle>
+
+      
+      <circle cx="310" cy="250" r="8" fill="#6B2E82" stroke="#2A1A12" stroke-width="1.8"></circle>
+      <circle cx="310" cy="250" r="3" fill="#F5EDE0"></circle>
+
+      
+      <circle cx="380" cy="215" r="7" fill="#F5EDE0" stroke="#2A1A12"></circle>
+      <circle cx="380" cy="215" r="2.4" fill="#2A1A12"></circle>
+
+      
+      <circle cx="450" cy="225" r="11" fill="#2F6B3E" stroke="#2A1A12" stroke-width="2"></circle>
+      <circle cx="450" cy="225" r="5" fill="#F5EDE0"></circle>
+      <text x="435" y="205" text-anchor="middle" font-family="Cinzel, serif" font-weight="600" font-size="11" fill="#2A1A12" letter-spacing="2">DESTINATION</text>
+    </g>
+
+    
+    <g transform="translate(262 265) rotate(-15)">
+      <rect x="-22" y="-12" width="44" height="18" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1.8"></rect>
+      <rect x="-22" y="-18" width="44" height="8" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1.4"></rect>
+      <g fill="#2A1A12">
+        <rect x="-18" y="-10" width="7" height="9"></rect>
+        <rect x="-8" y="-10" width="7" height="9"></rect>
+        <rect x="2" y="-10" width="7" height="9"></rect>
+        <rect x="12" y="-10" width="7" height="9"></rect>
+      </g>
+      <circle cx="-14" cy="10" r="4" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1.4"></circle>
+      <circle cx="14" cy="10" r="4" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1.4"></circle>
+      <circle cx="-14" cy="10" r="1.2" fill="#2A1A12"></circle>
+      <circle cx="14" cy="10" r="1.2" fill="#2A1A12"></circle>
+      
+      <line x1="0" y1="-18" x2="0" y2="-32" stroke-width="1.2"></line>
+      <line x1="-5" y1="-32" x2="5" y2="-32" stroke-width="1.2"></line>
+      
+      <circle cx="0" cy="-14" r="3" fill="#C29A3E" stroke="#2A1A12" stroke-width="0.8"></circle>
+    </g>
+
+    
+    <g transform="translate(460 230)">
+      <circle r="26" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1.4"></circle>
+      <path d="M 0 -24 L 4 0 L 0 -4 Z" fill="#2A1A12"></path>
+      <path d="M 0 -24 L -4 0 L 0 -4 Z" fill="#F5EDE0" stroke="#2A1A12" stroke-width="0.7"></path>
+      <path d="M 24 0 L 0 -4 L 4 0 Z" fill="#8A6B3C"></path>
+      <path d="M 24 0 L 0 4 L 4 0 Z" fill="#F5EDE0" stroke="#2A1A12" stroke-width="0.7"></path>
+      <path d="M 0 24 L -4 0 L 0 4 Z" fill="#2A1A12"></path>
+      <path d="M 0 24 L 4 0 L 0 4 Z" fill="#F5EDE0" stroke="#2A1A12" stroke-width="0.7"></path>
+      <path d="M -24 0 L 0 4 L -4 0 Z" fill="#8A6B3C"></path>
+      <path d="M -24 0 L 0 -4 L -4 0 Z" fill="#F5EDE0" stroke="#2A1A12" stroke-width="0.7"></path>
+      <text y="-30" text-anchor="middle" font-family="Cinzel, serif" font-weight="700" font-size="10" fill="#2A1A12">N</text>
+    </g>
+
+    
+    <g transform="translate(320 425)">
+      <path d="M -60 -10 L 60 -10 L 60 10 L -60 10 Z" fill="#F5EDE0" stroke="#2A1A12" stroke-width="1"></path>
+      <path d="M -68 0 L -60 -10 M -68 0 L -60 10" stroke-width="1"></path>
+      <path d="M 68 0 L 60 -10 M 68 0 L 60 10" stroke-width="1"></path>
+      <text text-anchor="middle" y="4" font-family="Cinzel, serif" font-weight="500" font-size="10" fill="#2A1A12" letter-spacing="3">ROUTE 22</text>
+    </g>
+
+    
+    <g stroke-width="1.2" fill="none">
+      <path d="M 98 148 Q 110 140 115 150"></path>
+      <path d="M 502 148 Q 490 140 485 150"></path>
+      <path d="M 98 452 Q 110 460 115 450"></path>
+      <path d="M 502 452 Q 490 460 485 450"></path>
+    </g>
+
+  </g>
+</svg>

@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Navigator Console · Streetcar</title>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --canvas: #fafaf9;
+    --sidebar: #f7f7f5;
+    --border: #eceae5;
+    --border-strong: #d9d6cf;
+    --ink: #0f1011;
+    --ink-2: #2a2a2a;
+    --muted: #6b6b6b;
+    --muted-2: #8a8a85;
+    --accent: #5a1f2b;      /* streetcar burgundy — used sparingly */
+    --accent-2: #b8935a;    /* brass — used sparingly */
+    --mint: #10b981;
+    --rose: #e11d48;
+    --amber: #f59e0b;
+    --violet: #7c3aed;
+    --sky: #0ea5e9;
+    --highlight: #fff8ea;
+
+    /* Bill's personal flair: Nashville Predators */
+    --preds-navy: #041E42;
+    --preds-gold: #FFB81C;
+    --preds-steel: #8A8D8F;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============== LAYOUT ============== */
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* ============== SIDEBAR ============== */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px 24px;
+    display: flex; flex-direction: column; gap: 4px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px 18px;
+    font-weight: 600; font-size: 15px;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .side-section {
+    font-size: 11px; text-transform: none; letter-spacing: 0;
+    color: var(--muted-2); padding: 14px 10px 6px; font-weight: 500;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px; font-weight: 450;
+    text-decoration: none; cursor: pointer;
+    transition: background 120ms var(--ease);
+  }
+  .nav-item:hover { background: #efedea; }
+  .nav-item.active { background: #ebe9e5; font-weight: 500; }
+  .nav-item svg { width: 17px; height: 17px; color: var(--muted); flex-shrink: 0; }
+  .nav-item.active svg { color: var(--ink); }
+  .nav-item .count {
+    margin-left: auto; font-size: 11px; color: var(--muted-2);
+    background: #fff; border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px;
+  }
+
+  /* ============== MAIN ============== */
+  main { padding: 32px 40px 64px; overflow-x: hidden; }
+
+  /* Top row */
+  .page-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .page-head h1 {
+    font-size: 22px; font-weight: 600; margin: 0; letter-spacing: -0.015em;
+  }
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    background: #fff; border: 1px solid var(--border-strong); color: var(--ink);
+    cursor: pointer; text-decoration: none;
+    transition: background 120ms var(--ease), border-color 120ms var(--ease);
+  }
+  .btn:hover { background: #fafaf9; border-color: #c4c0b9; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn.primary:hover { background: #222; }
+
+  .segmented {
+    display: inline-flex; border: 1px solid var(--border-strong);
+    border-radius: 8px; background: #fff; padding: 2px; font-size: 12.5px;
+  }
+  .segmented button {
+    border: 0; background: transparent; padding: 4px 10px; border-radius: 6px;
+    cursor: pointer; color: var(--muted); font-weight: 500;
+    font-family: inherit; font-size: inherit;
+  }
+  .segmented button.on { background: var(--ink); color: #fff; }
+
+  /* Scoreboard variant — Bill's Preds touch on the time-range picker */
+  .segmented.scoreboard {
+    background: var(--preds-navy); border-color: var(--preds-navy);
+    padding: 3px;
+  }
+  .segmented.scoreboard button {
+    color: #b8c2d1; letter-spacing: 0.04em; font-weight: 600;
+    font-size: 11.5px;
+  }
+  .segmented.scoreboard button.on {
+    background: var(--preds-gold); color: var(--preds-navy);
+  }
+
+  /* Sidebar footer — Preds season-ticket styled ID card */
+  .sidebar-footer { margin-top: auto; padding: 10px 6px 4px; }
+  .preds-crest {
+    margin: 0 4px 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preds-crest img { width: 100%; max-width: 150px; height: auto; display: block; }
+
+  /* Minimalist profile row (replaces the ticket card) */
+  .profile-minimal {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 6px;
+  }
+  .pm-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #d7d2c8; color: #3d3a35;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .pm-text { min-width: 0; line-height: 1.25; }
+  .pm-name { font-size: 12.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .pm-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .preds-card {
+    border-radius: 10px; overflow: hidden;
+    background: var(--preds-navy);
+    box-shadow: 0 2px 0 rgba(4,30,66,0.15);
+  }
+  .preds-stripe {
+    height: 6px;
+    background: linear-gradient(90deg, var(--preds-gold) 0%, var(--preds-gold) 60%, #fff 60%, #fff 80%, var(--preds-gold) 80%);
+  }
+  .preds-body { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+  .preds-avatar {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preds-avatar svg { width: 100%; height: 100%; }
+  .preds-text { min-width: 0; line-height: 1.25; }
+  .preds-name { font-size: 12.5px; font-weight: 600; color: #fff; letter-spacing: -0.005em; }
+  .preds-sub {
+    font-size: 11px; color: var(--preds-gold);
+    font-variant-numeric: tabular-nums; margin-top: 1px; letter-spacing: 0.02em;
+  }
+
+  /* ============== HERO: fingerprint + career title ============== */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 200px 1fr 340px;
+    gap: 28px;
+    padding-left: 32px;
+    align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 50%, var(--amber) 100%);
+    opacity: 0.7;
+  }
+  .fp-wrap {
+    width: 220px; height: 220px; display: flex; align-items: center; justify-content: center;
+    position: relative;
+    margin-left: -20px;
+    margin-top: -16px;
+  }
+  .fp-wrap svg { width: 100%; height: 100%; }
+  .fp-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .hero-copy { }
+  .hero .eyebrow {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero .eyebrow::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mint); display: inline-block;
+  }
+  .hero .name {
+    font-size: 14px; color: var(--muted); font-weight: 450; margin-bottom: 4px;
+  }
+  .hero .name b { color: var(--ink); font-weight: 600; }
+  .hero .title {
+    font-size: 56px; font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.0; color: var(--ink);
+    margin: 4px 0 14px;
+    font-variation-settings: "wght" 700;
+  }
+  .hero .confidence {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--muted);
+    white-space: nowrap;
+  }
+  .hero .confidence .bar {
+    width: 140px; height: 5px; background: #efefec; border-radius: 999px; overflow: hidden;
+  }
+  .hero .confidence .bar > span {
+    display: block; height: 100%; width: 87%;
+    background: linear-gradient(90deg, var(--mint), #34d399); border-radius: 999px;
+  }
+  .hero .confidence b { color: var(--ink); font-weight: 600; }
+  .hero-alts {
+    display: flex; flex-direction: column; gap: 8px;
+    border-left: 1px solid var(--border); padding-left: 20px;
+    min-width: 0;
+  }
+  .hero-alts .label {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px;
+    white-space: nowrap;
+  }
+  .hero-alts .student-view-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+    padding: 6px 10px; border-radius: 6px;
+    background: #f4efe2; border: 1px solid var(--border);
+    color: var(--ink); font-size: 11.5px; font-weight: 500; letter-spacing: -0.005em;
+    cursor: pointer; margin-bottom: 12px;
+    transition: background 120ms ease;
+  }
+  .hero-alts .student-view-btn:hover { background: #ebe5d4; }
+  .hero-alts .student-view-btn svg { width: 12px; height: 12px; }
+  .alt-row {
+    display: flex; align-items: baseline;
+    font-size: 13px; padding: 2px 0; gap: 8px;
+    min-width: 0;
+  }
+  .alt-row .t {
+    color: var(--ink-2); font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .alt-row .n {
+    color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  /* ============== STAT CARD ROW ============== */
+  .stat-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px 18px;
+    position: relative; overflow: hidden;
+  }
+  .stat .label {
+    font-size: 12.5px; color: var(--muted); font-weight: 450;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .stat .label svg {
+    width: 12px; height: 12px; color: var(--muted-2);
+  }
+  .stat .value {
+    font-size: 26px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .stat .value .unit { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+
+  /* Stat card variant: alumni stack */
+  .stat.alumni { display: flex; flex-direction: column; gap: 10px; }
+  .stat.alumni .who {
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .stat.alumni .who b { color: var(--ink); font-weight: 600; }
+  .stat.alumni .who .track {
+    font-size: 10.5px; font-weight: 500; color: var(--muted-2);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 1px 6px; border-radius: 4px; background: #f4f3f0;
+  }
+
+  /* Stat card variant: concerns list */
+  .stat.concerns { display: flex; flex-direction: column; gap: 10px; }
+  .stat.concerns .lead {
+    font-size: 12px; color: var(--muted); line-height: 1.4;
+  }
+  .stat.concerns .lead b { color: var(--ink); font-weight: 600; }
+  .concern-list { display: flex; flex-direction: column; gap: 6px; }
+  .concern-row {
+    display: grid; grid-template-columns: 14px 1fr; gap: 8px;
+    align-items: flex-start;
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.4;
+  }
+  .concern-row .bullet {
+    width: 14px; height: 14px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .concern-row .bullet svg { width: 10px; height: 10px; }
+  .concern-row .bullet.hot { background: #fef2f2; color: #991b1b; }
+  .concern-row .bullet.warn { background: #fff8ea; color: #8a5a00; }
+  .concern-row .bullet.note { background: #eff6ff; color: #1e40af; }
+  .concern-row .ct { font-weight: 500; color: var(--ink); }
+  .concern-row .cs { color: var(--muted); }
+  .stat.concerns .src-line {
+    font-size: 10.5px; color: var(--muted-2); letter-spacing: 0.02em;
+    margin-top: 2px; padding-top: 8px; border-top: 1px dashed var(--border);
+  }
+  .alumni-list {
+    display: flex; flex-direction: column; gap: 6px; margin-top: 2px;
+  }
+  .alumni-row {
+    display: grid; grid-template-columns: 24px 1fr auto; gap: 8px;
+    align-items: center; min-width: 0;
+  }
+  .alumni-row .av {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: #efeee9; color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; flex-shrink: 0;
+  }
+  .alumni-row .who-body { min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+  .alumni-row .nm {
+    font-size: 12.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .alumni-row .rl {
+    font-size: 11px; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .alumni-row .status {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .alumni-row .status .d {
+    width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+  }
+  .alumni-row .status.replied { background: #ecfdf5; color: #065f46; }
+  .alumni-row .status.sent    { background: #f4f3f0; color: var(--muted); }
+  .alumni-row .status.owed    { background: #fef2f2; color: #991b1b; }
+  .alumni-row .status.intro   { background: #fff8ea; color: #8a5a00; }
+
+  /* Stat card variant: top firm pick */
+  .stat.firm { display: flex; flex-direction: column; gap: 10px; }
+  .firm-mark {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: #0b1f3a; color: #f4efe2;
+    border: 1px solid #0b1f3a;
+  }
+  .firm-mark .mono {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: #f4efe2; color: #0b1f3a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .firm-mark .fn {
+    font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em; line-height: 1.2;
+  }
+  .firm-mark .fs {
+    font-size: 11px; color: #b8935a; margin-top: 2px; letter-spacing: 0.02em;
+  }
+  .firm-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .firm-stat.full { grid-column: 1 / -1; }
+  .firm-stat {
+    padding: 8px 10px; border-radius: 6px;
+    background: #fafaf9; border: 1px solid var(--border);
+  }
+  .firm-stat .k {
+    font-size: 10px; color: var(--muted-2);
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;
+  }
+  .firm-stat .v {
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    font-variant-numeric: tabular-nums; margin-top: 2px; letter-spacing: -0.01em;
+  }
+  .firm-stat .v .sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+  .spark { margin-top: 16px; height: 36px; }
+  .spark svg { width: 100%; height: 100%; display: block; }
+
+  .stat.highlight { background: var(--highlight); border-color: #f3e7c4; }
+  .stat.highlight .cta {
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 6px;
+    background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 500;
+    border: 0; cursor: pointer;
+  }
+  .stat.highlight .cta svg { width: 12px; height: 12px; }
+
+  /* Strategies list inside highlight card */
+  .stat.highlight .strat-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 4px;
+  }
+  .stat.highlight .strat-row {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 10px; border-radius: 6px;
+    background: rgba(255,255,255,0.55); border: 1px solid #eedfb8;
+  }
+  .stat.highlight .sn {
+    width: 22px; height: 22px; border-radius: 4px; flex-shrink: 0;
+    background: #1a1a1a; color: #f4efe2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat.highlight .sb { min-width: 0; flex: 1; }
+  .stat.highlight .st {
+    font-size: 12.5px; font-weight: 600; color: #3d2f1a;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .stat.highlight .ss {
+    font-size: 11px; color: #8a6b3c; margin-top: 2px; line-height: 1.35;
+  }
+
+  /* ============== TWO-COL: todays appts + updates ============== */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 340px; gap: 28px;
+  }
+  section.panel h2 {
+    font-size: 16px; font-weight: 600; margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px;
+  }
+  .panel-head h2 { margin: 0; }
+  .panel-head .panel-actions {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  /* Student list cards */
+  .student-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .student-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color 120ms var(--ease), transform 120ms var(--ease);
+  }
+  .student-card:hover { border-color: var(--border-strong); }
+  .sc-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .sc-avatar {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: #efeee9; color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .sc-name { font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .sc-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .sc-time {
+    margin-left: auto; font-size: 12px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .sc-track {
+    font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+    display: flex; align-items: center; gap: 6px; margin-top: 4px;
+  }
+  .sc-track::before {
+    content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-2);
+  }
+  .sc-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    background: #f4f3f0; border: 1px solid transparent;
+    padding: 2px 8px; border-radius: 999px;
+  }
+  .tag.hot { background: #fef2f2; color: #991b1b; }
+  .tag.new { background: #ecfdf5; color: #065f46; }
+  .tag.prep { background: #eff6ff; color: #1e40af; }
+
+  /* Updates feed */
+  .feed { display: flex; flex-direction: column; gap: 14px; }
+  .feed-item {
+    display: flex; gap: 10px;
+  }
+  .feed-item .dot {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+    background: #efeee9; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); margin-top: 2px;
+  }
+  .feed-item .dot svg { width: 14px; height: 14px; }
+  .feed-item .dot.rose { background: #fef2f2; color: var(--rose); }
+  .feed-item .dot.mint { background: #ecfdf5; color: var(--mint); }
+  .feed-item .dot.amber { background: #fef3c7; color: var(--amber); }
+  .feed-item .dot.violet { background: #f5f3ff; color: var(--violet); }
+  .feed-time {
+    font-size: 11.5px; color: var(--muted-2); margin-bottom: 2px;
+  }
+  .feed-title {
+    font-size: 13.5px; font-weight: 500; color: var(--ink); letter-spacing: -0.005em;
+  }
+  .feed-body {
+    font-size: 12.5px; color: var(--muted); line-height: 1.45; margin-top: 3px;
+  }
+
+  /* Alumni radar table at bottom */
+  .radar {
+    margin-top: 28px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .radar-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .radar-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+  .radar-head .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .radar-head-left { display: flex; align-items: baseline; gap: 12px; }
+  table.radar-tbl {
+    width: 100%; border-collapse: collapse;
+  }
+  .radar-tbl th {
+    text-align: left; padding: 10px 20px;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border); background: #fafaf9;
+  }
+  .radar-tbl td {
+    padding: 12px 20px; font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-2);
+  }
+  .radar-tbl tr:last-child td { border-bottom: 0; }
+  .radar-tbl tr:hover td { background: #fafaf9; }
+  .radar-tbl .alum { display: flex; align-items: center; gap: 10px; }
+  .radar-tbl .alum .av {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: #efeee9; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--ink-2);
+  }
+  .radar-tbl .alum b { font-weight: 600; color: var(--ink); }
+  .radar-tbl .alum span { color: var(--muted); font-size: 12px; display: block; margin-top: 1px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 500;
+    background: #f4f3f0; color: var(--muted);
+  }
+  .pill.match { background: #ecfdf5; color: #047857; }
+  .pill.match::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--mint);
+  }
+  .link-act {
+    color: var(--ink); font-weight: 500; text-decoration: none; font-size: 12.5px;
+    border-bottom: 1px solid transparent;
+  }
+  .link-act:hover { border-bottom-color: var(--ink); }
+
+  @media (max-width: 1100px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: 180px 1fr; }
+    .hero-alts { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">S</div>
+      Streetcar
+    </div>
+
+    <a class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Advisor Portal
+    </a>
+
+    <div class="side-section">Navigate</div>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a3 3 0 00-2-2.83"/></svg>
+      My Students
+      <span class="count">28</span>
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+      Alumni Database
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+      Internal Hiring Trends
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+      Appointments
+      <span class="count">7</span>
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 4 3 5-7"/></svg>
+      Performance
+    </a>
+
+    <div class="side-section">Manage</div>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 4 3 5-7"/></svg>
+      Outcomes
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+      Reports
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M3 9h18"/></svg>
+      Logs
+    </a>
+    <a class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="preds-crest" aria-hidden="true">
+        <img src="PredatorsLogo.png" alt="Nashville Predators">
+      </div>
+      <div class="profile-minimal">
+        <div class="pm-avatar">BH</div>
+        <div class="pm-text">
+          <div class="pm-name">Bill Hudlow</div>
+          <div class="pm-sub">Freeman · Consultant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <div class="page-head">
+      <h1>Advisor Portal</h1>
+      <div class="head-right">
+        <button class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Customize My Dashboard
+        </button>
+      </div>
+    </div>
+
+    <!-- ============== SECTION HEAD ============== -->
+    <div style="margin: 16px 2px 10px;">
+      <div style="font-size:14px; font-weight:600; color:var(--accent-2, #5a1f2b); letter-spacing:0.06em; text-transform:uppercase;">Hi, Bill.</div>
+    </div>
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; margin: 0 2px 18px; gap: 24px;">
+      <div>
+        <div style="font-size:48px; font-weight:700; color:var(--ink); letter-spacing:-0.03em; line-height:1.02; text-transform:uppercase;">Your Next Upcoming Appointment</div>
+        <div style="font-size:14px; color:var(--muted); margin-top:10px;">Pre-brief auto-assembled and ready to review.</div>
+      </div>
+      <a class="link-act" style="color:var(--ink); font-weight:500; text-decoration:none; font-size:14px; white-space:nowrap;">View full schedule →</a>
+    </div>
+
+    <!-- ============== HERO: fingerprint + career title ============== -->
+    <div class="hero">
+      <div class="fp-wrap">
+        <svg viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" aria-label="Investment banker">
+          <g fill="none" stroke="#2a1e14" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Hair silhouette / crown -->
+            <path d="M 86 74
+                     C 86 52 100 40 120 40
+                     C 140 40 154 52 154 74"/>
+            <!-- Side hair sweep (classic banker part, left-sided) -->
+            <path d="M 90 76 C 98 66 112 60 126 62 C 138 64 146 70 150 78"/>
+            <path d="M 102 70 C 112 66 124 66 134 72"/>
+            <!-- Face / jaw -->
+            <path d="M 88 80
+                     C 88 104 96 124 108 132
+                     L 108 146
+                     C 108 151 112 154 120 154
+                     C 128 154 132 151 132 146
+                     L 132 132
+                     C 144 124 152 104 152 80"/>
+            <!-- Ears -->
+            <path d="M 88 98 C 84 100 82 106 84 112 C 86 115 90 115 91 113"/>
+            <path d="M 152 98 C 156 100 158 106 156 112 C 154 115 150 115 149 113"/>
+            <!-- Brows -->
+            <path d="M 100 102 C 104 100 110 100 114 102"/>
+            <path d="M 126 102 C 130 100 136 100 140 102"/>
+            <!-- Eyes -->
+            <circle cx="107" cy="110" r="1.6" fill="#2a1e14"/>
+            <circle cx="133" cy="110" r="1.6" fill="#2a1e14"/>
+            <!-- Nose -->
+            <path d="M 120 112 L 118 124 C 117 128 119 130 122 130"/>
+            <!-- Mouth -->
+            <path d="M 112 138 C 116 140 124 140 128 138"/>
+            <!-- Neck sides -->
+            <path d="M 108 152 C 104 156 100 160 96 164"/>
+            <path d="M 132 152 C 136 156 140 160 144 164"/>
+            <!-- Shirt collar V -->
+            <path d="M 96 164 L 120 192 L 144 164"/>
+            <!-- Shirt inner placket -->
+            <path d="M 120 192 L 120 244"/>
+            <!-- Tie (knot + body) -->
+            <path d="M 114 192 L 120 184 L 126 192 L 124 204 L 132 258 L 120 272 L 108 258 L 116 204 Z"
+                  fill="#2a1e14" stroke="#2a1e14"/>
+            <!-- Tie knot highlight -->
+            <path d="M 118 194 L 120 198 L 122 194" stroke="#c7a565" stroke-width="1"/>
+            <!-- Suit jacket lapels -->
+            <path d="M 96 164
+                     C 78 178 66 200 60 228
+                     L 60 272"/>
+            <path d="M 144 164
+                     C 162 178 174 200 180 228
+                     L 180 272"/>
+            <!-- Lapel fold lines -->
+            <path d="M 102 176 C 90 188 80 208 76 228 L 76 256"/>
+            <path d="M 138 176 C 150 188 160 208 164 228 L 164 256"/>
+            <!-- Shoulder seams -->
+            <path d="M 96 164 C 84 162 72 166 60 176"/>
+            <path d="M 144 164 C 156 162 168 166 180 176"/>
+            <!-- Jacket bottom edge -->
+            <path d="M 60 272 L 180 272"/>
+            <!-- Breast pocket square (folded triangle) -->
+            <path d="M 150 212 L 162 212 L 162 226"/>
+            <path d="M 150 212 L 158 204"/>
+            <!-- Lapel pin — Nashville Predators shield -->
+            <g transform="translate(140 196)">
+              <path d="M 0 -4 L 5 -2 L 5 3 C 5 6 2.5 8 0 9 C -2.5 8 -5 6 -5 3 L -5 -2 Z"
+                    fill="#041E42" stroke="#FFB81C" stroke-width="0.8"/>
+              <path d="M -2 -1 L 0 3 L 2 -1" fill="#FFB81C" stroke="none"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="hero-copy">
+        <div class="eyebrow">Career Profile · High Confidence</div>
+        <div class="name">Pre-brief for <b>Morgan A. Thibodaux</b> · 11:30 AM · Junior · Finance + CS</div>
+        <div class="title">INVESTMENT BANKER</div>
+        <div class="confidence">
+          <div class="bar"><span></span></div>
+          <b>87% match</b> &nbsp;·&nbsp; based on GPA 3.89, ACCN-2010 (A+) &amp; 3 other metrics
+        </div>
+      </div>
+
+      <div class="hero-alts">
+        <button class="student-view-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          See Student View
+        </button>
+        <div class="label">Adjacent paths</div>
+        <div class="alt-row"><span class="t">Private Equity Analyst</span><span class="n">79%</span></div>
+        <div class="alt-row"><span class="t">M&amp;A Consultant</span><span class="n">71%</span></div>
+        <div class="alt-row"><span class="t">Corporate Strategy</span><span class="n">64%</span></div>
+        <div class="alt-row"><span class="t">Hedge Fund Research</span><span class="n">58%</span></div>
+      </div>
+    </div>
+
+    <!-- ============== STAT ROW ============== -->
+    <div class="stat-row">
+      <div class="stat alumni">
+        <div class="label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Morgan is talking to
+        </div>
+        <div class="who">
+          <b>4 alumni</b>
+          <span class="track">IB · Goldman</span>
+        </div>
+        <div class="alumni-list">
+          <div class="alumni-row">
+            <div class="av">SK</div>
+            <div class="who-body">
+              <span class="nm">Sarah Kim</span>
+              <span class="rl">Freeman '18 · VP Goldman IBD</span>
+            </div>
+            <span class="status replied"><span class="d"></span>Replied</span>
+          </div>
+          <div class="alumni-row">
+            <div class="av">DC</div>
+            <div class="who-body">
+              <span class="nm">David Chen</span>
+              <span class="rl">Freeman '20 · Associate JPM M&amp;A</span>
+            </div>
+            <span class="status sent">Sent 2d</span>
+          </div>
+          <div class="alumni-row">
+            <div class="av">RP</div>
+            <div class="who-body">
+              <span class="nm">Rachel Pham</span>
+              <span class="rl">Freeman '19 · Evercore M&amp;A</span>
+            </div>
+            <span class="status owed"><span class="d"></span>Reply owed</span>
+          </div>
+          <div class="alumni-row">
+            <div class="av">MO</div>
+            <div class="who-body">
+              <span class="nm">Marcus Okafor</span>
+              <span class="rl">Freeman '21 · Analyst Goldman TMT</span>
+            </div>
+            <span class="status intro">Intro staged</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat concerns">
+        <div class="label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Morgan is concerned about
+        </div>
+        <div class="concern-list">
+          <div class="concern-row">
+            <div class="bullet hot"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg></div>
+            <div><span class="ct">Technical screen nerves:</span><span class="cs"> froze on LBO walk-through in last mock</span></div>
+          </div>
+          <div class="concern-row">
+            <div class="bullet warn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg></div>
+            <div><span class="ct">NYC cost of living:</span><span class="cs"> no family support for move-in</span></div>
+          </div>
+          <div class="concern-row">
+            <div class="bullet warn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg></div>
+            <div><span class="ct">Feels "non-traditional":</span><span class="cs"> Finance+CS, not Wharton pedigree</span></div>
+          </div>
+          <div class="concern-row">
+            <div class="bullet note"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg></div>
+            <div><span class="ct">Consulting fallback undecided:</span><span class="cs"> MBB apps still warm?</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat firm">
+        <div class="label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 12h1M14 12h1M9 17h1M14 17h1"/></svg>
+          Morgan's top firm pick
+        </div>
+        <div class="firm-mark">
+          <div class="mono">GS</div>
+          <div>
+            <div class="fn">Goldman Sachs</div>
+            <div class="fs">IBD Summer Analyst · NYC</div>
+          </div>
+        </div>
+        <div class="firm-stats">
+          <div class="firm-stat">
+            <div class="k">Freeman placement</div>
+            <div class="v">73<span class="sub">%</span></div>
+          </div>
+          <div class="firm-stat">
+            <div class="k">Morgan's fit</div>
+            <div class="v">87<span class="sub">%</span></div>
+          </div>
+          <div class="firm-stat full">
+            <div class="k">Hired from Tulane '24</div>
+            <div class="v">5<span class="sub">in IBD role</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat highlight">
+        <div class="label" style="color:#8a6b3c;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4-4 4 4 4-5 6 6"/><path d="M3 20h18"/></svg>
+          Strategies for Morgan
+        </div>
+        <div class="strat-list">
+          <div class="strat-row">
+            <div class="sn">01</div>
+            <div class="sb">
+              <div class="st">LBO drill w/ Sarah Kim</div>
+            </div>
+          </div>
+          <div class="strat-row">
+            <div class="sn">02</div>
+            <div class="sb">
+              <div class="st">Reframe Finance+CS as edge</div>
+            </div>
+          </div>
+          <div class="strat-row">
+            <div class="sn">03</div>
+            <div class="sb">
+              <div class="st">Send NYC housing + stipend info</div>
+            </div>
+          </div>
+        </div>
+        <button class="cta">
+          Open full playbook
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ============== TWO-COL: STUDENTS + UPDATES ============== -->
+    <div class="two-col">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Today's Schedule</h2>
+          <div class="panel-actions">
+            <div class="segmented">
+              <button class="on">24h</button>
+              <button>7d</button>
+              <button>30d</button>
+              <button>90d</button>
+            </div>
+            <button class="btn primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              New appointment
+            </button>
+          </div>
+        </div>
+        <div class="student-grid">
+          <div class="student-card">
+            <div class="sc-top">
+              <div class="sc-avatar">MT</div>
+              <div>
+                <div class="sc-name">Morgan A. Thibodaux</div>
+                <div class="sc-meta">Finance + CS · Junior · 3.82</div>
+              </div>
+              <div class="sc-time">11:30 AM</div>
+            </div>
+            <div class="sc-track">Track: Investment Banking</div>
+            <div class="sc-tags">
+              <span class="tag hot">Interview Thursday</span>
+              <span class="tag prep">Pre-brief ready</span>
+            </div>
+          </div>
+
+          <div class="student-card">
+            <div class="sc-top">
+              <div class="sc-avatar">JL</div>
+              <div>
+                <div class="sc-name">Jasmine L. Okoye</div>
+                <div class="sc-meta">Public Health · Senior · 3.91</div>
+              </div>
+              <div class="sc-time">1:00 PM</div>
+            </div>
+            <div class="sc-track">Track: Healthcare Consulting</div>
+            <div class="sc-tags">
+              <span class="tag">Undecided between 2 offers</span>
+            </div>
+          </div>
+
+          <div class="student-card">
+            <div class="sc-top">
+              <div class="sc-avatar">DR</div>
+              <div>
+                <div class="sc-name">Diego Ramirez</div>
+                <div class="sc-meta">Econ · Sophomore · 3.65</div>
+              </div>
+              <div class="sc-time">2:15 PM</div>
+            </div>
+            <div class="sc-track">Track: Exploring</div>
+            <div class="sc-tags">
+              <span class="tag new">First session</span>
+              <span class="tag">Needs fingerprint</span>
+            </div>
+          </div>
+
+          <div class="student-card">
+            <div class="sc-top">
+              <div class="sc-avatar">AP</div>
+              <div>
+                <div class="sc-name">Alex Park</div>
+                <div class="sc-meta">CS · Junior · 3.78</div>
+              </div>
+              <div class="sc-time">3:45 PM</div>
+            </div>
+            <div class="sc-track">Track: Product Management</div>
+            <div class="sc-tags">
+              <span class="tag prep">3 alumni matches</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Updates</h2>
+        <div class="feed">
+          <div class="feed-item">
+            <div class="dot rose">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <div>
+              <div class="feed-time">3 min ago</div>
+              <div class="feed-title">Morgan Thibodaux has an interview Thursday</div>
+              <div class="feed-body">Goldman Sachs, NYC. Pre-brief auto-generated — 3 alumni intros staged.</div>
+            </div>
+          </div>
+
+          <div class="feed-item">
+            <div class="dot mint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div>
+              <div class="feed-time">1 hr ago</div>
+              <div class="feed-title">3 Freeman '22 alumni just updated titles</div>
+              <div class="feed-body">Two to VP at JPM, one lateral to Blackstone PE. Added to radar.</div>
+            </div>
+          </div>
+
+          <div class="feed-item">
+            <div class="dot amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3"/></svg>
+            </div>
+            <div>
+              <div class="feed-time">Yesterday</div>
+              <div class="feed-title">New fingerprint: Diego Ramirez</div>
+              <div class="feed-body">Initial scan complete. Three exploratory tracks surfaced.</div>
+            </div>
+          </div>
+
+          <div class="feed-item">
+            <div class="dot violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.17L4 17.17V4z"/></svg>
+            </div>
+            <div>
+              <div class="feed-time">2 days ago</div>
+              <div class="feed-title">Q1 placement report available</div>
+              <div class="feed-body">73.2% placed within 90 days of graduation. +4.1 pts vs. last cohort.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============== ALUMNI RADAR TABLE ============== -->
+    <section class="radar">
+      <div class="radar-head">
+        <div class="radar-head-left">
+          <h2>Alumni Radar</h2>
+          <div class="sub">Recent role announcements matching open student tracks</div>
+        </div>
+        <a class="link-act">View all →</a>
+      </div>
+      <table class="radar-tbl">
+        <thead>
+          <tr>
+            <th style="width:30%;">Alum</th>
+            <th>New role</th>
+            <th>City</th>
+            <th>Matches</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="alum"><div class="av">AC</div><div><b>Anna Chen '22</b><span>Freeman · Finance</span></div></div></td>
+            <td>VP, Investment Banking · Goldman Sachs</td>
+            <td>New York, NY</td>
+            <td><span class="pill match">3 students</span></td>
+            <td><a class="link-act">Draft intro →</a></td>
+          </tr>
+          <tr>
+            <td><div class="alum"><div class="av">MK</div><div><b>Marcus Kim '21</b><span>Freeman · Finance + CS</span></div></div></td>
+            <td>Principal · Blackstone PE</td>
+            <td>New York, NY</td>
+            <td><span class="pill match">2 students</span></td>
+            <td><a class="link-act">Draft intro →</a></td>
+          </tr>
+          <tr>
+            <td><div class="alum"><div class="av">RP</div><div><b>Rahul Patel '23</b><span>SSE · Computer Science</span></div></div></td>
+            <td>SWE-III · Anthropic</td>
+            <td>San Francisco, CA</td>
+            <td><span class="pill match">1 student</span></td>
+            <td><a class="link-act">Draft intro →</a></td>
+          </tr>
+          <tr>
+            <td><div class="alum"><div class="av">SG</div><div><b>Sarah Goldberg '20</b><span>SLA · Public Health</span></div></div></td>
+            <td>Associate · McKinsey Health</td>
+            <td>Boston, MA</td>
+            <td><span class="pill match">2 students</span></td>
+            <td><a class="link-act">Draft intro →</a></td>
+          </tr>
+          <tr>
+            <td><div class="alum"><div class="av">JW</div><div><b>James Whitfield '22</b><span>Freeman · Accounting</span></div></div></td>
+            <td>Senior Manager · KPMG M&amp;A</td>
+            <td>Chicago, IL</td>
+            <td><span class="pill">0 matches</span></td>
+            <td><a class="link-act">Archive →</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

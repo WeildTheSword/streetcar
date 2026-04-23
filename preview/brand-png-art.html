@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Brand · PNG Ornaments</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:var(--font-body);padding:18px 22px 40px;color:var(--ink);}
+  .heading{font-family:var(--font-label);font-weight:500;text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-bottom:6px;}
+  .sub{font-family:var(--font-body);font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;max-width:720px;}
+
+  .section-label{
+    font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;
+    font-size:10px;color:var(--brass-deep);margin:28px 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-label::before{content:'';width:24px;height:1px;background:var(--brass);}
+
+  /* ========= CATALOG ========= */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .cell{display:flex;flex-direction:column;align-items:center;}
+  .tile{
+    width:100%;aspect-ratio:1/1;
+    border:1px solid var(--brass);
+    background:rgba(255,255,255,0.5);
+    padding:14px;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .tile img{max-width:100%;max-height:100%;object-fit:contain;display:block;}
+  .cap{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.28em;font-size:9px;color:var(--brass-deep);margin-top:8px;text-align:center;}
+
+  /* ========= IN-CONTEXT EXAMPLES ========= */
+  .contexts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  /* Example 1 — section-header watermark */
+  .ctx{
+    border:1px solid var(--brass);background:rgba(255,255,255,0.5);
+    position:relative;overflow:hidden;padding:32px 28px;min-height:220px;
+  }
+  .ctx .wm{
+    position:absolute;right:-20px;top:-12px;width:240px;height:240px;
+    opacity:0.14;pointer-events:none;
+  }
+  .ctx .wm img{width:100%;height:100%;object-fit:contain;}
+  .ctx .eyebrow{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.4em;font-size:9px;color:var(--brass-deep);}
+  .ctx h3{font-family:var(--font-display);font-weight:700;font-size:26px;color:var(--espresso);margin:6px 0 10px;letter-spacing:0.005em;}
+  .ctx p{font-family:var(--font-body);font-size:13px;color:var(--ink);line-height:1.5;margin:0;max-width:340px;}
+
+  /* Example 2 — hero with large ornament behind title */
+  .ctx.hero{padding:40px 32px;min-height:260px;display:flex;align-items:center;}
+  .ctx.hero .wm{width:320px;height:320px;right:-40px;top:-40px;opacity:0.12;}
+  .ctx.hero h2{font-family:var(--font-display);font-weight:800;font-size:40px;color:var(--espresso);margin:0;letter-spacing:0.005em;line-height:1.04;}
+  .ctx.hero .sup{font-family:var(--font-body);font-size:13px;color:var(--burgundy);margin-top:10px;}
+
+  /* Example 3 — divider ornament */
+  .ctx.divider{padding:24px;text-align:center;background:var(--cream-hi);}
+  .ctx.divider .row{display:flex;align-items:center;gap:16px;}
+  .ctx.divider .line{flex:1;height:1px;background:var(--brass);opacity:0.5;}
+  .ctx.divider .orn{width:42px;height:42px;flex-shrink:0;opacity:0.85;}
+  .ctx.divider .orn img{width:100%;height:100%;object-fit:contain;}
+  .ctx.divider .lab{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.4em;font-size:10px;color:var(--brass-deep);margin-top:14px;}
+
+  /* Example 4 — card accent */
+  .ctx.card-demo{padding:22px;}
+  .ctx.card-demo .card{
+    border:1px solid var(--rule);background:rgba(255,255,255,0.7);
+    padding:18px 20px;position:relative;overflow:hidden;
+  }
+  .ctx.card-demo .card .bg{
+    position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;
+    opacity:0.1;pointer-events:none;
+  }
+  .ctx.card-demo .card .bg img{width:100%;height:100%;object-fit:contain;}
+  .ctx.card-demo .eyebrow{font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.35em;font-size:9px;color:var(--brass-deep);}
+  .ctx.card-demo h4{font-family:var(--font-display);font-weight:700;font-size:18px;margin:6px 0 6px;color:var(--espresso);}
+  .ctx.card-demo .n{font-family:var(--font-display);font-weight:800;font-size:36px;color:var(--burgundy);letter-spacing:-0.01em;line-height:1;margin-top:4px;}
+  .ctx.card-demo .d{font-family:var(--font-body);font-size:12.5px;color:var(--muted);margin-top:6px;}
+
+  .ctx-label{
+    font-family:var(--font-label);text-transform:uppercase;letter-spacing:0.3em;font-size:9px;
+    color:var(--brass-deep);margin-top:8px;
+  }
+
+  .desc{font-family:var(--font-body);font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center;line-height:1.5;border-top:1px solid var(--rule-soft);padding-top:14px;}
+</style></head>
+<body>
+
+<div class="heading">PNG Brand Art · Full-Color · Generative</div>
+<div class="sub">Sepia-toned generative illustrations. Reserved for atmospheric use — never literal product iconography. They make the website feel inhabited, not templated. Use them often, but always at 10–30% opacity so type and data sit on top.</div>
+
+<div class="section-label">Catalog</div>
+<div class="grid">
+  <div class="cell"><div class="tile"><img src="../assets/Fingerprint.png" alt="Fingerprint"></div><div class="cap">Fingerprint</div></div>
+  <div class="cell"><div class="tile"><img src="../assets/OakTree.png" alt="Oak Tree"></div><div class="cap">Oak Tree</div></div>
+  <div class="cell"><div class="tile" style="background:transparent;border-color:var(--rule-soft);"><img src="../assets/Band.png" alt="Carnival Brass Band"></div><div class="cap">Carnival Band</div></div>
+  <div class="cell"><div class="tile"><img src="../assets/DramaMasks.png" alt="Drama Masks"></div><div class="cap">Drama Masks</div></div>
+  <div class="cell"><div class="tile"><img src="../assets/Flower.png" alt="Flower"></div><div class="cap">Flower</div></div>
+  <div class="cell"><div class="tile"><img src="../assets/Hearts.png" alt="Hearts"></div><div class="cap">Hearts</div></div>
+  <div class="cell"><div class="tile"><img src="../assets/MarriedCouple.png" alt="Married Couple"></div><div class="cap">Married Couple</div></div>
+  <div class="cell"><div class="tile" style="background:rgba(255,255,255,0.9);"><img src="../assets/12twentylogo.png" alt="12Twenty"></div><div class="cap">12Twenty</div></div>
+</div>
+
+<div class="section-label">In-context usage · how these show up on the website</div>
+<div class="contexts">
+
+  <div>
+    <div class="ctx hero">
+      <div class="wm"><img src="../assets/Fingerprint.png" alt=""></div>
+      <div style="position:relative;z-index:1;">
+        <h2>Your career<br>fingerprint.</h2>
+        <div class="sup">71% aligned to biotech product · updated hourly</div>
+      </div>
+    </div>
+    <div class="ctx-label">A · Hero watermark — 12% opacity, bleeds off canvas</div>
+  </div>
+
+  <div>
+    <div class="ctx">
+      <div class="wm"><img src="../assets/OakTree.png" alt=""></div>
+      <div style="position:relative;z-index:1;">
+        <div class="eyebrow">Section 02</div>
+        <h3>Alumni roots.</h3>
+        <p>Four decades of Tulane graduates, indexed and searchable. When an alum changes roles, your students hear first.</p>
+      </div>
+    </div>
+    <div class="ctx-label">B · Section header watermark — 14% opacity, top-right anchor</div>
+  </div>
+
+  <div>
+    <div class="ctx divider">
+      <div class="row">
+        <div class="line"></div>
+        <div class="orn"><img src="../assets/Flower.png" alt=""></div>
+        <div class="line"></div>
+      </div>
+      <div class="lab">Part II · The Product</div>
+    </div>
+    <div class="ctx-label">C · Chapter divider — ornament between hairlines, 85% opacity</div>
+  </div>
+
+  <div>
+    <div class="ctx card-demo">
+      <div class="card">
+        <div class="bg"><img src="../assets/Band.png" alt=""></div>
+        <div style="position:relative;z-index:1;">
+          <div class="eyebrow">Placement rate</div>
+          <div class="n">73.2<span style="font-size:20px;color:var(--brass-deep);">%</span></div>
+          <div class="d">Tulane graduates placed within 90 days, Q3 2025 cohort.</div>
+        </div>
+      </div>
+    </div>
+    <div class="ctx-label">D · Stat card accent — tucked into bottom-right, 10% opacity</div>
+  </div>
+
+</div>
+
+<div class="desc">Rules of use: never pair two ornaments on the same page fold; never tint — use the native sepia; never reduce below 10% (the image vanishes) or above 30% (it competes with content). The 12Twenty logo is a partner mark and follows its own guidelines — not an ornament.</div>
+
+</body></html>

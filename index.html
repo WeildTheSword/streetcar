@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Streetcar · Design System</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  :root {
+    --pad: clamp(32px, 5vw, 96px);
+    --ink: #1a1a1a;
+    --ink-2: #3a3a3a;
+    --muted: #7a7a7a;
+    --paper: #fafaf9;
+    --paper-2: #f4f4f2;
+    --line: #e8e8e5;
+    --line-strong: #d4d4d0;
+    --mg-purple: #6B2E82;
+    --mg-purple-deep: #4A1F5C;
+    --mg-green:  #2F6B3E;
+    --mg-gold:   #C29A3E;
+    --mg-gold-bright: #E8C547;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html, body { margin:0; padding:0; min-height:100%; background: var(--paper); }
+  body {
+    font-family: -apple-system, 'Inter var', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; }
+
+  /* ---------------- Top nav bar ---------------- */
+  .topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(250,250,249,0.85);
+    backdrop-filter: saturate(140%) blur(12px);
+    -webkit-backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px var(--pad);
+    font-size: 13px; font-weight: 500;
+  }
+  .topnav .brand { display:flex; align-items:center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
+  .topnav .brand .dot { width: 10px; height: 10px; border-radius: 2px; background: linear-gradient(135deg, var(--mg-purple) 0%, var(--mg-purple) 33%, var(--mg-green) 33%, var(--mg-green) 66%, var(--mg-gold-bright) 66%); }
+  .topnav .links { display:flex; gap: 28px; color: var(--muted); }
+  .topnav .links a { text-decoration:none; transition: color 180ms var(--ease); }
+  .topnav .links a:hover { color: var(--ink); }
+  .topnav .tag { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* ---------------- Hero ---------------- */
+  .hero {
+    padding: 120px var(--pad) 96px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 80px;
+    align-items: end;
+  }
+  .hero::before {
+    content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg,
+      var(--mg-purple) 0%, var(--mg-purple) 33%,
+      var(--mg-green) 33%, var(--mg-green) 66%,
+      var(--mg-gold-bright) 66%, var(--mg-gold-bright) 100%);
+  }
+  .hero .eyebrow {
+    display:inline-flex; align-items:center; gap:10px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--mg-purple);
+    margin-bottom: 24px;
+  }
+  .hero .eyebrow::before {
+    content:''; width:8px; height:8px; border-radius:999px;
+    background: var(--mg-purple);
+  }
+  .hero h1 {
+    font-size: clamp(56px, 8.5vw, 132px); font-weight: 700;
+    letter-spacing: -0.035em; line-height: 0.98;
+    margin: 0 0 24px; color: var(--ink);
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--mg-purple) 0%, var(--mg-green) 60%, var(--mg-gold) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .lede {
+    font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; color: var(--ink-2);
+    max-width: 620px; font-weight: 400;
+  }
+  .hero .meta-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+    padding: 28px 0 4px;
+  }
+  .hero .meta-grid .cell { }
+  .hero .meta-grid .k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+  .hero .meta-grid .v { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .hero .meta-grid .v .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; background: #ecf6ef; color: var(--mg-green); margin-left: 6px; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+
+  /* ---------------- Quote band ---------------- */
+  .pullband {
+    padding: 80px var(--pad);
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-2);
+  }
+  .pullband-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 64px; align-items: stretch;
+  }
+  .pullband-text { display: flex; flex-direction: column; justify-content: center; }
+  .pullband q {
+    display:block; quotes: none;
+    font-size: clamp(28px, 3.2vw, 46px); font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1.15; color: var(--ink);
+  }
+  .pullband q::before, .pullband q::after { content: none; }
+  .pullband q strong { color: var(--mg-purple); font-weight: 600; }
+  .pullband .cite { margin-top: 24px; font-size: 13px; color: var(--muted); font-weight: 500; }
+  .map-fig {
+    position: relative; aspect-ratio: 1/1;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 24px;
+    height: 100%;
+    margin-left: auto;
+    max-width: 100%;
+  }
+  .map-fig .tag {
+    position: absolute; top: 14px; left: 20px;
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+  }
+  .map-fig .coord {
+    position: absolute; bottom: 14px; right: 20px;
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .map-fig svg { width: 100%; height: 100%; display: block; }
+  @media (max-width: 900px) {
+    .pullband-inner { grid-template-columns: 1fr; gap: 32px; }
+    .map-fig { max-width: 260px; margin-left: 0; height: auto; }
+  }
+
+  /* ---------------- Section heading ---------------- */
+  .section-head {
+    padding: 96px var(--pad) 32px;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 40px;
+    flex-wrap: wrap;
+  }
+  .section-head .left h2 {
+    font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1.05; color: var(--ink);
+    margin: 10px 0 8px;
+  }
+  .section-head .left .num {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .section-head .left .num .tick { display:inline-block; width:24px; height:1px; background: var(--line-strong); vertical-align: middle; margin-right: 12px; }
+  .section-head .right {
+    font-size: 15px; color: var(--muted); line-height: 1.5; max-width: 480px;
+  }
+
+  /* ---------------- Card grid ---------------- */
+  .grid {
+    padding: 0 var(--pad) 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    transition: transform 320ms var(--ease), box-shadow 320ms var(--ease), border-color 320ms var(--ease);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 44px -22px rgba(20,20,20,0.18), 0 4px 12px -6px rgba(20,20,20,0.06);
+    border-color: var(--line-strong);
+  }
+  .card .thumb {
+    aspect-ratio: 4 / 3;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    position: relative;
+    background: var(--paper-2);
+  }
+  .card .thumb iframe {
+    width: 200%; height: 200%;
+    transform: scale(0.5); transform-origin: top left;
+    border: 0; pointer-events: none;
+  }
+  .card .thumb::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.015) 100%);
+    pointer-events: none;
+  }
+  .card .body {
+    padding: 20px 22px 22px;
+    display:flex; flex-direction:column; gap: 6px;
+    position: relative;
+  }
+  .card .cart {
+    display:flex; align-items:center; gap: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .card .cart::before {
+    content:''; width:6px; height:6px; border-radius: 999px; background: var(--accent, var(--mg-purple));
+  }
+  .card[data-accent="purple"] { --accent: var(--mg-purple); }
+  .card[data-accent="green"]  { --accent: var(--mg-green); }
+  .card[data-accent="gold"]   { --accent: var(--mg-gold); }
+  .card h3 {
+    font-size: 20px; font-weight: 600; color: var(--ink);
+    margin: 2px 0 0; letter-spacing: -0.015em; line-height: 1.2;
+  }
+  .card p {
+    font-size: 14px; color: var(--muted); line-height: 1.5; margin: 2px 0 0;
+    font-weight: 400;
+  }
+  .card .arr {
+    position: absolute; top: 20px; right: 20px;
+    width: 30px; height: 30px; border-radius: 999px;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--muted); background: var(--paper-2);
+    transition: all 260ms var(--ease);
+  }
+  .card:hover .arr { background: var(--ink); color: #fff; transform: translate(2px, -2px); }
+  .card .arr svg { width: 13px; height: 13px; }
+
+  /* Flagship cards for products */
+  .grid.flagship { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 24px; }
+  .grid.flagship .card .thumb { aspect-ratio: 16 / 10; }
+  .grid.flagship .card h3 { font-size: 26px; }
+  .grid.flagship .card p { font-size: 15px; }
+
+  /* ---------------- Manifest table ---------------- */
+  .manifest {
+    padding: 0 var(--pad) 120px;
+  }
+  .manifest table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .manifest th, .manifest td {
+    text-align: left; padding: 16px 24px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink-2);
+    vertical-align: top;
+  }
+  .manifest tr:last-child td { border-bottom: 0; }
+  .manifest th {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    background: var(--paper-2);
+  }
+  .manifest td code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 13px; color: var(--ink);
+    background: var(--paper-2); padding: 2px 6px; border-radius: 4px;
+  }
+  .manifest td .note { color: var(--muted); }
+
+  /* ---------------- Colophon ---------------- */
+  .colophon {
+    border-top: 1px solid var(--line);
+    padding: 36px var(--pad) 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: var(--paper-2);
+  }
+  .colophon .brand { font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .colophon .swatch-row { display:flex; gap: 6px; }
+  .colophon .swatch-row i { display:inline-block; width: 14px; height: 14px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- =================== TOP NAV =================== -->
+<nav class="topnav">
+  <div class="brand"><span class="dot"></span> Streetcar · Design System</div>
+  <div class="links">
+    <a href="#foundations">Foundations</a>
+    <a href="#components">Components</a>
+    <a href="#brand">Brand</a>
+    <a href="#products">Products</a>
+    <a href="#manifest">Manifest</a>
+  </div>
+  <div class="tag">v1.0 · 2026</div>
+</nav>
+
+<!-- =================== HERO =================== -->
+<header class="hero">
+  <div>
+    <div class="eyebrow">The Streetcar Design System</div>
+    <h1>NOLA roots.<br><em>Global hustle.</em></h1>
+    <p class="lede">A modern identity and product system for an AI-powered career navigator. Built for Tulane University — and every school that follows.</p>
+  </div>
+  <div class="meta-grid">
+    <div class="cell"><div class="k">Pilot</div><div class="v">Tulane <span class="pill">Live Q1 2026</span></div></div>
+    <div class="cell"><div class="k">Components</div><div class="v">17 preview cards</div></div>
+    <div class="cell"><div class="k">Products</div><div class="v">Navigator · Portal · Slides</div></div>
+    <div class="cell"><div class="k">Palette</div><div class="v">Matte paper + Mardi Gras</div></div>
+  </div>
+</header>
+
+<!-- =================== QUOTE BAND =================== -->
+<section class="pullband">
+  <div class="pullband-inner">
+    <div class="pullband-text">
+      <q>Career consultants help navigate.<br><strong>Streetcar is the map.</strong></q>
+      <div class="cite">The founding principle behind every component in this system</div>
+    </div>
+    <figure class="map-fig">
+      <span class="tag">St. Charles Line</span>
+      <span class="coord">29.94° N · 90.13° W</span>
+      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M20 0 L0 0 L0 20" fill="none" stroke="#ece6d8" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="300" height="300" fill="url(#grid)"/>
+        <!-- river curve (Mississippi) -->
+        <path d="M -10 240 Q 80 210 140 230 T 310 180" fill="none" stroke="#b8935a" stroke-width="14" stroke-opacity="0.18" stroke-linecap="round"/>
+        <path d="M -10 240 Q 80 210 140 230 T 310 180" fill="none" stroke="#8a6b3c" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="2 4"/>
+        <!-- neighborhood blocks -->
+        <g fill="none" stroke="#d9d2c2" stroke-width="0.7">
+          <path d="M40 40 L260 60"/>
+          <path d="M30 80 L255 95"/>
+          <path d="M25 120 L250 130"/>
+          <path d="M60 30 L90 270"/>
+          <path d="M110 25 L135 255"/>
+          <path d="M170 30 L190 240"/>
+          <path d="M220 40 L235 210"/>
+        </g>
+        <!-- streetcar line — hero route -->
+        <path d="M 40 260 Q 80 240 110 200 T 180 130 Q 210 100 260 60" fill="none" stroke="#4a1a6b" stroke-width="3" stroke-linecap="round"/>
+        <!-- stops -->
+        <g fill="#f4efe2" stroke="#4a1a6b" stroke-width="1.8">
+          <circle cx="40" cy="260" r="5"/>
+          <circle cx="110" cy="200" r="4"/>
+          <circle cx="150" cy="165" r="4"/>
+          <circle cx="180" cy="130" r="4"/>
+          <circle cx="215" cy="95" r="4"/>
+          <circle cx="260" cy="60" r="5"/>
+        </g>
+        <!-- destination star -->
+        <g transform="translate(260 60)">
+          <circle r="12" fill="#f4efe2" stroke="#4a1a6b" stroke-width="1.5"/>
+          <path d="M0 -6 L1.5 -1.5 L6 -1.5 L2.5 1.5 L4 6 L0 3 L-4 6 L-2.5 1.5 L-6 -1.5 L-1.5 -1.5 Z" fill="#d4a43a" stroke="#8a6b3c" stroke-width="0.6" stroke-linejoin="round"/>
+        </g>
+        <!-- origin pin -->
+        <g transform="translate(40 260)">
+          <circle r="3" fill="#5a1f2b"/>
+        </g>
+        <!-- compass -->
+        <g transform="translate(38 38)">
+          <circle r="14" fill="#f4efe2" stroke="#8a6b3c" stroke-width="0.8"/>
+          <path d="M0 -10 L3 0 L0 10 L-3 0 Z" fill="#5a1f2b" stroke="#5a1f2b" stroke-width="0.5" stroke-linejoin="round"/>
+          <text x="0" y="-16" font-family="Georgia, serif" font-size="7" text-anchor="middle" fill="#8a6b3c" font-style="italic">N</text>
+        </g>
+        <!-- label -->
+        <text x="150" y="295" font-family="Georgia, serif" font-style="italic" font-size="10" text-anchor="middle" fill="#8a6b3c">carondelet · canal · riverbend</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- =================== FOUNDATIONS =================== -->
+<section id="foundations" class="section-head">
+  <div class="left">
+    <div class="num"><span class="tick"></span>01 · Foundations</div>
+    <h2>Type, color &amp; rhythm</h2>
+  </div>
+  <div class="right">The grammar that precedes every interface — three typefaces, a matte paper base, and Mardi Gras purple, green, and gold used with intention.</div>
+</section>
+
+<section class="grid">
+  <a class="card" data-accent="purple" href="preview/type-display.html" target="_blank">
+    <div class="thumb"><iframe src="preview/type-display.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Typography · I</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Display Serif</h3>
+      <p>Playfair Display 800–900 — headlines, stat numerals, chapter titles.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="purple" href="preview/type-italic.html" target="_blank">
+    <div class="thumb"><iframe src="preview/type-italic.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Typography · II</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Editorial Voice</h3>
+      <p>Cormorant Garamond italic 500 — pull-quotes and pre-brief narration.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="purple" href="preview/type-labels.html" target="_blank">
+    <div class="thumb"><iframe src="preview/type-labels.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Typography · III</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Label Caps</h3>
+      <p>Cinzel 500 — eyebrows, labels, page numbers, metadata.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="purple" href="preview/type-scale.html" target="_blank">
+    <div class="thumb"><iframe src="preview/type-scale.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Typography · IV</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Type Scale</h3>
+      <p>Display, editorial, body, label — the full hierarchy in one view.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="gold" href="preview/colors-core.html" target="_blank">
+    <div class="thumb"><iframe src="preview/colors-core.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Palette · V</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Core Palette</h3>
+      <p>Cream, espresso, ink, brass, burgundy — the five that do the work.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="gold" href="preview/colors-mardi-gras.html" target="_blank">
+    <div class="thumb"><iframe src="preview/colors-mardi-gras.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Palette · VI</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Mardi Gras Accents</h3>
+      <p>Purple, green, gold — illustration only, one at a time.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="gold" href="preview/colors-semantic.html" target="_blank">
+    <div class="thumb"><iframe src="preview/colors-semantic.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Palette · VII</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Semantic Roles</h3>
+      <p>Paper, ink, rule, accent — how the palette maps onto UI intent.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="preview/spacing-scale.html" target="_blank">
+    <div class="thumb"><iframe src="preview/spacing-scale.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Rhythm · VIII</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Spacing Scale</h3>
+      <p>4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96. Whitespace as composition.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="preview/borders-frames.html" target="_blank">
+    <div class="thumb"><iframe src="preview/borders-frames.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Rhythm · IX</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Borders &amp; Frames</h3>
+      <p>1px brass hairlines, double-rule playbill frames, cartouches.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="preview/motion.html" target="_blank">
+    <div class="thumb"><iframe src="preview/motion.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Rhythm · X</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Motion &amp; Easing</h3>
+      <p>One curve, one direction — rise-fade on cubic-bezier(0.16, 1, 0.3, 1).</p>
+    </div>
+  </a>
+</section>
+
+<!-- =================== COMPONENTS =================== -->
+<section id="components" class="section-head">
+  <div class="left">
+    <div class="num"><span class="tick"></span>02 · Components</div>
+    <h2>Buttons, cards, forms, stats</h2>
+  </div>
+  <div class="right">Flat surfaces, hairlined borders, one accent color at a time. Every element earns its place in the interface.</div>
+</section>
+
+<section class="grid">
+  <a class="card" data-accent="purple" href="preview/components-buttons.html" target="_blank">
+    <div class="thumb"><iframe src="preview/components-buttons.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Components · XI</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Buttons &amp; CTAs</h3>
+      <p>Espresso primary, hairlined secondary, brass arrow navigator.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="preview/components-cards.html" target="_blank">
+    <div class="thumb"><iframe src="preview/components-cards.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Components · XII</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Cards &amp; Cartouches</h3>
+      <p>Flat panels, hairlined, with protruding small-caps labels.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="gold" href="preview/components-forms.html" target="_blank">
+    <div class="thumb"><iframe src="preview/components-forms.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Components · XIII</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Inputs &amp; Forms</h3>
+      <p>Underline fields, hairlined selects, FERPA-aware consent blocks.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="purple" href="preview/components-stat.html" target="_blank">
+    <div class="thumb"><iframe src="preview/components-stat.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Components · XIV</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Stat Rings</h3>
+      <p>Big burgundy numerals, brass ring gauges, small-caps captions.</p>
+    </div>
+  </a>
+</section>
+
+<!-- =================== BRAND =================== -->
+<section id="brand" class="section-head">
+  <div class="left">
+    <div class="num"><span class="tick"></span>03 · Brand</div>
+    <h2>Logo, engravings, imagery</h2>
+  </div>
+  <div class="right">The streetcar wordmark, sepia ornaments, and a library of engraved illustrations — the visual vocabulary that makes Streetcar recognizable at a glance.</div>
+</section>
+
+<section class="grid">
+  <a class="card" data-accent="gold" href="preview/brand-logo.html" target="_blank">
+    <div class="thumb"><iframe src="preview/brand-logo.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Brand · XV</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>The Wordmark</h3>
+      <p>Streetcar — engraved car, fleur-de-lis divider, small-caps tagline.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="preview/brand-illustrations.html" target="_blank">
+    <div class="thumb"><iframe src="preview/brand-illustrations.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Brand · XVI</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Engraved Plates</h3>
+      <p>Twelve SVG engravings — cathedral, compass, live oak, streetcar route.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="purple" href="preview/brand-png-art.html" target="_blank">
+    <div class="thumb"><iframe src="preview/brand-png-art.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Brand · XVII</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Sepia Ornaments</h3>
+      <p>Full-color PNG brand art — fingerprint, oak tree, band, drama masks.</p>
+    </div>
+  </a>
+</section>
+
+<!-- =================== PRODUCTS =================== -->
+<section id="products" class="section-head">
+  <div class="left">
+    <div class="num"><span class="tick"></span>04 · Products</div>
+    <h2>The system, rendered</h2>
+  </div>
+  <div class="right">Three reference implementations — the consultant console, the student-facing portal, and the editorial slide templates.</div>
+</section>
+
+<section class="grid flagship">
+  <a class="card" data-accent="purple" href="ui_kits/navigator/NavigatorConsole.html" target="_blank">
+    <div class="thumb"><iframe src="ui_kits/navigator/NavigatorConsole.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Product · One</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Navigator Console</h3>
+      <p>The consultant-facing UI — student lookup, pre-briefs, alumni radar, session recap.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="green" href="ui_kits/student/StudentPortal.html" target="_blank">
+    <div class="thumb"><iframe src="ui_kits/student/StudentPortal.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Product · Two</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Student Portal</h3>
+      <p>Course paths, alumni introductions, a career fingerprint the student can read.</p>
+    </div>
+  </a>
+  <a class="card" data-accent="gold" href="slides/SampleSlides.html" target="_blank">
+    <div class="thumb"><iframe src="slides/SampleSlides.html" loading="lazy"></iframe></div>
+    <div class="body">
+      <div class="cart">Product · Three</div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Editorial Slides</h3>
+      <p>Five playbill slide templates — cover, stat, pull-quote, modules, the ask.</p>
+    </div>
+  </a>
+</section>
+
+<!-- =================== MANIFEST =================== -->
+<section id="manifest" class="section-head">
+  <div class="left">
+    <div class="num"><span class="tick"></span>05 · Manifest</div>
+    <h2>Files &amp; folders</h2>
+  </div>
+  <div class="right">Every artifact in this system and what it does.</div>
+</section>
+
+<section class="manifest">
+  <table>
+    <thead>
+      <tr><th style="width: 28%;">File / Folder</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>README.md</code></td><td>Brand, content, visual, iconography guidelines — the primary reference document.</td></tr>
+      <tr><td><code>SKILL.md</code></td><td>Claude Code skill manifest — invoke-ready design brief.</td></tr>
+      <tr><td><code>colors_and_type.css</code></td><td>CSS custom properties, <code>@font-face</code> declarations, semantic element styles.</td></tr>
+      <tr><td><code>fonts/</code></td><td>Playfair Display, Cormorant Garamond, Cinzel — TTFs and licenses.</td></tr>
+      <tr><td><code>assets/</code></td><td>Logo, PNG brand art, <code>illustrations/</code> SVG engravings.</td></tr>
+      <tr><td><code>preview/</code></td><td><span class="note">Design-system review cards — type, color, spacing, components, brand.</span></td></tr>
+      <tr><td><code>ui_kits/navigator/</code></td><td>Navigator Console UI kit — the consultant-facing product.</td></tr>
+      <tr><td><code>ui_kits/student/</code></td><td>Student Portal UI kit — the student-facing opt-in.</td></tr>
+      <tr><td><code>slides/</code></td><td>Editorial slide templates — cover, stat, quote, modules, ask.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- =================== COLOPHON =================== -->
+<footer class="colophon">
+  <div class="brand">Streetcar · Design System</div>
+  <div>NOLA Roots. Global Hustle.</div>
+  <div class="swatch-row">
+    <i style="background: var(--mg-purple)"></i>
+    <i style="background: var(--mg-green)"></i>
+    <i style="background: var(--mg-gold-bright)"></i>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <title>Magnolia Blossom · Streetcar</title>
+  <defs>
+    <pattern id="hatch-m" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#2A1A12" stroke-width="0.5" opacity="0.22"></line>
+    </pattern>
+  </defs>
+
+  <circle cx="300" cy="300" r="268" fill="none" stroke="#B8935A" stroke-width="1" opacity="0.55"></circle>
+  <circle cx="300" cy="300" r="254" fill="none" stroke="#B8935A" stroke-width="0.6" opacity="0.3"></circle>
+
+  <g stroke="#2A1A12" stroke-linecap="round" stroke-linejoin="round">
+    
+    <g fill="#2F6B3E" fill-opacity="0.22" stroke="#2A1A12" stroke-width="1.6">
+      
+      <path d="M 180 400&#xA;               C 150 395 115 410 105 440&#xA;               C 130 445 175 430 195 410&#xA;               C 192 405 188 402 180 400 Z"></path>
+      
+      <path d="M 420 400&#xA;               C 450 395 485 410 495 440&#xA;               C 470 445 425 430 405 410&#xA;               C 408 405 412 402 420 400 Z"></path>
+      
+      <path d="M 200 280&#xA;               C 155 260 110 268 100 300&#xA;               C 140 315 180 300 210 290&#xA;               C 208 286 204 282 200 280 Z"></path>
+      
+      <path d="M 400 280&#xA;               C 445 260 490 268 500 300&#xA;               C 460 315 420 300 390 290&#xA;               C 392 286 396 282 400 280 Z"></path>
+      
+      <path d="M 230 185&#xA;               C 200 160 165 165 160 195&#xA;               C 190 210 225 200 245 195&#xA;               C 242 190 236 186 230 185 Z"></path>
+      
+      <path d="M 370 185&#xA;               C 400 160 435 165 440 195&#xA;               C 410 210 375 200 355 195&#xA;               C 358 190 364 186 370 185 Z"></path>
+    </g>
+
+    
+    <g stroke="#2A1A12" stroke-width="0.8" opacity="0.7" fill="none">
+      <path d="M 190 418 L 115 435"></path>
+      <path d="M 190 418 L 125 425"></path>
+      <path d="M 190 418 L 140 445"></path>
+      <path d="M 410 418 L 485 435"></path>
+      <path d="M 410 418 L 475 425"></path>
+      <path d="M 410 418 L 460 445"></path>
+      <path d="M 205 290 L 115 297"></path>
+      <path d="M 205 290 L 125 285"></path>
+      <path d="M 205 290 L 140 308"></path>
+      <path d="M 395 290 L 485 297"></path>
+      <path d="M 395 290 L 475 285"></path>
+      <path d="M 395 290 L 460 308"></path>
+      <path d="M 240 195 L 170 185"></path>
+      <path d="M 240 195 L 175 205"></path>
+      <path d="M 360 195 L 430 185"></path>
+      <path d="M 360 195 L 425 205"></path>
+    </g>
+
+    
+    <g fill="#F5EDE0" stroke-width="2.2">
+      <path d="M 300 195&#xA;               C 230 195 190 260 200 310&#xA;               C 230 310 270 285 300 270&#xA;               C 330 285 370 310 400 310&#xA;               C 410 260 370 195 300 195 Z"></path>
+    </g>
+    <path d="M 300 195&#xA;             C 230 195 190 260 200 310&#xA;             C 230 310 270 285 300 270&#xA;             C 330 285 370 310 400 310&#xA;             C 410 260 370 195 300 195 Z" fill="url(#hatch-m)" stroke="none"></path>
+    <g stroke="#2A1A12" stroke-width="1" opacity="0.6" fill="none">
+      <path d="M 300 195 C 290 230 285 260 295 280"></path>
+      <path d="M 300 195 C 310 230 315 260 305 280"></path>
+      <path d="M 260 205 C 255 240 260 275 275 290"></path>
+      <path d="M 340 205 C 345 240 340 275 325 290"></path>
+    </g>
+
+    
+    <g fill="#F5EDE0" stroke-width="2.2">
+      <path d="M 220 270&#xA;               C 165 275 150 340 200 380&#xA;               C 240 375 280 340 290 310&#xA;               C 280 290 260 270 220 270 Z"></path>
+      <path d="M 380 270&#xA;               C 435 275 450 340 400 380&#xA;               C 360 375 320 340 310 310&#xA;               C 320 290 340 270 380 270 Z"></path>
+    </g>
+    <g stroke="#2A1A12" stroke-width="1" opacity="0.6" fill="none">
+      <path d="M 220 270 C 210 300 210 340 220 370"></path>
+      <path d="M 380 270 C 390 300 390 340 380 370"></path>
+      <path d="M 200 330 C 225 330 255 325 280 318"></path>
+      <path d="M 400 330 C 375 330 345 325 320 318"></path>
+    </g>
+
+    
+    <g fill="#F5EDE0" stroke-width="2.2">
+      <path d="M 250 320&#xA;               C 225 330 210 370 240 400&#xA;               C 260 405 290 390 300 370&#xA;               C 295 345 280 325 250 320 Z"></path>
+      <path d="M 350 320&#xA;               C 375 330 390 370 360 400&#xA;               C 340 405 310 390 300 370&#xA;               C 305 345 320 325 350 320 Z"></path>
+    </g>
+    <g stroke="#2A1A12" stroke-width="1" opacity="0.55" fill="none">
+      <path d="M 258 325 C 250 355 255 385 268 395"></path>
+      <path d="M 342 325 C 350 355 345 385 332 395"></path>
+    </g>
+
+    
+    <ellipse cx="300" cy="335" rx="28" ry="22" fill="#F5EDE0" stroke="#2A1A12" stroke-width="2"></ellipse>
+    
+    <ellipse cx="300" cy="335" rx="18" ry="14" fill="#C29A3E" stroke="#8A6B3C" stroke-width="1.4"></ellipse>
+    
+    <g stroke="#8A6B3C" stroke-width="1" fill="#C29A3E">
+      <g transform="rotate(0 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(30 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(60 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(90 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(120 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(150 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(180 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(210 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(240 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(270 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(300 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+      <g transform="rotate(330 300 335)">
+        <line x1="300" y1="320" x2="300" y2="310" stroke-width="1"></line>
+        <circle cx="300" cy="308" r="2"></circle>
+      </g>
+    </g>
+    
+    <g fill="#8A6B3C">
+      <circle cx="294" cy="332" r="1.2"></circle>
+      <circle cx="302" cy="330" r="1.2"></circle>
+      <circle cx="308" cy="334" r="1.2"></circle>
+      <circle cx="296" cy="338" r="1.2"></circle>
+      <circle cx="304" cy="340" r="1.2"></circle>
+    </g>
+
+    
+    <path d="M 300 405 L 300 475" fill="none" stroke-width="2.4"></path>
+    <path d="M 300 440 Q 315 432 320 420" fill="none" stroke-width="1.6"></path>
+
+    
+    <circle cx="340" cy="310" r="3.5" fill="#6B2E82" fill-opacity="0.45" stroke="#6B2E82" stroke-width="0.8"></circle>
+    <circle cx="341" cy="309" r="1" fill="#F5EDE0" stroke="none"></circle>
+  </g>
+</svg>
