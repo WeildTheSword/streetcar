@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot Backend",
+      "request": "launch",
+      "mainClass": "com.streetcar.backend.BackendApplication",
+      "projectName": "backend"
+    },
+    {
+      "type": "node",
+      "name": "React Frontend",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack",
+      "configurations": ["Spring Boot Backend", "React Frontend"]
+    }
+  ]
+}
