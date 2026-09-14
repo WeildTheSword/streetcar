@@ -1,3 +1,36 @@
+.collection {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px;
+  text-align: left;
+}
+
+.collection fieldset {
+  border: 1px solid var(--border);
+  margin: 24px 0;
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.collection input,
+.collection textarea,
+.collection button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.collection button { cursor: pointer; background: var(--accent-bg); }
+.collection button:disabled { cursor: wait; opacity: 0.6; }
+.collection li { margin-bottom: 16px; overflow-wrap: anywhere; }
+.collection [role="alert"] { color: var(--text-h); border-left: 3px solid var(--accent); padding: 8px; }
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
