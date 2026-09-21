@@ -85,3 +85,16 @@ As Sarah, I want to compare courses so that I could choose the most appropriate 
 - Predictions on career or jobs
 
 **MVP goal:** This MVP would allow users to use their academic and historical career data to choose more suitable classes. The system would show patterns and recommendations, but it would not predict any career or job based on it.
+## Diagrams
+
+### Package Diagram
+
+How the React frontend folders and the Spring Boot backend packages depend on each other. Source: [package-diagram.drawio](package-diagram.drawio).
+
+![Package diagram](package-diagram.png)
+
+### Sequence Diagram
+
+A student saving their academic profile, from the form through the REST API to the database. Source: [sequence-diagram.drawio](sequence-diagram.drawio).
+
+![Sequence diagram](sequence-diagram.png)
