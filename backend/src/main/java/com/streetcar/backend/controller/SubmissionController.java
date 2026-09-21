@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/submissions")
@@ -25,9 +26,31 @@ public class SubmissionController {
         return service.getAll();
     }
 
+    @GetMapping("/{id}")
+    public Submission getById(@PathVariable long id) {
+        return service.getById(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Submission create(@RequestBody Submission input) {
+        validate(input);
+        return service.create(input);
+    }
+
+    @PutMapping("/{id}")
+    public Submission update(@PathVariable long id, @RequestBody Submission input) {
+        validate(input);
+        return service.update(id, input);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable long id) {
+        service.delete(id);
+    }
+
+    private void validate(Submission input) {
         if (input.gpa() == null || input.gpa().compareTo(BigDecimal.ZERO) < 0
                 || input.gpa().compareTo(new BigDecimal("4")) > 0
                 || input.gpa().stripTrailingZeros().scale() > 2
@@ -35,7 +58,6 @@ public class SubmissionController {
                 || !validText(input.major(), 120) || !validText(input.careerGoal(), 200)) {
             throw new IllegalArgumentException();
         }
-        return service.create(input);
     }
 
     private boolean validText(String value, int max) {
@@ -47,6 +69,12 @@ public class SubmissionController {
         return ResponseEntity.badRequest().body(Map.of("message",
                 "Provide GPA (0–4, at most two decimals), completed courses (up to 2000 characters), "
                 + "major (up to 120), and career goal (up to 200)."));
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Map<String, String>> notFound() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Submission not found."));
     }
 
     @ExceptionHandler(DataAccessException.class)
