@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createSubmission, fetchSubmissions } from "../services/submissionService";
+import { createSubmission, deleteSubmission, fetchSubmissions, updateSubmission } from "../services/submissionService";
 import "../App.css";
 
 export default function SubmissionsPage() {
@@ -9,6 +9,9 @@ export default function SubmissionsPage() {
   const [error, setError] = useState("");
   const [loadError, setLoadError] = useState("");
   const [message, setMessage] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [busyId, setBusyId] = useState(null);
+  const [listError, setListError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -42,6 +45,41 @@ export default function SubmissionsPage() {
     }
   }
 
+  async function saveEdit(event, id) {
+    event.preventDefault();
+    const values = Object.fromEntries(new FormData(event.currentTarget));
+    setListError("");
+    if ([values.completedCourses, values.major, values.careerGoal].some((value) => !value.trim())) {
+      setListError("Please fill in every field. Enter None if no courses are completed.");
+      return;
+    }
+    setBusyId(id);
+    try {
+      const updated = await updateSubmission(id, { ...values, gpa: Number(values.gpa) });
+      setRecords((previous) => previous.map((record) => (record.id === id ? updated : record)));
+      setEditingId(null);
+    } catch (err) {
+      setListError(err.message || "Could not save changes. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function remove(id) {
+    if (!window.confirm("Delete this profile? This cannot be undone.")) return;
+    setListError("");
+    setBusyId(id);
+    try {
+      await deleteSubmission(id);
+      setRecords((previous) => previous.filter((record) => record.id !== id));
+      if (editingId === id) setEditingId(null);
+    } catch (err) {
+      setListError(err.message || "Could not delete. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <section className="collection" aria-labelledby="collection-title">
       <h1 id="collection-title">Academic Profile</h1>
@@ -66,12 +104,41 @@ export default function SubmissionsPage() {
       {loading && <p role="status">Loading submissions…</p>}
       {loadError && <p role="alert">{loadError}</p>}
       {!loading && !loadError && records.length === 0 && <p>No profiles submitted yet.</p>}
+      {listError && <p role="alert">{listError}</p>}
       <ul>
         {records.map((record) => (
           <li key={record.id}>
-            <strong>{record.major} — {record.careerGoal}</strong>
-            <p>GPA: {record.gpa} · Completed courses: {record.completedCourses}</p>
-            <small>Submitted {new Date(record.createdAt).toLocaleString()}</small>
+            {editingId === record.id ? (
+              <form onSubmit={(event) => saveEdit(event, record.id)}>
+                <fieldset disabled={busyId === record.id}>
+                  <legend>Edit profile</legend>
+                  <label htmlFor={`gpa-${record.id}`}>GPA (0–4)</label>
+                  <input id={`gpa-${record.id}`} name="gpa" type="number" min="0" max="4" step="0.01" defaultValue={record.gpa} required />
+                  <label htmlFor={`completedCourses-${record.id}`}>Completed courses (or None)</label>
+                  <textarea id={`completedCourses-${record.id}`} name="completedCourses" maxLength={2000} defaultValue={record.completedCourses} required />
+                  <label htmlFor={`major-${record.id}`}>Major</label>
+                  <input id={`major-${record.id}`} name="major" maxLength={120} defaultValue={record.major} required />
+                  <label htmlFor={`careerGoal-${record.id}`}>Career goal</label>
+                  <input id={`careerGoal-${record.id}`} name="careerGoal" maxLength={200} defaultValue={record.careerGoal} required />
+                  <div className="actions">
+                    <button type="submit">{busyId === record.id ? "Saving…" : "Save changes"}</button>
+                    <button type="button" onClick={() => { setEditingId(null); setListError(""); }}>Cancel</button>
+                  </div>
+                </fieldset>
+              </form>
+            ) : (
+              <>
+                <strong>{record.major} — {record.careerGoal}</strong>
+                <p>GPA: {record.gpa} · Completed courses: {record.completedCourses}</p>
+                <small>Submitted {new Date(record.createdAt).toLocaleString()}</small>
+                <div className="actions">
+                  <button type="button" disabled={busyId === record.id} onClick={() => { setEditingId(record.id); setListError(""); }}>Edit</button>
+                  <button type="button" disabled={busyId === record.id} onClick={() => remove(record.id)}>
+                    {busyId === record.id ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>

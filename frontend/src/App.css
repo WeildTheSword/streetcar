@@ -29,6 +29,8 @@
 .collection button { cursor: pointer; background: var(--accent-bg); }
 .collection button:disabled { cursor: wait; opacity: 0.6; }
 .collection li { margin-bottom: 16px; overflow-wrap: anywhere; }
+.collection .actions { display: flex; gap: 8px; margin-top: 8px; }
+.collection .actions button { width: auto; padding: 6px 14px; }
 .collection [role="alert"] { color: var(--text-h); border-left: 3px solid var(--accent); padding: 8px; }
 
 .counter {
