@@ -9,3 +9,4 @@ data/
 *.trace.db
 dist/
 .local-cache/
+HANDOFF.md

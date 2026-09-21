@@ -6,7 +6,7 @@
 }
 
 .collection fieldset {
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-hairline-strong);
   margin: 24px 0;
   padding: 20px;
   display: grid;
@@ -21,15 +21,18 @@
   min-width: 0;
   padding: 10px;
   font: inherit;
-  color: var(--text-h);
-  background: var(--bg);
-  border: 1px solid var(--border);
+  color: var(--color-ink);
+  background: #fff;
+  border: 1px solid var(--color-hairline-strong);
 }
 
-.collection button { cursor: pointer; background: var(--accent-bg); }
+.collection button { cursor: pointer; background: var(--color-canvas); }
 .collection button:disabled { cursor: wait; opacity: 0.6; }
+.collection h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+.collection h2 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; }
+.collection label { font-size: 14px; font-weight: 500; }
 .collection li { margin-bottom: 16px; overflow-wrap: anywhere; }
-.collection [role="alert"] { color: var(--text-h); border-left: 3px solid var(--accent); padding: 8px; }
+.collection [role="alert"] { color: var(--color-ink); border-left: 3px solid var(--color-burgundy); padding: 8px; }
 
 .counter {
   font-size: 16px;
