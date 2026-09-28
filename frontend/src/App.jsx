@@ -7,6 +7,7 @@ import { AdvisorDashboard } from "@/pages/AdvisorDashboard";
 import { LoginPage } from "@/pages/LoginPage";
 import { OnboardingPage } from "@/pages/OnboardingPage";
 import { StudentDashboard } from "@/pages/StudentDashboard";
+import SubmissionsPage from "@/pages/SubmissionsPage";
 import { WelcomePage } from "@/pages/WelcomePage";
 
 /** Sends a signed-in user to their own side, and everyone else to sign-in. */
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingRedirect />} />
           <Route path="/sign-in" element={<LoginPage />} />
+          <Route path="/profiles" element={<SubmissionsPage />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/welcome" element={<WelcomePage />} />
