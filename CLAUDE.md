@@ -100,7 +100,7 @@ Work is tracked as Jira SCRUM tickets. Branches are named `SCRUM-<n>-<kebab-summ
 
 ### Task lifecycle — the course checklist
 
-This is a course project, and the instructor prescribes the lifecycle of every task. Source: the Canvas pages **"Checklist — Working a Task: Backlog to Merge"** and **"Code Reviews"** in CMPS-3300-01Fa26 Software Studio. Follow it for every ticket, in this order.
+This is a course project, and the instructor prescribes the lifecycle of every task. Sources: the Canvas pages **"Checklist — Working a Task: Backlog to Merge"**, **"Code Reviews"**, **"Practical Guide — Jira Setup"**, **"Practical Guide — GitHub Repository"** and **"Lecture — Scrum: Roles, Events & Artifacts"** in CMPS-3300-01Fa26 Software Studio. Follow it for every ticket, in this order.
 
 **1. Jira — pick up the task**
 - Open the active Sprint board, take an unassigned task from **To Do**, and assign it to yourself.
@@ -114,7 +114,8 @@ This is a course project, and the instructor prescribes the lifecycle of every t
 
 **3. GitHub — open and merge the PR**
 - Open a PR into `main` with a short description of what changed and why, and **request a teammate as reviewer**.
-- **At least one approving review is required**, enforced by branch protection. The reviewer reads the **Files changed** tab and submits **Approve** or **Request changes** through **Start a review**, so queued comments post together.
+- **At least one approving review is required**, enforced by branch protection, together with **required status checks**. The reviewer reads the **Files changed** tab and submits **Approve** or **Request changes** through **Start a review**, so queued comments post together. Reviews are specific and point at lines; approving without reading the diff defeats the requirement.
+- If changes are requested, **fix on the same branch** — same Jira key in the commit message, push, and the PR updates itself. Never open a second PR for the same task.
 - Resolve any conflicts.
 - Merge only once **approved and status checks pass**, then **delete the branch** using GitHub's prompt.
 
@@ -126,5 +127,31 @@ This is a course project, and the instructor prescribes the lifecycle of every t
 A task is not done when the code works locally. It is done when it is merged to `main`, linked in Jira, and moved to Done.
 
 **What this means for Claude specifically.** Do not approve a PR on the user's behalf when you wrote or amended commits on that branch — the approving review must come from a human who did not write the change, which is the entire point of the requirement. Prepare the work, push the branch, open the PR and report what needs review; leave the approval, and the Jira transitions, to the user or a teammate. Never merge before an approval and green checks exist, and delete the branch after merging.
+
+### Jira conventions
+
+- **The Jira link is mandatory and graded.** Every commit message starts with the task key (`SCRUM-<n>: <Imperative summary>`); that prefix is what links the commit to Jira. A key can be fixed by editing the message before pushing, never after. A task with no linked commits and PR **is not graded as complete**, however finished the code is.
+- **Every task carries a title, a description, an assignee and a story-point estimate** before work starts. Points are Fibonacci (1, 2, 3, 5, 8, 13) and measure relative effort, not hours.
+- **Each sprint user story is broken into at least three Jira tasks**, split so every teammate touches both backend and frontend work rather than one person owning all the Java and another all the React.
+- **Ticket text follows the course's requirements format**: user stories as *As a [persona], I want to [action] so that [benefit]*, with 2–3 acceptance criteria written Given/When/Then.
+
+### Definition of done
+
+A task is done when the code is written, its **unit tests pass**, the PR is **reviewed and merged to `main`**, **CI is green**, the work is **linked in Jira**, and the ticket is moved to **Done**. Work that only runs locally is not done. Commented-out code, comment-only edits and deletions do not count as contribution for the graded task-completion standard.
+
+### Sprint rhythm and deliverables
+
+Sprints run about two weeks, one per course module. The instructor is the product owner and prescribes each sprint's user stories; the Scrum Master role rotates; the **Sprint Review is the TA demo**, not a separate event. Each sprint has four deliverables:
+
+- **Sprint Planning** (team, Canvas text box) — the Jira task keys created for the sprint, each with title, description, assignee and estimate.
+- **Task Completion** (individual, Canvas text box) — the tasks you personally finished, each with commit links visible in Jira, the PR link, and a one-to-two-sentence statement of its acceptance criteria. Graded against at least four qualifying tasks.
+- **Sprint Review** (team, Canvas text box) — the completed task keys and links to the artifacts, plus a live TA demo of the working software.
+- **Retrospective** — Start / Stop / Continue with at least one concrete action item, written up as `docs/sprint<n>-retro.md`.
+
+**Code and documents go to GitHub, never to Canvas.** Canvas takes quiz answers and these text-box submissions only; attaching files or pasting code there is explicitly called out as wrong.
+
+### Standing project requirements
+
+These are graded across the whole semester, not per sprint: authentication and authorization with at least two roles enforced in both layers; full CRUD on a core resource through the API and the UI; a PostgreSQL database via JPA; **≥70% line coverage on service classes**; a CI pipeline running tests on every push; class, package and sequence diagrams kept **updated each module**; a refactoring log with at least five before/after entries and commit links; and a design-pattern register of at least three patterns documented in `README.md` with rationale. Frontend component tests use **Vitest**, which this repo does not yet configure.
 
 `.claude/` is gitignored; this `CLAUDE.md` is not.
