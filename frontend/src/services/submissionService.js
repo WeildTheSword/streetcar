@@ -1,7 +1,16 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+const UNREACHABLE = "Unable to reach the server. Check that the API is running and try again.";
+
 async function request(path = "", options) {
-  const response = await fetch(`${API_URL}/submissions${path}`, options);
+  // fetch rejects with a TypeError when the API is unreachable, and its text
+  // ("Failed to fetch") is not something to show a user.
+  let response;
+  try {
+    response = await fetch(`${API_URL}/submissions${path}`, options);
+  } catch {
+    throw new Error(UNREACHABLE);
+  }
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || "Unable to access submissions. Please try again.");
