@@ -1,5 +1,8 @@
 .DS_Store
-.claude/
+# Claude Code's local state stays out of git, but shared team skills are tracked,
+# so a teammate can pull main and invoke them with no install step.
+.claude/*
+!.claude/skills/
 node_modules/
 .env
 .env.*
