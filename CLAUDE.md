@@ -104,7 +104,9 @@ This is a course project, and the instructor prescribes the lifecycle of every t
 
 **1. Jira — pick up the task**
 - Open the active Sprint board, take an unassigned task from **To Do**, and assign it to yourself.
-- Drag it to **In Progress** before starting work.
+- Move it out of **To Do** before starting work. Note the board's real workflow is **To Do → In Review → Done** — there is no *In Progress* status, though the course checklist names one.
+
+The board: site `streetcarnola.atlassian.net`, project key **SCRUM**, board id **1**. Sprint-1 work was modelled as Subtasks under a Feature; sprint-2 work as Tasks carrying a `sprint-2` label. Neither pattern is wrong, but pick one per sprint rather than mixing.
 
 **2. Git — do the work**
 - **Pull first**, so the branch starts from the latest `main`.
