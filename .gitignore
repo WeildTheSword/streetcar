@@ -4,7 +4,8 @@ node_modules/
 .env
 .env.*
 !.env.example
-data/
+/data/
+backend/data/
 *.mv.db
 *.trace.db
 dist/
