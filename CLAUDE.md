@@ -98,4 +98,33 @@ Check the scope list before adding features — salary predictions, transcript i
 
 Work is tracked as Jira SCRUM tickets. Branches are named `SCRUM-<n>-<kebab-summary>`, commits are `SCRUM-<n>: <Imperative summary>`, and each branch lands on `main` via a pull request. Follow this pattern for new work.
 
+### Task lifecycle — the course checklist
+
+This is a course project, and the instructor prescribes the lifecycle of every task. Source: the Canvas pages **"Checklist — Working a Task: Backlog to Merge"** and **"Code Reviews"** in CMPS-3300-01Fa26 Software Studio. Follow it for every ticket, in this order.
+
+**1. Jira — pick up the task**
+- Open the active Sprint board, take an unassigned task from **To Do**, and assign it to yourself.
+- Drag it to **In Progress** before starting work.
+
+**2. Git — do the work**
+- **Pull first**, so the branch starts from the latest `main`.
+- **Branch**, named after the Jira key: `SCRUM-<n>-<kebab-summary>`.
+- **Commit** with the key first: `SCRUM-<n>: <Imperative summary>`. Small, frequent commits beat one large one.
+- **Push** the branch.
+
+**3. GitHub — open and merge the PR**
+- Open a PR into `main` with a short description of what changed and why, and **request a teammate as reviewer**.
+- **At least one approving review is required**, enforced by branch protection. The reviewer reads the **Files changed** tab and submits **Approve** or **Request changes** through **Start a review**, so queued comments post together.
+- Resolve any conflicts.
+- Merge only once **approved and status checks pass**, then **delete the branch** using GitHub's prompt.
+
+**4. Jira — close the loop**
+- Confirm the commits and PR show as linked on the ticket.
+- Drag the ticket to **Done**.
+- Pull the updated `main` before starting the next task.
+
+A task is not done when the code works locally. It is done when it is merged to `main`, linked in Jira, and moved to Done.
+
+**What this means for Claude specifically.** Do not approve a PR on the user's behalf when you wrote or amended commits on that branch — the approving review must come from a human who did not write the change, which is the entire point of the requirement. Prepare the work, push the branch, open the PR and report what needs review; leave the approval, and the Jira transitions, to the user or a teammate. Never merge before an approval and green checks exist, and delete the branch after merging.
+
 `.claude/` is gitignored; this `CLAUDE.md` is not.
