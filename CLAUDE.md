@@ -152,6 +152,10 @@ Sprints run about two weeks, one per course module. The instructor is the produc
 
 ### Standing project requirements
 
-These are graded across the whole semester, not per sprint: authentication and authorization with at least two roles enforced in both layers; full CRUD on a core resource through the API and the UI; a PostgreSQL database via JPA; **≥70% line coverage on service classes**; a CI pipeline running tests on every push; class, package and sequence diagrams kept **updated each module**; a refactoring log with at least five before/after entries and commit links; and a design-pattern register of at least three patterns documented in `README.md` with rationale. Frontend component tests use **Vitest**, which this repo does not yet configure.
+These are graded across the whole semester, not per sprint: authentication and authorization with at least two roles enforced in both layers; full CRUD on a core resource through the API and the UI; a PostgreSQL database via JPA; **≥70% line coverage on service classes**; a CI pipeline running tests on every push; class, package and sequence diagrams kept **updated each module**; a refactoring log with at least five before/after entries and commit links; and a design-pattern register of at least three patterns documented in `README.md` with rationale.
+
+Test conventions the course grades: every test is written **Arrange-Act-Assert**, backend service tests isolate the service (Mockito mocks where a dependency would otherwise be real), and frontend components get **Vitest** plus React Testing Library — one render test and one interaction test each, in a `*.test.jsx` file beside the component, run by an `npm test` script and by their own `.github/workflows/frontend.yml`. **This repo has none of the frontend half yet**: no Vitest, no `npm test`, and one workflow that only lints and builds the frontend.
+
+Two knowing divergences from the course guides, both fine but worth not "correcting" by accident: the course toolchain guide specifies **Java 21** while this project targets **Java 17** in both `pom.xml` and CI, and the course expects **PostgreSQL via JPA** while submissions currently use **H2 via `JdbcClient`**.
 
 `.claude/` is gitignored; this `CLAUDE.md` is not.
