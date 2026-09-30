@@ -1,74 +1,40 @@
 package com.streetcar.backend.service;
 
 import com.streetcar.backend.model.*;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hardcoded demo fixtures for the pitch walkthrough. Content mirrors the
- * high-fidelity mockups in ui_kits/. There is no database — the only mutable
- * state is which students have completed the fingerprint onboarding, which the
- * demo needs so the splash can be shown once and then skipped.
+ * high-fidelity mockups in ui_kits/. Every method is a pure function of its
+ * arguments: this class holds no state, so the demo's mutable progress lives in
+ * {@link DemoSessionState} instead.
  */
-@Service
-public class DemoDataService {
+@Component
+public class DemoFixtures {
 
-    private static final String MORGAN = "morgan-thibodaux";
+    public static final String MORGAN_ID = "morgan-thibodaux";
+    public static final String BILL_ID = "bill-hudlow";
 
-    private final Map<String, Boolean> onboarded = new ConcurrentHashMap<>();
-
-    /**
-     * Name/initials supplied when an account is created during the demo. The
-     * fixture profile is kept in full — only the identity on the front of it is
-     * swapped, so a new sign-up sees their own name over the same record.
-     */
-    private final Map<String, String[]> identities = new ConcurrentHashMap<>();
-
-    public void setIdentity(String profileId, String name, String initials) {
-        identities.put(profileId, new String[] { name, initials });
-    }
-
-    private String nameFor(String profileId, String fallback) {
-        String[] identity = identities.get(profileId);
-        return identity != null ? identity[0] : fallback;
-    }
-
-    private String initialsFor(String profileId, String fallback) {
-        String[] identity = identities.get(profileId);
-        return identity != null ? identity[1] : fallback;
-    }
+    public static final Identity MORGAN = new Identity("Morgan A. Thibodaux", "MT");
+    public static final Identity BILL = new Identity("Bill Hudlow", "BH");
 
     public List<DemoUser> users() {
         return List.of(
-            new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN,
-                "Morgan A. Thibodaux", "MT", "Finance + CS · Junior"),
-            new DemoUser("bill.hudlow@tulane.edu", "streetcar", "ADVISOR", "bill-hudlow",
-                "Bill Hudlow", "BH", "Freeman · Consultant")
+            new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID,
+                MORGAN.name(), MORGAN.initials(), "Finance + CS · Junior"),
+            new DemoUser("bill.hudlow@tulane.edu", "streetcar", "ADVISOR", BILL_ID,
+                BILL.name(), BILL.initials(), "Freeman · Consultant")
         );
     }
 
-    public boolean isOnboarded(String studentId) {
-        return onboarded.getOrDefault(studentId, false);
-    }
-
-    public void completeOnboarding(String studentId) {
-        onboarded.put(studentId, true);
-    }
-
-    /** Resets onboarding and any created identities so the demo can run again. */
-    public void resetOnboarding() {
-        onboarded.clear();
-        identities.clear();
-    }
-
-    public Student morgan() {
+    /** The demo student, shown under {@code who} and at the given onboarding state. */
+    public Student morgan(Identity who, boolean onboarded) {
         return new Student(
-            MORGAN,
-            nameFor(MORGAN, "Morgan A. Thibodaux"),
-            initialsFor(MORGAN, "MT"),
+            MORGAN_ID,
+            who.name(),
+            who.initials(),
             "Finance + CS",
             "Junior",
             3.89,
@@ -77,7 +43,7 @@ public class DemoDataService {
             "Based on GPA 3.89, ACCN-2010 (A+), and three other signals. NYC-weighted. "
                 + "5 Freeman '24 alumni placed in IB out of 73% of the cohort. Morgan's fit: 87%.",
             "Source: 12Twenty · Freeman outcomes Q3 '25 · Tulane alumni hiring data",
-            isOnboarded(MORGAN),
+            onboarded,
             List.of(
                 new CareerMatch("Private Equity Analyst", 79),
                 new CareerMatch("M&A Consultant", 71),
@@ -171,17 +137,15 @@ public class DemoDataService {
         );
     }
 
-    public Advisor bill() {
-        return new Advisor("bill-hudlow",
-            nameFor("bill-hudlow", "Bill Hudlow"),
-            initialsFor("bill-hudlow", "BH"),
+    public Advisor bill(Identity who) {
+        return new Advisor(BILL_ID, who.name(), who.initials(),
             "Freeman · Consultant", 28, 7);
     }
 
-    public List<Appointment> schedule() {
+    /** Today's appointments; the first one is with the demo student, shown as {@code morgan}. */
+    public List<Appointment> schedule(Identity morgan) {
         return List.of(
-            new Appointment("appt-1", MORGAN, nameFor(MORGAN, "Morgan A. Thibodaux"),
-                initialsFor(MORGAN, "MT"), "11:30 AM",
+            new Appointment("appt-1", MORGAN_ID, morgan.name(), morgan.initials(), "11:30 AM",
                 "Finance + CS", "Junior", 3.82, "Investment Banking",
                 List.of("Interview Thursday", "Pre-brief ready")),
             new Appointment("appt-2", "jasmine-okoye", "Jasmine L. Okoye", "JL", "1:00 PM",

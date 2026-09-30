@@ -4,7 +4,7 @@ import com.streetcar.backend.model.AuthRequest;
 import com.streetcar.backend.model.AuthResponse;
 import com.streetcar.backend.model.SignupRequest;
 import com.streetcar.backend.service.AuthService;
-import com.streetcar.backend.service.DemoDataService;
+import com.streetcar.backend.service.DemoSessionState;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final DemoDataService demoData;
+    private final DemoSessionState session;
 
-    public AuthController(AuthService authService, DemoDataService demoData) {
+    public AuthController(AuthService authService, DemoSessionState session) {
         this.authService = authService;
-        this.demoData = demoData;
+        this.session = session;
     }
 
     @PostMapping("/login")
@@ -40,7 +40,7 @@ public class AuthController {
     /** Puts the demo back to its opening state so the splash can be shown again. */
     @PostMapping("/reset")
     public ResponseEntity<Void> reset() {
-        demoData.resetOnboarding();
+        session.reset();
         authService.clearCreatedAccounts();
         return ResponseEntity.noContent().build();
     }

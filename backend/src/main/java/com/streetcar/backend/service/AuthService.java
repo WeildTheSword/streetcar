@@ -3,6 +3,7 @@ package com.streetcar.backend.service;
 import com.streetcar.backend.model.AuthRequest;
 import com.streetcar.backend.model.AuthResponse;
 import com.streetcar.backend.model.DemoUser;
+import com.streetcar.backend.model.Identity;
 import com.streetcar.backend.model.SignupRequest;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,12 @@ import java.util.stream.Stream;
 @Service
 public class AuthService {
 
-    private final DemoDataService demoData;
+    private final DemoFixtures fixtures;
+    private final DemoSessionState session;
 
-    public AuthService(DemoDataService demoData) {
-        this.demoData = demoData;
+    public AuthService(DemoFixtures fixtures, DemoSessionState session) {
+        this.fixtures = fixtures;
+        this.session = session;
     }
 
     /**
@@ -57,13 +60,13 @@ public class AuthService {
             email,
             request.password(),
             advisor ? "ADVISOR" : "STUDENT",
-            advisor ? "bill-hudlow" : "morgan-thibodaux",
+            advisor ? DemoFixtures.BILL_ID : DemoFixtures.MORGAN_ID,
             name,
             initialsOf(name),
             advisor ? "Freeman · Consultant" : "Finance + CS · Junior");
         created.put(email, user);
         // Keep the fixture profile, wear the new name over it.
-        demoData.setIdentity(user.profileId(), name, user.initials());
+        session.setIdentity(user.profileId(), new Identity(name, user.initials()));
         return Optional.of(toResponse(user));
     }
 
@@ -72,7 +75,7 @@ public class AuthService {
     }
 
     private Stream<DemoUser> allUsers() {
-        return Stream.concat(demoData.users().stream(), created.values().stream());
+        return Stream.concat(fixtures.users().stream(), created.values().stream());
     }
 
     private static boolean isBlank(String value) {
@@ -102,7 +105,7 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(DemoUser user) {
-        boolean onboarded = !"STUDENT".equals(user.role()) || demoData.isOnboarded(user.profileId());
+        boolean onboarded = !"STUDENT".equals(user.role()) || session.isOnboarded(user.profileId());
         return new AuthResponse(
             "demo-" + user.profileId(),
             user.role(),

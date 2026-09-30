@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AuthServiceTest {
-    private DemoDataService demoData;
+    private DemoSessionState session;
     private AuthService service;
 
     @BeforeEach
     void setUp() {
-        demoData = new DemoDataService();
-        service = new AuthService(demoData);
+        session = new DemoSessionState();
+        service = new AuthService(new DemoFixtures(), session);
     }
 
     @Test
@@ -89,7 +89,7 @@ class AuthServiceTest {
         assertEquals("STUDENT", created.get().role());
         assertEquals("Alex Rivera", created.get().displayName());
         assertEquals("AR", created.get().initials());
-        assertEquals("Alex Rivera", demoData.morgan().name());
+        assertEquals("Alex Rivera", session.identityOr("morgan-thibodaux", DemoFixtures.MORGAN).name());
         assertTrue(signedIn.isPresent());
     }
 

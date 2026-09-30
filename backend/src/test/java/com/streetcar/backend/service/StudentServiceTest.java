@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StudentServiceTest {
-    private DemoDataService demoData;
+    private DemoSessionState session;
     private StudentService service;
 
     @BeforeEach
     void setUp() {
-        demoData = new DemoDataService();
-        service = new StudentService(demoData);
+        session = new DemoSessionState();
+        service = new StudentService(new DemoFixtures(), session);
     }
 
     @Test
@@ -55,7 +55,7 @@ class StudentServiceTest {
 
         // Assert
         assertTrue(student.isPresent());
-        assertTrue(demoData.isOnboarded(id));
+        assertTrue(session.isOnboarded(id));
     }
 
     @Test
@@ -68,6 +68,6 @@ class StudentServiceTest {
 
         // Assert
         assertTrue(student.isEmpty());
-        assertFalse(demoData.isOnboarded(id));
+        assertFalse(session.isOnboarded(id));
     }
 }
