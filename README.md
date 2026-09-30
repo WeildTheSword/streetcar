@@ -153,3 +153,15 @@ None. All three families (Playfair Display v40, Cormorant Garamond v21, Cinzel v
   <hr class="sc-rule">
 </body>
 ```
+
+---
+
+## Design pattern register
+
+Design patterns used in the app (`backend/` and `frontend/`), where each one lives, and why it was chosen. Add a row whenever a pattern is introduced.
+
+| Pattern | Where | Why |
+|---|---|---|
+| **Repository** | `backend/.../repository/CourseRepository.java`, implemented by `InMemoryCourseRepository` and used by `CourseService` (SCRUM-60) | Keeps *where courses are stored* apart from *what the service does with them*. The catalogue is in memory today; moving it to the database means writing a new `CourseRepository` implementation and leaving `CourseService` alone. It also lets `CourseServiceTest` run against a fake repository instead of the real catalogue. |
+| **Dependency Injection** | Constructor injection throughout `backend/.../service/` and `controller/` (for example `StudentService(DemoFixtures, DemoSessionState)`) | Classes are given their collaborators by Spring rather than creating them. That is what makes the Repository swap above possible, and it lets each unit test pass in a fresh or fake collaborator. |
+| **Provider (React Context)** | `frontend/src/auth/`: `AuthProvider` supplies the session through `AuthContext`, and components read it with `useAuth()` | The signed-in session is needed by the route guard (`RequireAuth`) and many pages. One provider owns it and its `sessionStorage` persistence, so it isn't passed down through props or read from storage in several places. |
