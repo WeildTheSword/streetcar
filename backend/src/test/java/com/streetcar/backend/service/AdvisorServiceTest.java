@@ -14,7 +14,7 @@ class AdvisorServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new AdvisorService(new DemoDataService());
+        service = new AdvisorService(new DemoFixtures(), new DemoSessionState());
     }
 
     @Test
