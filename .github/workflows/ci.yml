@@ -1,30 +1,59 @@
+# Workflow display name
 name: CI
 
+
+
+# Every time user opens push/ pull yml pipeline runs
 on:
   push:
   pull_request:
 
-jobs:
-  backend:
-    runs-on: ubuntu-latest
+
+
+# Define a list of jobs... Ie. different sections for each part of CI pipeline
+jobs: 
+
+  # -------------------------------------------------------------------------------------------
+  # BACKEND TEST SECTION: One job for the backend
+  backend: 
+    # using ubuntu VM
+    # We could do mac later if we build this out as an App. (Windows, macOS, etc.)
+    runs-on: ubuntu-latest  # We need a VM for running anything. Github stores code but can't run a test pipeline
     defaults:
       run:
+        # Specify backed folder as directory for this test section
         working-directory: backend
+
+
     steps:
+      # Copy repo to VM
       - uses: actions/checkout@v4
+
+      # Install Java 17 and cache Maven dependencies for faster builds
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+          # Make sure to cache the downloaded libraries. 
+          # Avoids new installation of dependencies every time the pipeline runs.
+          # If the .xml file changes, the cache will be invalidated and dependencies will be reinstalled.
+          # Github stores cache from VM in different location than the code, so we need to specify the path to the .xml file for caching.
           cache: maven
+
+
+
       # verify runs the unit tests and the JaCoCo 70% service coverage check
-      - run: chmod +x mvnw && ./mvnw -B verify
+      - run: chmod +x mvnw && ./mvnw -B verify #Backedn checks
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jacoco-report
           path: backend/target/site/jacoco
 
+
+
+  # -------------------------------------------------------------------------------------------
+  # FRONTEND TEST SECTION: One job for the frontend
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -38,3 +67,4 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+  # -------------------------------------------------------------------------------------------
