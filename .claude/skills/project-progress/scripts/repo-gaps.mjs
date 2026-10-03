@@ -29,7 +29,7 @@
 
 
 
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -183,7 +183,9 @@ export function checkRepo(root) {
 
 // pathToFileURL, not a hand-built "file://" string: that never matches on Windows, or in a
 // path with spaces or non-ASCII characters, and the script would silently print nothing.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// realpathSync because Node resolves symlinks in import.meta.url but not in argv[1]: on a Mac,
+// /var and /tmp are links into /private, so a script run from there would also print nothing.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const root = process.argv[2] ?? process.cwd();
   const results = checkRepo(root);
   const gaps = results.filter((r) => !r.met);
