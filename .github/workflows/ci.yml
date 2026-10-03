@@ -1,7 +1,15 @@
+# DESCRIPTION:
+# CI yml file for GitHub Actions. This file defines the CI pipeline for the project.
+# It includes jobs for backend and frontend testing, as well as caching dependencies.
+
+    # Attribution: Qixuan Liu & Claude
+    # SCRUM-46: Add GitHub Actions CI workflow
+    # Date: 10/2/2026
+
+
+
 # Workflow display name
 name: CI
-
-
 
 # Every time user opens push/ pull yml pipeline runs
 on:
