@@ -1,5 +1,8 @@
 # StreetCar Design System
 
+[![CI](https://github.com/WeildTheSword/streetcar/actions/workflows/ci.yml/badge.svg)](https://github.com/WeildTheSword/streetcar/actions/workflows/ci.yml)
+[![Frontend Tests](https://github.com/WeildTheSword/streetcar/actions/workflows/frontend.yml/badge.svg)](https://github.com/WeildTheSword/streetcar/actions/workflows/frontend.yml)
+
 > Heritage editorial identity for an AI-powered career navigation platform — built for Tulane University.
 
 StreetCar transforms fragmented university data (transcripts, degree audits, alumni outcomes, hiring data) into real-time, outcome-driven guidance for students and career advisors. It builds "career fingerprints" that power course planning, alumni introductions, and data-backed career decisions — inside a FERPA-safe perimeter as a school-official contractor.
