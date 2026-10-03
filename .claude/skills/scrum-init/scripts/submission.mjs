@@ -8,6 +8,7 @@
 //      { "key": "SCRUM-48", "title": "...", "assignee": "...", "points": 3, "description": "..." }]}]}
 
 import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 export function formatSubmission(plan) {
   const lines = [`${plan.sprint} Sprint Planning — Jira tasks`];
@@ -56,7 +57,9 @@ export function rubricWarnings(plan) {
   return warnings;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL, not a hand-built "file://" string: that never matches on Windows, or in a
+// path with spaces or non-ASCII characters, and the script would silently print nothing.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const plan = JSON.parse(readFileSync(process.argv[2], "utf8"));
   const warnings = rubricWarnings(plan);
   if (warnings.length) {

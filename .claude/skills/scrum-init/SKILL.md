@@ -86,7 +86,9 @@ leave the board half-written.
 ## Stage 4 — Deliverables
 
 1. Write `docs/sprint-<n>-plan.md`: the stories, their acceptance criteria, and the task table.
-   This is the team's record and the input to `scrum-close` later.
+   This is the team's record and the input to `scrum-close` later. Write the same plan as
+   `docs/sprint-<n>-plan.json` too, in the shape documented at the top of `scripts/submission.mjs`
+   — the next step reads it.
 2. Print the Canvas submission text with
    `node .claude/skills/scrum-init/scripts/submission.mjs docs/sprint-<n>-plan.json`.
 3. Hand it to the user to paste. **Never claim it was submitted** — Canvas submission is theirs.
