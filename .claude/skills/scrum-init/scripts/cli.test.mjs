@@ -15,8 +15,13 @@ const awkwardDir = () => {
   mkdirSync(dir, { recursive: true });
   return dir;
 };
+// repo-gaps.mjs moved to the project-progress skill; submission.mjs stays here.
+const source = {
+  "repo-gaps.mjs": join(here, "../../project-progress/scripts/repo-gaps.mjs"),
+  "submission.mjs": join(here, "submission.mjs"),
+};
 const run = (dir, script, ...args) => {
-  copyFileSync(join(here, script), join(dir, script));
+  copyFileSync(source[script], join(dir, script));
   return spawnSync(process.execPath, [join(dir, script), ...args], { encoding: "utf8" });
 };
 

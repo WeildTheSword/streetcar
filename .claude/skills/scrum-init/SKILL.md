@@ -1,6 +1,6 @@
 ---
 name: scrum-init
-description: Use when starting a new sprint for the CMPS-3300 Software Studio project — "start the sprint", "sprint planning", "set up module 3", "what should our user stories be", "we need to plan sprint 4", "scrum init", or when a module's Sprint Planning deliverable is due. Opens a browser tab for the user to slide in the current module page, reads it together with the codebase, brainstorms user stories with the user, decomposes them into estimated Jira tasks, writes them to the SCRUM board, and emits the Canvas submission text. Not for working a single ticket that already exists.
+description: Use when starting a new sprint for the CMPS-3300 Software Studio project — "start the sprint", "sprint planning", "set up module 3", "what should our user stories be", "we need to plan sprint 4", "scrum init", or when a module's Sprint Planning deliverable is due. Asks for auto-complete mode (Claude drives) or manual-oversight mode (the user drives while Claude explains the codebase and suggests stories with their subtasks). Opens a browser tab for the user to slide in the current module page, reads it together with the codebase, brainstorms user stories with the user, decomposes them into estimated Jira tasks, writes them to the SCRUM board, and emits the Canvas submission text. Not for working a single ticket that already exists.
 ---
 
 # Scrum Init — sprint planning, end to end
@@ -9,6 +9,47 @@ Runs one sprint's planning from a blank page to a started sprint and a ready-to-
 submission. Four stages, each ending at a gate. **Nothing is written to Jira before Stage 3's
 approval.**
 
+## Mode select (ask first, before anything else)
+
+Ask the user, once, which mode to run in (use `AskUserQuestion`):
+
+- **Auto-complete** — Claude drives. Runs Stages 0–4 below end to end, drafting stories and
+  tasks itself. Stages 1 and 2 still present their output, but the user may approve both in one
+  reply. Board writes still wait for an explicit approval in the conversation.
+- **Manual oversight** — the user drives. Claude is a planning assistant: it explains the state of
+  the project and suggests stories and subtasks, but the user decides what goes in the sprint.
+  Follow **Manual-oversight mode** below instead of Stages 1–4.
+
+If the user already named a mode in their request, skip the question.
+
+## Manual-oversight mode
+
+Run Stage 0 (preflight) as normal, then:
+
+1. **Explain the codebase.** In plain language, summarize what changed since the last sprint
+   (recent merged PRs and commits), what the app can do now, and what the last sprint left
+   unfinished. Cite files and ticket keys.
+2. **Explain what is left for the course.** Walk through the Stage 0 gap list grouped by due
+   module: overdue, due this module, and on schedule for later. Say which ones the current module
+   page makes this sprint's job (ask for the module tab as in Stage 1, step 1, if it is not open).
+3. **Suggest stories one at a time.** For each suggested story, show a block:
+   - the story in `As a [persona], I want to [action] so that [benefit]` form, with 2–3
+     Given/When/Then acceptance criteria and the gap it closes;
+   - directly beneath it, the suggested subtasks (at least three), each with title, one-line
+     description, suggested assignee and Fibonacci estimate;
+   - a one-line **"Would add to the sprint:"** summary (the story plus N tasks, X points).
+
+   After each block, let the user accept, edit, or drop it, or ask for another suggestion. Take
+   their wording over yours whenever they rewrite something.
+4. **Show the running sprint preview.** After each decision, show what the sprint would contain
+   so far: accepted stories, their tasks, and point totals per person. Check it against the rubric
+   in the Stage 2 bullets and point out gaps, but do not fix them unless asked.
+5. **Hand over.** When the user says the list is done, show the final preview. Write to Jira
+   (Stage 3) or write `docs/sprint-<n>-plan.md` (Stage 4) **only if the user asks for it**.
+   Otherwise the preview is the output, and the user enters it themselves.
+
+In this mode Claude never writes to Jira, `docs/`, or code on its own initiative.
+
 The course rules this follows live in `CLAUDE.md` under "Workflow conventions" — read that
 section first; do not restate or re-derive it here.
 
@@ -16,9 +57,9 @@ section first; do not restate or re-derive it here.
 
 Run both, in parallel:
 
-1. `node .claude/skills/scrum-init/scripts/repo-gaps.mjs` — reports which standing course
+1. `node .claude/skills/project-progress/scripts/repo-gaps.mjs` — reports which standing course
    requirements the repo does not yet meet, each tagged with its source and the module that
-   schedules it.
+   schedules it. The script belongs to the `project-progress` skill; run it from there.
 
    **This list never decides sprint scope.** The mandatory requirements are delivered across the
    semester; a gap marked `due:M5` is on schedule, not a failure, and pulling it forward is scope
@@ -107,6 +148,8 @@ leave the board half-written.
 
 ## Red flags — stop
 
+- Started work without asking for a mode (and the user did not name one) → stop, ask.
+- In manual-oversight mode, about to write a ticket or file the user did not ask for → stop.
 - About to propose stories without having read the module page → stop, ask for the tab.
 - A task with no assignee, no estimate, or no acceptance criteria → it loses a rubric point; fix
   it before the gate.

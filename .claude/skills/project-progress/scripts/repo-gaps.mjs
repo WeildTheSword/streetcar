@@ -1,19 +1,35 @@
 #!/usr/bin/env node
-// Reports which standing CMPS-3300 course requirements this repo does not yet meet.
-// Deterministic: same tree in, same verdict out. Judgment about what to DO with a gap
-// belongs in the skill body, not here.
-//
-// Every check carries its SOURCE, because they do not all carry the same weight:
-//   "mandatory" — Session 1 — Course Overview, "Mandatory Project Requirements (all groups)"
-//   "module"    — a module's own deliverables or practical guide
-//   "team"      — our own ticket, not the course's. Droppable without losing a point.
-//
-// Each check also carries DUE: the module that schedules it ("ongoing" = every module). The
-// mandatory requirements are delivered ACROSS the semester, so a gap due in a later module is
-// on schedule, not a failure. The module overview and its Sprint Planning assignment decide
+
+
+
+
+// DESCRIPTION: CMPS3300 Class Project Progress Tracker
+  // This script allows the user to understand which course requirements have 
+  // not been met different than our .yml file. It's not the CI pipeline, it is for understanding 
+  // our project progress for the entire class. So we are using this script as a progress tracker.
+
+  // It is the script behind the /project-progress skill, and /scrum-init runs it from here
+  // during preflight. One copy, so a fix to a check reaches both.
+  
+  // Usage: node .claude/skills/project-progress/scripts/repo-gaps.mjs [repo folder]
+
+  // Every check carries its SOURCE, because they do not all carry the same weight:
+  //   "mandatory" — Session 1 — Course Overview, "Mandatory Project Requirements (all groups)"
+  //   "module"    — a module's own deliverables or practical guide
+  //   "team"      — our own ticket, not the course's. Droppable without losing a point.
+  //
+  // Each check also carries DUE: the module that schedules it ("ongoing" = every module). The
+  // mandatory requirements are delivered ACROSS the semester, so a gap due in a later module is
+  // on schedule, not a failure. The module overview and its Sprint Planning assignment decide
 // what a sprint contains; this list never does.
 
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+// Attribution: Michael Weild & Claude
+// SCRUM (NA): This was for project tracking. Fun use of skills.
+// Date: 9/20/2026
+
+
+
+import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -25,6 +41,18 @@ const walk = (dir) =>
       )
     : [];
 
+// Entries in the refactoring log are its "## " headings (the "# " title is not an entry).
+const countLogEntries = (text) => (text.match(/^## /gm) ?? []).length;
+
+// Patterns are the table rows under the README's "Design pattern register" heading, stopping at
+// the next heading so a later section's table is not counted. Header and |---| rows are skipped.
+const countRegisterRows = (readme) => {
+  const section = readme.split(/^#{1,6} .*design pattern.*$/im)[1];
+  if (section === undefined) return 0;
+  const rows = section.split(/^#{1,6} /m)[0].split("\n").filter((l) => l.trim().startsWith("|"));
+  return Math.max(rows.filter((l) => !/^\|[\s|:-]+\|$/.test(l.trim())).length - 1, 0);
+};
+
 export function checkRepo(root) {
   const pkg = read(join(root, "frontend/package.json"));
   const pom = read(join(root, "backend/pom.xml"));
@@ -35,6 +63,9 @@ export function checkRepo(root) {
     : [];
   const frontendFiles = walk(join(root, "frontend/src"));
   const backendMain = walk(join(root, "backend/src/main/java"));
+  const logFile = docs.find((d) => /refactor/i.test(d));
+  const logEntries = logFile ? countLogEntries(read(join(root, "docs", logFile))) : 0;
+  const patterns = countRegisterRows(readme);
 
   return [
     {
@@ -115,14 +146,16 @@ export function checkRepo(root) {
       due: "M3",
       requirement: "Refactoring log, 5+ entries with before/after code and commit links",
       source: "mandatory",
-      met: docs.some((d) => /refactor/i.test(d)),
+      met: logEntries >= 5,
+      progress: `${logEntries}/5`,
     },
     {
       id: "pattern-register",
       due: "M3",
       requirement: "Design pattern register (3+) in README with rationale",
       source: "mandatory",
-      met: /design pattern/i.test(readme),
+      met: patterns >= 3,
+      progress: `${patterns}/3`,
     },
     {
       id: "persistence",
@@ -150,14 +183,17 @@ export function checkRepo(root) {
 
 // pathToFileURL, not a hand-built "file://" string: that never matches on Windows, or in a
 // path with spaces or non-ASCII characters, and the script would silently print nothing.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// realpathSync because Node resolves symlinks in import.meta.url but not in argv[1]: on a Mac,
+// /var and /tmp are links into /private, so a script run from there would also print nothing.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const root = process.argv[2] ?? process.cwd();
   const results = checkRepo(root);
   const gaps = results.filter((r) => !r.met);
   const label = { mandatory: "[course]", module: "[module]", team: "[ours]  " };
   for (const r of results) {
     console.log(
-      `${r.met ? "MET " : "GAP "} ${label[r.source]} due:${r.due.padEnd(7)} ${r.id} — ${r.requirement}`,
+      `${r.met ? "MET " : "GAP "} ${label[r.source]} due:${r.due.padEnd(7)} ${r.id} — ${r.requirement}` +
+        (r.progress ? ` (${r.progress})` : ""),
     );
   }
   const bySource = (s) => gaps.filter((g) => g.source === s).length;

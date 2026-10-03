@@ -1,3 +1,13 @@
+// DESCRIPTION:
+// Debugging Points: Allows us to avoid having print statements in our code 
+// when shit fails. We can use breakpoints if we'd like.
+
+    // Attribution: Michael Weild
+    // SCRUM-8: Add VS Code launch configuration for full stack
+    // Date: 8/31/2026
+
+
+
 {
   "version": "0.2.0",
   "configurations": [

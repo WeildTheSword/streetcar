@@ -1,13 +1,34 @@
 #!/usr/bin/env node
-// Formats the Canvas Sprint Planning submission from a sprint plan JSON.
-// Deterministic formatting + rubric arithmetic, so the skill never eyeballs either.
-//
-// Plan shape:
+
+// DESCRIPTION: CMPS3300 Class Sprint Plan Formatter
+  // This script takes our sprint plan (user stories, their tasks, who owns each task, the
+  // story points and a description) and turns it into the text that we can use to give us the 
+  // basic bones for each of the canvas submissions... This just allows us to save time instead
+  // of having to copy and paste each of the stories and tasks into the canvas submission form.
+  
+  // Before it writes anything, it grades the plan against the Sprint Planning rubric, so we
+  // find lost points before the TA does:
+  //   - every user story has at least 3 tasks
+  //   - every task has an assignee, a story point estimate and a description
+  //   - every teammate has at least one task
+  // Any miss prints as a RUBRIC WARNING and the script exits with an error, so the skill
+  // stops and we fix the plan instead of submitting it.
+  //
+  // It also totals the story points per person. The formatting and the math are done in code,
+  // not by Claude, so the same plan always produces the same submission.
+  //
+  // Usage: node submission.mjs plan.json
+  //
+  // Plan shape:
 // { "sprint": "Module 3", "team": ["Michael Weild", "Qixuan Liu"],
 //   "stories": [{ "title": "...", "tasks": [
 //      { "key": "SCRUM-48", "title": "...", "assignee": "...", "points": 3, "description": "..." }]}]}
 
-import { readFileSync } from "node:fs";
+// Attribution: Michael Weild & Claude
+// SCRUM (NA): Decrease sprint write-up time. Fun use of skills.
+// Date: 9/20/2026
+
+import { readFileSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 export function formatSubmission(plan) {
@@ -34,6 +55,9 @@ export function formatSubmission(plan) {
   return lines.join("\n");
 }
 
+
+
+
 // The Sprint Planning rubric: 6 pts only when EVERY story has >= 3 tasks; 4 pts only when every
 // task has an assignee, a description and an estimate.
 export function rubricWarnings(plan) {
@@ -59,7 +83,9 @@ export function rubricWarnings(plan) {
 
 // pathToFileURL, not a hand-built "file://" string: that never matches on Windows, or in a
 // path with spaces or non-ASCII characters, and the script would silently print nothing.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// realpathSync because Node resolves symlinks in import.meta.url but not in argv[1]: on a Mac,
+// /var and /tmp are links into /private, so a script run from there would also print nothing.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const plan = JSON.parse(readFileSync(process.argv[2], "utf8"));
   const warnings = rubricWarnings(plan);
   if (warnings.length) {

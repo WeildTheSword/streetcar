@@ -1,10 +1,8 @@
 # scrum-init
 
-Sprint planning for this course project, from a blank page to a started sprint and a
-ready-to-paste Canvas submission.
+Sprint planning for this course project, from a blank page to a started sprint and a ready-to-paste Canvas submission.
 
-## Using it
-
+## Using it 
 Pull `main` and type:
 
 ```
@@ -14,10 +12,21 @@ Pull `main` and type:
 No install step — Claude Code finds skills in `.claude/skills/`, and this one is tracked in git.
 You need the Atlassian tools connected for the Jira half; the rest works without them.
 
-## What happens, stage by stage
+## Two modes
+
+It asks which mode you want before it starts:
+
+- **Auto-complete**: Claude runs the whole pipeline below and drafts the stories and tasks
+  itself. It still waits for your approval before writing anything to Jira.
+- **Manual oversight**: you drive. Claude explains what changed in the codebase and what the
+  course still requires. Then it suggests user stories one at a time, each with its subtasks and
+  a "would add to the sprint" summary, and you accept, edit, or drop each one. It shows a running
+  sprint preview and writes to Jira or `docs/` only if you ask.
+
+## What happens, stage by stage (auto-complete)
 
 **0. Preflight.** Checks the board for a sprint left open past its end date and for tickets sitting
-outside any sprint, and runs `scripts/repo-gaps.mjs` for the standing course requirements the repo
+outside any sprint, and runs the `project-progress` skill's `repo-gaps.mjs` for the standing course requirements the repo
 does not meet. Every gap is tagged with its source — `[course]` from the mandatory list in Session 1,
 `[module]` from a module's own deliverables, `[ours]` from a ticket we raised ourselves — and with
 the module that schedules it. **A gap due in a later module is on schedule, not a failure.**
@@ -45,19 +54,19 @@ and moves them in. If any single write fails it stops rather than leaving the bo
 **4. Deliverables.** Writes the sprint plan to `docs/`, then prints the Canvas submission text.
 **It never submits to Canvas** — that is yours to paste.
 
-## The two scripts
+## The scripts
 
 Deterministic checks live in scripts, not in prose, so they cannot be re-derived differently each run.
 
 | Script | What it does |
 |---|---|
-| `scripts/repo-gaps.mjs` | Prints every standing requirement as MET or GAP, with source and due module. Run it on its own any time: `node .claude/skills/scrum-init/scripts/repo-gaps.mjs` |
 | `scripts/submission.mjs` | Formats the Canvas Sprint Planning text from a plan JSON, and **warns against the rubric** — a story with fewer than three tasks, a task missing an assignee, estimate or description, or a plan where only one teammate holds work. |
+| `../project-progress/scripts/repo-gaps.mjs` | Prints every standing requirement as MET or GAP, with source and due module. It lives in the `project-progress` skill, so you can check course progress any time with `/project-progress` without starting sprint planning. |
 
-Run their tests with:
+Run the tests for both skills with:
 
 ```
-node --test .claude/skills/scrum-init/scripts/*.test.mjs
+node --test .claude/skills/*/scripts/*.test.mjs
 ```
 
 ## What it will not do
