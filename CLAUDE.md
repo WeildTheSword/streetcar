@@ -36,9 +36,8 @@ npm run dev      # dev server on :5173
 npm run lint     # oxlint
 npm run build    # production build to dist/
 npm run preview  # serve the built output
+npm test         # Vitest + React Testing Library, single run
 ```
-
-No frontend test runner is configured; `npm run lint` and `npm run build` are the only frontend gates.
 
 ### Both at once
 
@@ -46,7 +45,7 @@ VS Code `.vscode/launch.json` defines a **Full Stack** compound launch config th
 
 ### CI
 
-`.github/workflows/ci.yml` runs on every push and pull request: a **backend** job (`./mvnw -B verify`, which includes the coverage gate, uploading the JaCoCo report as an artifact) and a **frontend** job (`npm ci`, `npm run lint`, `npm run build`).
+Two workflows run on every push and pull request. `.github/workflows/ci.yml` has a **backend** job (`./mvnw -B verify`, which includes the coverage gate, uploading the JaCoCo report as an artifact) and a **frontend** job (`npm ci`, `npm run lint`, `npm run build`). `.github/workflows/frontend.yml` runs the frontend tests (`npm ci`, `npm test`) as its own check. Both have status badges in `README.md`.
 
 ### Static design-system pages
 
@@ -62,11 +61,11 @@ All `fetch` calls stay in `services/`: `api.js` (auth, student, advisor), `cours
 
 ### Backend
 
-Layering is `controller/` → `service/` → `model/`, with `config/` for cross-cutting Spring config. Endpoints: `/auth/login`, `/auth/signup`, `/auth/reset`, `/students/{id}`, `/students/{id}/fingerprint`, `/advisors/{id}/dashboard`, `/courses`, and full CRUD on `/submissions`.
+Layering is `controller/` → `service/` → `repository/` / `model/`, with `config/` for cross-cutting Spring config. Endpoints: `/auth/login`, `/auth/signup`, `/auth/reset`, `/students/{id}`, `/students/{id}/fingerprint`, `/advisors/{id}/dashboard`, `/courses`, and full CRUD on `/submissions`.
 
 **Two kinds of data live here, and they behave differently:**
 
-- **Demo data is hardcoded.** `DemoDataService`, `CourseService`, `StudentService` and `AdvisorService` return literal objects. There is no persistence behind them.
+- **Demo data is hardcoded.** `DemoFixtures` holds the fixtures and is stateless; `DemoSessionState` holds the demo's only mutable state (who has onboarded, and the name a sign-up wears over a fixture profile) in memory, reset on restart. `AuthService`, `StudentService` and `AdvisorService` build on those two. `CourseService` reads through the `CourseRepository` interface, implemented today by `InMemoryCourseRepository`. There is no persistence behind any of them.
 - **Submissions are persisted.** `SubmissionService` uses `JdbcClient` against H2, created from `backend/src/main/resources/schema.sql` at startup. The default is a file database at `backend/data/streetcar` (gitignored); `backend/src/test/resources/application.properties` points tests at an in-memory one so the tests cannot collide with a running dev server or write into local demo data.
 
 **Authentication is fake on purpose.** Passwords are plain text and the session token is a label. Nothing in `AuthService` should be reused as an auth system.
@@ -90,7 +89,7 @@ The prose conventions — no emoji, no exclamation points, em-dashes — apply t
 
 ## Product context
 
-`docs/requirements.md` holds the personas (Alex, Sarah), user stories US-1..US-4, use cases UC-1/UC-2, an explicit MVP in/out-of-scope list, and the package and sequence diagrams. `docs/database-plan.md` covers the submissions schema, and `docs/class-diagram.png` the domain model.
+`docs/requirements.md` holds the personas (Alex, Sarah), user stories US-1..US-4, use cases UC-1/UC-2, an explicit MVP in/out-of-scope list, and the package and sequence diagrams. `docs/database-plan.md` covers the submissions schema. The class, package and sequence diagrams are in `docs/` as `.drawio` sources with `.png` exports. `docs/refactoring-log.md` and `docs/solid-audit.md` record the refactorings, and the design pattern register is a section of `README.md`.
 
 Check the scope list before adding features — salary predictions, transcript integration, LinkedIn, mobile, and multi-university support are all deliberately out of scope for the graded MVP. The pitch demo shows some of them anyway; `DEMO.md` explains why that is not a licence to widen the MVP.
 
@@ -156,8 +155,8 @@ Sprints run about two weeks, one per course module. The instructor is the produc
 
 These are graded across the whole semester, not per sprint: authentication and authorization with at least two roles enforced in both layers; full CRUD on a core resource through the API and the UI; a PostgreSQL database via JPA; **≥70% line coverage on service classes**; a CI pipeline running tests on every push; class, package and sequence diagrams kept **updated each module**; a refactoring log with at least five before/after entries and commit links; and a design-pattern register of at least three patterns documented in `README.md` with rationale.
 
-Test conventions the course grades: every test is written **Arrange-Act-Assert**, backend service tests isolate the service (Mockito mocks where a dependency would otherwise be real), and frontend components get **Vitest** plus React Testing Library — one render test and one interaction test each, in a `*.test.jsx` file beside the component, run by an `npm test` script and by their own `.github/workflows/frontend.yml`. **This repo has none of the frontend half yet**: no Vitest, no `npm test`, and one workflow that only lints and builds the frontend.
+Test conventions the course grades: every test is written **Arrange-Act-Assert**, backend service tests isolate the service (Mockito mocks where a dependency would otherwise be real), and frontend components get **Vitest** plus React Testing Library — one render test and one interaction test each, in a `*.test.jsx` file beside the component, run by an `npm test` script and by their own `.github/workflows/frontend.yml`. The frontend tooling is in place, but only `pages/SubmissionsPage` has tests so far (`SubmissionsPage.form.test.jsx` and `SubmissionsPage.list.test.jsx`). Other components still need theirs.
 
 Two knowing divergences from the course guides, both fine but worth not "correcting" by accident: the course toolchain guide specifies **Java 21** while this project targets **Java 17** in both `pom.xml` and CI, and the course expects **PostgreSQL via JPA** while submissions currently use **H2 via `JdbcClient`**.
 
-`.claude/` is gitignored; this `CLAUDE.md` is not.
+`.claude/` is gitignored except `.claude/skills/`, which holds shared team skills (such as `/scrum-init`) so everyone gets them from `main`. This `CLAUDE.md` is tracked.
