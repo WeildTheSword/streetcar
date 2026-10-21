@@ -2,12 +2,12 @@ package com.streetcar.backend.controller;
 
 import com.streetcar.backend.model.Submission;
 import com.streetcar.backend.service.SubmissionService;
+import com.streetcar.backend.service.SubmissionValidator;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,9 +16,11 @@ import java.util.NoSuchElementException;
 @RequestMapping("/submissions")
 public class SubmissionController {
     private final SubmissionService service;
+    private final SubmissionValidator validator;
 
-    public SubmissionController(SubmissionService service) {
+    public SubmissionController(SubmissionService service, SubmissionValidator validator) {
         this.service = service;
+        this.validator = validator;
     }
 
     @GetMapping
@@ -34,13 +36,13 @@ public class SubmissionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Submission create(@RequestBody Submission input) {
-        validate(input);
+        validator.validate(input);
         return service.create(input);
     }
 
     @PutMapping("/{id}")
     public Submission update(@PathVariable long id, @RequestBody Submission input) {
-        validate(input);
+        validator.validate(input);
         return service.update(id, input);
     }
 
@@ -50,25 +52,9 @@ public class SubmissionController {
         service.delete(id);
     }
 
-    private void validate(Submission input) {
-        if (input.gpa() == null || input.gpa().compareTo(BigDecimal.ZERO) < 0
-                || input.gpa().compareTo(new BigDecimal("4")) > 0
-                || input.gpa().stripTrailingZeros().scale() > 2
-                || !validText(input.completedCourses(), 2000)
-                || !validText(input.major(), 120) || !validText(input.careerGoal(), 200)) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    private boolean validText(String value, int max) {
-        return value != null && !value.isBlank() && value.strip().length() <= max;
-    }
-
     @ExceptionHandler({IllegalArgumentException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<Map<String, String>> invalidInput() {
-        return ResponseEntity.badRequest().body(Map.of("message",
-                "Provide GPA (0–4, at most two decimals), completed courses (up to 2000 characters), "
-                + "major (up to 120), and career goal (up to 200)."));
+        return ResponseEntity.badRequest().body(Map.of("message", SubmissionValidator.RULES));
     }
 
     @ExceptionHandler(NoSuchElementException.class)
