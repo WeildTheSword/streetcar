@@ -54,16 +54,16 @@ public class AuthService {
             return Optional.empty();
         }
 
-        boolean advisor = "ADVISOR".equalsIgnoreCase(request.role());
+        AccountRole role = AccountRole.fromRequest(request.role());
         String name = request.name().trim();
         DemoUser user = new DemoUser(
             email,
             request.password(),
-            advisor ? "ADVISOR" : "STUDENT",
-            advisor ? DemoFixtures.BILL_ID : DemoFixtures.MORGAN_ID,
+            role.name(),
+            role.fixtureProfileId(),
             name,
             initialsOf(name),
-            advisor ? "Freeman · Consultant" : "Finance + CS · Junior");
+            role.defaultSubtitle());
         created.put(email, user);
         // Keep the fixture profile, wear the new name over it.
         session.setIdentity(user.profileId(), new Identity(name, user.initials()));
@@ -105,7 +105,7 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(DemoUser user) {
-        boolean onboarded = !"STUDENT".equals(user.role()) || session.isOnboarded(user.profileId());
+        boolean onboarded = AccountRole.valueOf(user.role()).isOnboarded(user.profileId(), session);
         return new AuthResponse(
             "demo-" + user.profileId(),
             user.role(),
