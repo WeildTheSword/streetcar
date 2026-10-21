@@ -1,9 +1,12 @@
-const API_URL = "http://localhost:8080";
+import { HttpError, request } from "./httpClient";
 
 export async function fetchCourses() {
-  const response = await fetch(`${API_URL}/courses`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch courses");
+  try {
+    return await request("/courses");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      throw new Error("Failed to fetch courses");
+    }
+    throw error;
   }
-  return response.json();
 }
