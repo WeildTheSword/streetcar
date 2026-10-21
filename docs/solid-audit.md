@@ -11,6 +11,7 @@ An audit of `backend/src/main/java/com/streetcar/backend/service/` for SOLID vio
 | 3 | `AuthService` | Single Responsibility | Holds the created-accounts store as well as the sign-in and sign-up rules. Smaller than #1: the store is one map and only `AuthService` uses it. |
 | 4 | `AuthController.reset()` | Single Responsibility | The controller resets two services itself, so it knows how demo state is spread across the backend. **Fixed in SCRUM-69**, see [refactoring-log.md](refactoring-log.md). |
 | 5 | `SubmissionService` | Dependency Inversion | Calls `JdbcClient` directly instead of going through a repository. Acceptable for now: the tests already swap in an H2 database. |
+| 6 | `SubmissionController` | Single Responsibility | The controller maps HTTP requests *and* owns the rules for a valid submission (GPA range and precision, text length limits). Routes and product rules change for different reasons, and the rules could only be tested through the web layer. **Fixed in SCRUM-68**, see [refactoring-log.md](refactoring-log.md). |
 
 ## Decision
 
