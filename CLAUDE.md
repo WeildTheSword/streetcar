@@ -72,7 +72,7 @@ Layering is `controller/` → `service/` → `repository/` / `model/`, with `con
 
 ### Constraints worth knowing before you change things
 
-- **Ports are hardcoded in several places that must stay in sync.** every frontend call goes through `services/httpClient.js`, which reads `VITE_API_URL` and falls back to `http://localhost:8080`; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.
+- **Ports must stay in sync between the frontend and the backend.** Every frontend call goes through `services/httpClient.js`, which reads `VITE_API_URL` and falls back to `http://localhost:8080`; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.
 - **Env vars are opt-in and documented by example files**, `backend/.env.example` (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_ADDRESS`) and `frontend/.env.example` (`VITE_API_URL`). Spring does not load `.env` files; export the variables yourself.
 - **Coverage is gated.** JaCoCo requires 70% line coverage on `com.streetcar.backend.service`, checked in the `verify` phase. Adding service code without tests fails the build.
 - **Model classes are immutable** — records or getter-only POJOs, serialized by Jackson.
