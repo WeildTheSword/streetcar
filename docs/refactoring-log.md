@@ -72,3 +72,61 @@ classDiagram
 ```
 
 **Result.** The API responses are unchanged. The fixtures and the state are now tested separately (`DemoFixturesTest`, `DemoSessionStateTest`), and a state test no longer builds the fixture set.
+
+## 2. Move submission validation out of `SubmissionController`
+
+**Principle:** Single Responsibility · **Jira:** SCRUM-68 · **Commit:** [`7bfd8d8`](https://github.com/WeildTheSword/streetcar/commit/7bfd8d8)
+
+**Before.** `SubmissionController` mapped the `/submissions` routes and also decided what a valid submission is. The GPA range, its two-decimal limit and the 2000 / 120 / 200 character limits were private methods on the controller, and the error message repeated the same numbers by hand. The rules had no test of their own: the only way to exercise them was through an HTTP request.
+
+```java
+// SubmissionController
+private void validate(Submission input) {
+    if (input.gpa() == null || input.gpa().compareTo(BigDecimal.ZERO) < 0
+            || input.gpa().compareTo(new BigDecimal("4")) > 0
+            || input.gpa().stripTrailingZeros().scale() > 2
+            || !validText(input.completedCourses(), 2000)
+            || !validText(input.major(), 120) || !validText(input.careerGoal(), 200)) {
+        throw new IllegalArgumentException();
+    }
+}
+```
+
+**After.** `SubmissionValidator` owns the rules, the limits as named constants, and the message built from those constants. The controller is injected with it and only maps requests and errors.
+
+```java
+// SubmissionController
+public Submission create(@RequestBody Submission input) {
+    validator.validate(input);
+    return service.create(input);
+}
+```
+
+**Result.** `POST` and `PUT /submissions` answer exactly as before, including the 400 message. The rules now have their own unit tests (`SubmissionValidatorTest`, eight cases including the GPA boundaries and trimmed lengths), and a limit lives in one place instead of two.
+
+## 3. Move the demo reset out of `AuthController`
+
+**Principle:** Single Responsibility · **Jira:** SCRUM-69 · **Commit:** [`3c542ed`](https://github.com/WeildTheSword/streetcar/commit/3c542ed)
+
+**Before.** `POST /auth/reset` reset the demo inside the controller. `AuthController` depended on `DemoSessionState` only for this, so an HTTP class had to know every place demo state lives. Any new piece of demo state would have meant editing the controller.
+
+```java
+// AuthController
+public ResponseEntity<Void> reset() {
+    session.reset();
+    authService.clearCreatedAccounts();
+    return ResponseEntity.noContent().build();
+}
+```
+
+**After.** `DemoResetService` owns "put the demo back to its opening state". The controller depends on `AuthService` and `DemoResetService` only, and `reset()` makes one call.
+
+```java
+// AuthController
+public ResponseEntity<Void> reset() {
+    demoReset.reset();
+    return ResponseEntity.noContent().build();
+}
+```
+
+**Result.** `/auth/reset` behaves as before: it was checked against the running API by signing up, onboarding, resetting, and confirming the created account is refused and onboarding is cleared. `DemoResetServiceTest` covers the reset directly with four cases, and `AuthController` no longer imports `DemoSessionState`.

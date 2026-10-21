@@ -3,10 +3,7 @@ import {
   FALLBACK_STUDENT,
   FALLBACK_USERS,
 } from "@/data/fallback";
-
-// Kept in sync with backend/.../config/CorsConfig.java, which allows exactly
-// http://localhost:5173. Change one port and you must change the other.
-const API_URL = "http://localhost:8080";
+import { HttpError, request as send } from "./httpClient";
 
 /** Thrown when the API answered but rejected the request. */
 export class ApiError extends Error {
@@ -23,18 +20,16 @@ export class ApiError extends Error {
 export const connection = { live: true };
 
 async function request(path, options) {
-  const response = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
-  if (!response.ok) {
-    throw new ApiError(response.status, `Request failed: ${response.status}`);
+  try {
+    const data = await send(path, options);
+    connection.live = true;
+    return data;
+  } catch (error) {
+    if (error instanceof HttpError) {
+      throw new ApiError(error.status, error.message);
+    }
+    throw error;
   }
-  connection.live = true;
-  if (response.status === 204) {
-    return null;
-  }
-  return response.json();
 }
 
 /**
@@ -63,7 +58,7 @@ export function signIn(email, password) {
     () =>
       request("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: { email, password },
       }),
     () => {
       const normalized = email.trim().toLowerCase();
@@ -92,7 +87,7 @@ export function signUp({ name, email, password, role }) {
     () =>
       request("/auth/signup", {
         method: "POST",
-        body: JSON.stringify({ name, email, password, role }),
+        body: { name, email, password, role },
       }),
     () => {
       // Offline: mint a session over the fixture profile, same as the server.
