@@ -57,7 +57,7 @@ Two workflows run on every push and pull request. `.github/workflows/ci.yml` has
 
 `App.jsx` wraps everything in `AuthProvider` and `TransitionProvider` and routes with `react-router-dom`: `/sign-in`, `/welcome`, `/onboarding`, `/student`, `/advisor`, and `/profiles`. `RequireAuth` gates routes by role (`STUDENT` / `ADVISOR`); **`/profiles` sits outside it and is reachable without signing in**, which matches a backend that has no authentication on any endpoint.
 
-All `fetch` calls stay in `services/`: `api.js` (auth, student, advisor), `courseService.js`, `submissionService.js`. `api.js` falls back to the generated fixtures in `src/data/fallback.js` when the backend is unreachable, so a dead API degrades the demo rather than ending it.
+All `fetch` calls go through `services/httpClient.js` (the Facade in the pattern register); the services on top of it are `api.js` (auth, student, advisor), `courseService.js` and `submissionService.js`. `api.js` falls back to the generated fixtures in `src/data/fallback.js` when the backend is unreachable, so a dead API degrades the demo rather than ending it.
 
 ### Backend
 
@@ -72,7 +72,7 @@ Layering is `controller/` → `service/` → `repository/` / `model/`, with `con
 
 ### Constraints worth knowing before you change things
 
-- **Ports are hardcoded in several places that must stay in sync.** `api.js` and `courseService.js` hardcode `http://localhost:8080`; `submissionService.js` reads `VITE_API_URL` and falls back to the same; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.
+- **Ports are hardcoded in several places that must stay in sync.** every frontend call goes through `services/httpClient.js`, which reads `VITE_API_URL` and falls back to `http://localhost:8080`; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.
 - **Env vars are opt-in and documented by example files**, `backend/.env.example` (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_ADDRESS`) and `frontend/.env.example` (`VITE_API_URL`). Spring does not load `.env` files; export the variables yourself.
 - **Coverage is gated.** JaCoCo requires 70% line coverage on `com.streetcar.backend.service`, checked in the `verify` phase. Adding service code without tests fails the build.
 - **Model classes are immutable** — records or getter-only POJOs, serialized by Jackson.
