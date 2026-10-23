@@ -13,6 +13,8 @@ An audit of `backend/src/main/java/com/streetcar/backend/service/` for SOLID vio
 | 5 | `SubmissionService` | Dependency Inversion | Calls `JdbcClient` directly instead of going through a repository. Acceptable for now: the tests already swap in an H2 database. |
 | 6 | `SubmissionController` | Single Responsibility | The controller maps HTTP requests *and* owns the rules for a valid submission (GPA range and precision, text length limits). Routes and product rules change for different reasons, and the rules could only be tested through the web layer. **Fixed in SCRUM-68**, see [refactoring-log.md](refactoring-log.md). |
 
+| 7 | `SubmissionsPage.jsx` (frontend) | Single Responsibility | The page loads data, runs the create form, runs the inline edit form and handles deletion, *and* renders the four submission fields twice, with the labels, limits and the blank-field check copied in both places. **Fixed in SCRUM-70**, see [refactoring-log.md](refactoring-log.md). |
+
 ## Decision
 
 **Fix #1: split `DemoDataService`.** It has the widest reach: `StudentService`, `AdvisorService`, `AuthService` and `AuthController` all depend on it, so every one of them was coupled to both the fixtures and the state. Splitting it into a stateless `DemoFixtures` and a `DemoSessionState` gives each class one reason to change.

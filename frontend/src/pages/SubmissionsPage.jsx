@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { createSubmission, deleteSubmission, fetchSubmissions, updateSubmission } from "../services/submissionService";
+import SubmissionFields from "../components/SubmissionFields";
+import { BLANK_FIELD_MESSAGE, hasBlankField, readSubmission } from "../lib/submissionForm";
 import "../App.css";
 
 export default function SubmissionsPage() {
@@ -25,16 +27,16 @@ export default function SubmissionsPage() {
   async function submit(event) {
     event.preventDefault();
     const form = event.currentTarget;
-    const values = Object.fromEntries(new FormData(form));
+    const values = readSubmission(form);
     setError("");
     setMessage("");
-    if ([values.completedCourses, values.major, values.careerGoal].some((value) => !value.trim())) {
-      setError("Please fill in every field. Enter None if no courses are completed.");
+    if (hasBlankField(values)) {
+      setError(BLANK_FIELD_MESSAGE);
       return;
     }
     setSaving(true);
     try {
-      const record = await createSubmission({ ...values, gpa: Number(values.gpa) });
+      const record = await createSubmission(values);
       setRecords((previous) => [record, ...previous]);
       form.reset();
       setMessage("Academic profile saved.");
@@ -47,15 +49,15 @@ export default function SubmissionsPage() {
 
   async function saveEdit(event, id) {
     event.preventDefault();
-    const values = Object.fromEntries(new FormData(event.currentTarget));
+    const values = readSubmission(event.currentTarget);
     setListError("");
-    if ([values.completedCourses, values.major, values.careerGoal].some((value) => !value.trim())) {
-      setListError("Please fill in every field. Enter None if no courses are completed.");
+    if (hasBlankField(values)) {
+      setListError(BLANK_FIELD_MESSAGE);
       return;
     }
     setBusyId(id);
     try {
-      const updated = await updateSubmission(id, { ...values, gpa: Number(values.gpa) });
+      const updated = await updateSubmission(id, values);
       setRecords((previous) => previous.map((record) => (record.id === id ? updated : record)));
       setEditingId(null);
     } catch (err) {
@@ -87,14 +89,7 @@ export default function SubmissionsPage() {
       <form onSubmit={submit}>
         <fieldset disabled={saving || loading}>
           <legend>All fields are required</legend>
-          <label htmlFor="gpa">GPA (0–4)</label>
-          <input id="gpa" name="gpa" type="number" min="0" max="4" step="0.01" required />
-          <label htmlFor="completedCourses">Completed courses (or None)</label>
-          <textarea id="completedCourses" name="completedCourses" maxLength={2000} required />
-          <label htmlFor="major">Major</label>
-          <input id="major" name="major" maxLength={120} required />
-          <label htmlFor="careerGoal">Career goal</label>
-          <input id="careerGoal" name="careerGoal" maxLength={200} required />
+          <SubmissionFields />
           <button type="submit">{saving ? "Saving…" : "Save profile"}</button>
         </fieldset>
       </form>
@@ -112,14 +107,7 @@ export default function SubmissionsPage() {
               <form onSubmit={(event) => saveEdit(event, record.id)}>
                 <fieldset disabled={busyId === record.id}>
                   <legend>Edit profile</legend>
-                  <label htmlFor={`gpa-${record.id}`}>GPA (0–4)</label>
-                  <input id={`gpa-${record.id}`} name="gpa" type="number" min="0" max="4" step="0.01" defaultValue={record.gpa} required />
-                  <label htmlFor={`completedCourses-${record.id}`}>Completed courses (or None)</label>
-                  <textarea id={`completedCourses-${record.id}`} name="completedCourses" maxLength={2000} defaultValue={record.completedCourses} required />
-                  <label htmlFor={`major-${record.id}`}>Major</label>
-                  <input id={`major-${record.id}`} name="major" maxLength={120} defaultValue={record.major} required />
-                  <label htmlFor={`careerGoal-${record.id}`}>Career goal</label>
-                  <input id={`careerGoal-${record.id}`} name="careerGoal" maxLength={200} defaultValue={record.careerGoal} required />
+                  <SubmissionFields idSuffix={record.id} values={record} />
                   <div className="actions">
                     <button type="submit">{busyId === record.id ? "Saving…" : "Save changes"}</button>
                     <button type="button" onClick={() => { setEditingId(null); setListError(""); }}>Cancel</button>

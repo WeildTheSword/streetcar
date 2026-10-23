@@ -130,3 +130,25 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** `/auth/reset` behaves as before: it was checked against the running API by signing up, onboarding, resetting, and confirming the created account is refused and onboarding is cleared. `DemoResetServiceTest` covers the reset directly with four cases, and `AuthController` no longer imports `DemoSessionState`.
+
+## 4. Extract the shared submission form fields out of `SubmissionsPage`
+
+**Principle:** Single Responsibility · **Jira:** SCRUM-70 · **Commit:** [`215e9b1`](https://github.com/WeildTheSword/streetcar/commit/215e9b1)
+
+**Before.** `SubmissionsPage.jsx` rendered the four submission fields twice, once in the create form and once in the inline edit form. The labels, the 2000 / 120 / 200 `maxLength` limits, the "fill in every field" check and its message were all written out in both places. Changing one field meant editing two copies and keeping them in step by hand.
+
+```jsx
+// create form                                   // edit form
+<label htmlFor="major">Major</label>             <label htmlFor={`major-${record.id}`}>Major</label>
+<input id="major" name="major"                   <input id={`major-${record.id}`} name="major"
+  maxLength={120} required />                      maxLength={120} defaultValue={record.major} required />
+```
+
+**After.** `components/SubmissionFields.jsx` renders the four fields once and takes an id suffix and default values. The blank-field check, its message, and reading a form into the API shape live in `lib/submissionForm.js`. The page uses both in each form.
+
+```jsx
+<SubmissionFields />                                            // create
+<SubmissionFields idSuffix={record.id} values={record} />       // edit
+```
+
+**Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
