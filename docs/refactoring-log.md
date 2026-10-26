@@ -152,3 +152,32 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 5. Extract the transcript reveal out of `OnboardingPage` into a hook
+
+**Smell:** [Long Method](https://refactoring.guru/smells/long-method) · **Move:** Extract Method (custom hook) · **Jira:** SCRUM-80 · **Commit:** [`8518ac8`](https://github.com/WeildTheSword/streetcar/commit/8518ac8)
+
+**Before.** `OnboardingPage` was one 542-line component holding ten `useState` hooks. The profile form's state (Splash ID, major, graduation term, goal, focus) sat next to the animated reveal: a row counter and a stage counter, two timer effects that advanced them, and four values derived from them. Reading the form meant reading past the animation, and the reveal could only be tested through the whole page.
+
+```jsx
+// OnboardingPage
+const [rows, setRows] = useState(0);
+const [stage, setStage] = useState(0);
+useEffect(() => { /* stream one row every 130 ms while phase is "transcript" */ }, [phase, rows, transcript.length]);
+useEffect(() => { /* advance one stage every 850 ms while phase is "scan" */ }, [phase, stage]);
+const shown = transcript.slice(0, rows);
+const transcriptDone = transcript.length > 0 && rows >= transcript.length;
+```
+
+**After.** `hooks/useTranscriptReveal.js` owns the counters, both effects, the timings and the derived values. The page keeps its form state, the student fetch and the phase, and asks the hook for what it renders.
+
+```jsx
+const { shown, credits, transcriptDone, stage, scanComplete } = useTranscriptReveal({
+  transcript,
+  streaming: phase === "transcript",
+  scanning: phase === "scan",
+  stageCount: STAGES.length,
+});
+```
+
+**Result.** The page drops from 542 to 527 lines and from ten `useState` hooks to eight, with no reveal state or effects of its own. `OnboardingPage.test.jsx` was written first and passed on the unchanged page — one render test and four interaction tests that drive the profile, transcript and scan steps on fake timers — and passes unchanged after the move. `useTranscriptReveal.test.js` adds two `renderHook` cases for what the page cannot easily reach: an empty transcript is never reported as done, and streaming pauses with its progress kept when its flag turns off. The full suite is 38 tests, all passing.
