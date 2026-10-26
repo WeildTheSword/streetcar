@@ -152,3 +152,39 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 7. Replace `LoginPage`'s copy conditionals with lookup tables
+
+**Smell:** Repeated conditional · **Move:** Replace Conditional with a lookup table · **Jira:** SCRUM-75 · **Commit:** [`da766b0`](https://github.com/WeildTheSword/streetcar/commit/da766b0)
+
+**Before.** `LoginPage.jsx` chose its copy by branching on the same two values again and again: `mode === "signup"` picked the eyebrow, heading, lede and switch link, and `role === "ADVISOR"` picked the role label, the "Not a student?" link, the wrong-account error and two transition messages. The strings for one mode or role were scattered across the file, and a third mode or role would have meant finding and editing every branch.
+
+```jsx
+<h2>{mode === "signup" ? "Create your account" : "Welcome back"}</h2>
+<p>
+  {mode === "signup"
+    ? "Takes a moment. Streetcar builds the rest from your record."
+    : "Use your Tulane credentials to continue."}
+</p>
+// ...and in the handlers
+setError(
+  role === "ADVISOR"
+    ? "That is a student account. Choose Student, or use advisor credentials."
+    : "That is an advisor account. Choose Advisor, or use student credentials.",
+);
+```
+
+**After.** `MODE_COPY` and `ROLE_COPY` hold every mode- and role-specific string, keyed by mode and by role. The component looks its copy up once and reads from it.
+
+```jsx
+const MODE_COPY = {
+  signup: { eyebrow: "sign up", heading: "Create your account", lede: "...", switchLabel: "...", switchTo: "signin" },
+  signin: { eyebrow: "sign in", heading: "Welcome back", lede: "...", switchLabel: "...", switchTo: "signup" },
+};
+
+<h2>{modeCopy.heading}</h2>
+<p>{modeCopy.lede}</p>
+setError(ROLE_COPY[role].wrongAccount);
+```
+
+**Result.** No copy ternary on `mode` or `role` remains. The conditionals that are left choose behavior (which form to show, which route to open), not words. `LoginPage.test.jsx` was written and committed first, against the old code: a render test, a sign-up/sign-in toggle test, and two tests for the role copy (the wrong-account error and the transition message). All four pass unchanged after the refactor, and `npm run lint` and `npm run build` pass with no new warnings.
