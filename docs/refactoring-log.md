@@ -185,3 +185,53 @@ export function StudentDashboard() {
 ```
 
 **Result.** The page drops from 503 to 126 lines, and the largest section file is 84 lines. `StudentDashboard.test.jsx` (one render test, one walkthrough interaction test) was committed first, against the unchanged page, and passes unchanged after the split; the full suite passes, 33 of 33. The rendered DOM for the fixture student was captured before and after and is byte-identical, so there is no visual change.
+
+## 6. Extract one helper per list out of `DemoFixtures.morgan()`
+
+**Smell:** [Long Method](https://refactoring.guru/smells/long-method) · **Move:** Extract Method · **Jira:** SCRUM-74 · **Commit:** [`9df6c17`](https://github.com/WeildTheSword/streetcar/commit/9df6c17)
+
+**Before.** `morgan()` was 106 lines: one `new Student(...)` call that built eight unrelated lists inline, from career matches to weekly actions. Reading what a student is made of meant scrolling past every transcript row and alumni message, and the only way to tell where one list ended and the next began was to count parentheses.
+
+```java
+public Student morgan(Identity who, boolean onboarded) {
+    return new Student(
+        MORGAN_ID, who.name(), who.initials(), /* ...scalar fields... */ onboarded,
+        List.of(
+            new CareerMatch("Private Equity Analyst", 79),
+            // ...3 more
+        ),
+        List.of(
+            new Concern("The technical screen", /* ... */),
+            // ...3 more
+        ),
+        // ...six more inline lists, 80 more lines
+    );
+}
+```
+
+**After.** Each list is a private method named for what it holds, and `morgan()` reads as a table of contents.
+
+```java
+public Student morgan(Identity who, boolean onboarded) {
+    return new Student(
+        MORGAN_ID, who.name(), who.initials(), /* ...scalar fields... */ onboarded,
+        careerMatches(),
+        concerns(),
+        firms(),
+        strategies(),
+        transcript(),
+        recommendedCourses(),
+        alumniConversations(),
+        weeklyActions()
+    );
+}
+
+private static List<CareerMatch> careerMatches() {
+    return List.of(
+        new CareerMatch("Private Equity Analyst", 79),
+        // ...
+    );
+}
+```
+
+**Result.** `morgan()` drops from 106 lines to 24 and fits on one screen. The list contents were moved, not retyped, and the JSON from `GET /students/morgan-thibodaux`, `/advisors/bill-hudlow/dashboard` and both `/auth/login` accounts is byte-identical before and after. `./mvnw verify` passes all 51 tests with the service coverage gate met.
