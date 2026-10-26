@@ -23,9 +23,9 @@ public class DemoFixtures {
     public List<DemoUser> users() {
         return List.of(
             new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID,
-                MORGAN.name(), MORGAN.initials(), "Finance + CS · Junior"),
+                MORGAN, "Finance + CS · Junior"),
             new DemoUser("bill.hudlow@tulane.edu", "streetcar", "ADVISOR", BILL_ID,
-                BILL.name(), BILL.initials(), "Freeman · Consultant")
+                BILL, "Freeman · Consultant")
         );
     }
 
@@ -33,8 +33,7 @@ public class DemoFixtures {
     public Student morgan(Identity who, boolean onboarded) {
         return new Student(
             MORGAN_ID,
-            who.name(),
-            who.initials(),
+            who,
             "Finance + CS",
             "Junior",
             3.89,
@@ -170,23 +169,22 @@ public class DemoFixtures {
     }
 
     public Advisor bill(Identity who) {
-        return new Advisor(BILL_ID, who.name(), who.initials(),
-            "Freeman · Consultant", 28, 7);
+        return new Advisor(BILL_ID, who, "Freeman · Consultant", 28, 7);
     }
 
     /** Today's appointments; the first one is with the demo student, shown as {@code morgan}. */
     public List<Appointment> schedule(Identity morgan) {
         return List.of(
-            new Appointment("appt-1", MORGAN_ID, morgan.name(), morgan.initials(), "11:30 AM",
+            new Appointment("appt-1", MORGAN_ID, morgan, "11:30 AM",
                 "Finance + CS", "Junior", 3.82, "Investment Banking",
                 List.of("Interview Thursday", "Pre-brief ready")),
-            new Appointment("appt-2", "jasmine-okoye", "Jasmine L. Okoye", "JL", "1:00 PM",
+            new Appointment("appt-2", "jasmine-okoye", new Identity("Jasmine L. Okoye", "JL"), "1:00 PM",
                 "Public Health", "Senior", 3.91, "Healthcare Consulting",
                 List.of("Undecided between 2 offers")),
-            new Appointment("appt-3", "diego-ramirez", "Diego Ramirez", "DR", "2:15 PM",
+            new Appointment("appt-3", "diego-ramirez", new Identity("Diego Ramirez", "DR"), "2:15 PM",
                 "Econ", "Sophomore", 3.65, "Exploring",
                 List.of("First session", "Needs fingerprint")),
-            new Appointment("appt-4", "alex-park", "Alex Park", "AP", "3:45 PM",
+            new Appointment("appt-4", "alex-park", new Identity("Alex Park", "AP"), "3:45 PM",
                 "CS", "Junior", 3.78, "Product Management",
                 List.of("3 alumni matches"))
         );
