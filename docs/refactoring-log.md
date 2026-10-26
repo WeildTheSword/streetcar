@@ -152,3 +152,36 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 5. Split `StudentDashboard` into section components
+
+**Principle:** Single Responsibility · **Smell:** Large Class (God component), Long Method · **Move:** Extract Component (Extract Class) · **Jira:** SCRUM-79 · **Commit:** [`64392d8`](https://github.com/WeildTheSword/streetcar/commit/64392d8)
+
+**Before.** `StudentDashboard.jsx` was one 503-line function. It fetched the student, handled the loading and error states, and rendered every section of the page inline: the header, the match hero, four path cards, the course table, the alumni threads and the weekly checklist. Three private helpers (`SectionCard`, `CardCta`, `Panel`) and the conversation status map sat at the top of the same file. Changing one section meant reading past all the others, and the page had no tests.
+
+```jsx
+export function StudentDashboard() {
+  // ...fetch, error, loading...
+  return (
+    <AppShell ...>
+      <div className="mb-6 flex ...">            {/* page head, 18 lines */}
+      <div data-tour="hero" ...>                 {/* hero, 37 lines */}
+      <SectionCard eyebrow="My top firms">       {/* four cards, 90 lines */}
+      <Panel data-tour="courses" ...><table>     {/* course table, 57 lines */}
+      ...
+```
+
+**After.** Each section is its own component under `components/student/`, with its data passed in as props: `PathHeader`, `MatchHero`, `AdvisingMeetingCard`, `ConcernsCard`, `TopFirmsCard`, `StrategiesCard`, `CourseFitPanel`, `AlumniConversationsPanel` and `WeeklyActionsPanel`. The shared shells moved to `SectionCard.jsx` (with `CardCta`) and `Panel.jsx`. Helpers used by one section moved with it: `MindIcon` into `ConcernsCard`, the status map into `AlumniConversationsPanel`, the done count into `WeeklyActionsPanel`. The page now loads data, handles loading and error, and lays out the grid.
+
+```jsx
+<PathHeader firstName={student.name.split(" ")[0]} />
+<MatchHero matchPercent={student.matchPercent} ... />
+<div className="mt-3 grid grid-cols-4 gap-3">
+  <AdvisingMeetingCard />
+  <ConcernsCard concerns={student.concerns} />
+  <TopFirmsCard firms={student.firms} />
+  <StrategiesCard strategies={student.strategies} />
+</div>
+```
+
+**Result.** The page drops from 503 to 126 lines, and the largest section file is 84 lines. `StudentDashboard.test.jsx` (one render test, one walkthrough interaction test) was committed first, against the unchanged page, and passes unchanged after the split; the full suite passes, 33 of 33. The rendered DOM for the fixture student was captured before and after and is byte-identical, so there is no visual change.
