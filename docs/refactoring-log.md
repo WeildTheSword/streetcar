@@ -152,3 +152,29 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 5. Move the text trimming onto `Submission` and extract the not-found helper
+
+**Smell:** [Duplicate Code](https://refactoring.guru/smells/duplicate-code), [Feature Envy](https://refactoring.guru/smells/feature-envy) · **Move:** Move Method, Extract Method · **Jira:** SCRUM-81 · **Commit:** [`4564f45`](https://github.com/WeildTheSword/streetcar/commit/4564f45)
+
+**Before.** `create()` and `update()` both reached into the `Submission` to trim the same three text fields before binding them, and the not-found exception was built by hand in three places. A fourth text field, or a change to the message, meant editing every copy.
+
+```java
+// SubmissionService.create() and update()
+.params(input.gpa(), input.completedCourses().strip(),
+        input.major().strip(), input.careerGoal().strip())
+// getById(), update() and delete()
+throw new NoSuchElementException("Submission " + id + " not found");
+```
+
+**After.** `Submission.normalized()` returns a trimmed copy, so the rule lives on the record whose fields it touches. One private `notFound(id)` builds the exception.
+
+```java
+// SubmissionService
+Submission clean = input.normalized();
+jdbc.sql("INSERT ...").params(clean.gpa(), clean.completedCourses(), clean.major(), clean.careerGoal())
+...
+throw notFound(id);
+```
+
+**Result.** `SubmissionService` no longer calls `.strip()`, and the message is built once. The nine existing `SubmissionServiceTest` cases pass unchanged, including the trimming and the three not-found cases; `SubmissionTest` adds a unit test for `normalized()`. `./mvnw verify` passes with service line coverage at 100%.
