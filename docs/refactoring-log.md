@@ -205,7 +205,7 @@ private static List<CareerMatch> careerMatches() {
 
 ## 6. Pass `Identity` instead of a separate name and initials
 
-**Smell:** Data Clumps · **Move:** Introduce Parameter Object · **Jira:** SCRUM-77 · **Commit:** [`4edd427`](https://github.com/WeildTheSword/streetcar/commit/4edd427)
+**Smell:** [Data Clumps](https://refactoring.guru/smells/data-clumps) · **Move:** Introduce Parameter Object · **Jira:** SCRUM-77 · **Commit:** [`4edd427`](https://github.com/WeildTheSword/streetcar/commit/4edd427)
 
 **Before.** A person's name and initials always travelled together, but as two loose arguments. The `Identity` record already existed for the demo session state, yet `Student`, `Advisor`, `Appointment` and `DemoUser` all took the pair separately, so every call site unpacked it by hand, and sign-up packed it back up again.
 
