@@ -202,3 +202,37 @@ private static List<CareerMatch> careerMatches() {
 ```
 
 **Result.** `morgan()` drops from 106 lines to 24 and fits on one screen. The list contents were moved, not retyped, and the JSON from `GET /students/morgan-thibodaux`, `/advisors/bill-hudlow/dashboard` and both `/auth/login` accounts is byte-identical before and after. `./mvnw verify` passes all 51 tests with the service coverage gate met.
+
+## 6. Pass `Identity` instead of a separate name and initials
+
+**Smell:** Data Clumps · **Move:** Introduce Parameter Object · **Jira:** SCRUM-77 · **Commit:** [`4edd427`](https://github.com/WeildTheSword/streetcar/commit/4edd427)
+
+**Before.** A person's name and initials always travelled together, but as two loose arguments. The `Identity` record already existed for the demo session state, yet `Student`, `Advisor`, `Appointment` and `DemoUser` all took the pair separately, so every call site unpacked it by hand, and sign-up packed it back up again.
+
+```java
+// DemoFixtures
+new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID,
+    MORGAN.name(), MORGAN.initials(), "Finance + CS · Junior")
+new Advisor(BILL_ID, who.name(), who.initials(), "Freeman · Consultant", 28, 7)
+new Appointment("appt-1", MORGAN_ID, morgan.name(), morgan.initials(), "11:30 AM", ...)
+
+// AuthService.signUp
+DemoUser user = new DemoUser(email, password, role, profileId, name, initialsOf(name), subtitle);
+session.setIdentity(user.profileId(), new Identity(name, user.initials()));
+```
+
+**After.** Each of the four records has a second constructor that takes an `Identity` and delegates to the canonical one. Callers pass the `Identity` whole, and sign-up builds it once and hands the same object to both the account and the session.
+
+```java
+// DemoFixtures
+new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID, MORGAN, "Finance + CS · Junior")
+new Advisor(BILL_ID, who, "Freeman · Consultant", 28, 7)
+new Appointment("appt-1", MORGAN_ID, morgan, "11:30 AM", ...)
+
+// AuthService.signUp
+Identity who = new Identity(name, initialsOf(name));
+DemoUser user = new DemoUser(email, password, role, profileId, who, subtitle);
+session.setIdentity(user.profileId(), who);
+```
+
+**Result.** No call in `DemoFixtures` or `AuthService` passes `x.name(), x.initials()` as a pair any more. The record components are unchanged, so the JSON stays flat, and the responses from `/students/morgan-thibodaux`, `/advisors/bill-hudlow/dashboard` and both `/auth/login` accounts are byte-identical before and after. `DemoFixturesTest` gains `usersAreShownUnderTheFixtureIdentities`, and `./mvnw verify` passes all 52 tests with the service coverage gate met.
