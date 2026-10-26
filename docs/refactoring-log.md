@@ -152,3 +152,29 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 5. Give `StudentService` and `AdvisorService` one shared way to build the current Morgan
+
+**Smell:** [Duplicate Code](https://refactoring.guru/smells/duplicate-code), [Feature Envy](https://refactoring.guru/smells/feature-envy) · **Move:** Move Method · **Jira:** SCRUM-78 · **Commit:** [`1e4d0b0`](https://github.com/WeildTheSword/streetcar/commit/1e4d0b0)
+
+**Before.** Both services rebuilt "Morgan as of right now" themselves: look up the identity a sign-up gave the profile, look up the onboarding flag, and pass both to the fixture. The logic was more interested in `DemoSessionState` than in either service, and any new piece of per-session state would have meant editing both copies in step.
+
+```java
+// StudentService.getStudent()
+fixtures.morgan(session.identityOr(MORGAN_ID, MORGAN), session.isOnboarded(MORGAN_ID))
+// AdvisorService.getDashboard()
+Identity morgan = session.identityOr(MORGAN_ID, MORGAN);
+fixtures.morgan(morgan, session.isOnboarded(MORGAN_ID))
+```
+
+**After.** `CurrentProfiles` is the one place where the session state is laid over the fixtures. Both services ask it for the profile they need, and `AdvisorService` no longer depends on `DemoSessionState` at all.
+
+```java
+// StudentService
+return Optional.of(profiles.morgan());
+// AdvisorService
+List<Appointment> schedule = fixtures.schedule(profiles.morganIdentity());
+new AdvisorDashboard(profiles.bill(), profiles.morgan(), schedule.get(0), ...)
+```
+
+**Result.** Neither service calls `identityOr` or `isOnboarded` itself. Two tests were added before the change and passed on the old code: one per service, covering a sign-up name and onboarding. They pass unchanged after it, and `CurrentProfilesTest` adds three cases. Against the running API, `/students/morgan-thibodaux` and `/advisors/bill-hudlow/dashboard` return byte-identical JSON before and after, both fresh and after onboarding plus a sign-up that renames Morgan. `./mvnw verify` passes.
