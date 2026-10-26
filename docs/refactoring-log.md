@@ -155,7 +155,7 @@ public ResponseEntity<Void> reset() {
 
 ## 7. Replace `LoginPage`'s copy conditionals with lookup tables
 
-**Smell:** Repeated conditional · **Move:** Replace Conditional with a lookup table · **Jira:** SCRUM-75 · **Commit:** [`da766b0`](https://github.com/WeildTheSword/streetcar/commit/da766b0)
+**Smell:** [Switch Statements](https://refactoring.guru/smells/switch-statements) (the same conditional repeated) · **Move:** Replace Conditional with a lookup table · **Jira:** SCRUM-75 · **Commit:** [`da766b0`](https://github.com/WeildTheSword/streetcar/commit/da766b0)
 
 **Before.** `LoginPage.jsx` chose its copy by branching on the same two values again and again: `mode === "signup"` picked the eyebrow, heading, lede and switch link, and `role === "ADVISOR"` picked the role label, the "Not a student?" link, the wrong-account error and two transition messages. The strings for one mode or role were scattered across the file, and a third mode or role would have meant finding and editing every branch.
 
