@@ -155,7 +155,7 @@ public ResponseEntity<Void> reset() {
 
 ## 5. Extract one helper per list out of `DemoFixtures.morgan()`
 
-**Smell:** Long Method · **Move:** Extract Method · **Jira:** SCRUM-74 · **Commit:** [`9df6c17`](https://github.com/WeildTheSword/streetcar/commit/9df6c17)
+**Smell:** [Long Method](https://refactoring.guru/smells/long-method) · **Move:** Extract Method · **Jira:** SCRUM-74 · **Commit:** [`9df6c17`](https://github.com/WeildTheSword/streetcar/commit/9df6c17)
 
 **Before.** `morgan()` was 106 lines: one `new Student(...)` call that built eight unrelated lists inline, from career matches to weekly actions. Reading what a student is made of meant scrolling past every transcript row and alumni message, and the only way to tell where one list ended and the next began was to count parentheses.
 
