@@ -152,3 +152,50 @@ public ResponseEntity<Void> reset() {
 ```
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
+
+## 8. Split `AdvisorDashboard` into section components
+
+**Smell:** [Large Class](https://refactoring.guru/smells/large-class) (God component), [Long Method](https://refactoring.guru/smells/long-method) · **Move:** Extract Component (Extract Class) · **Jira:** SCRUM-76 · **Commit:** [`c7f08b5`](https://github.com/WeildTheSword/streetcar/commit/c7f08b5)
+
+**Before.** `AdvisorDashboard.jsx` was one 521-line component. It fetched the dashboard, handled the loading and error states, and then rendered every section of the advisor console inline: the heading, the pre-brief hero, four student cards, today's schedule, the updates feed and the alumni radar table. The lookup tables for chip colors and feed icons sat at the top of the file, far from the sections that used them, and none of it had a test.
+
+```jsx
+export function AdvisorDashboard() {
+  // ...fetch, error and loading states...
+  return (
+    <AppShell sections={sections} /* ... */>
+      {/* Hero pre-brief */}
+      <div data-tour="prebrief" /* ...58 lines... */>
+      {/* Four cards */}
+      <div className="mt-3 grid grid-cols-4 gap-3">
+        <Card title={`${firstName} is talking to`} /* ...120 lines for four cards... */>
+      {/* Schedule + updates */}
+      {/* Alumni radar */}
+      <section data-tour="radar" /* ...67 lines... */>
+    </AppShell>
+  );
+}
+```
+
+**After.** Each section is its own component under `components/advisor/`, takes its data as props, and keeps its own lookup table (`STATUS_CHIP` in `TalkingToCard`, `TONE_DOT` in `ConcernsCard`, `FEED_ICON` in `UpdatesFeed`). The page loads the data and lays the sections out.
+
+```jsx
+<AppShell sections={SECTIONS} /* ... */>
+  <AppointmentHeading greetingName={/* ... */} />
+  <PreBriefHero nextStudent={nextStudent} nextAppointment={nextAppointment} />
+  <div className="mt-3 grid grid-cols-4 gap-3">
+    <TalkingToCard firstName={firstName} conversations={nextStudent.conversations} />
+    <ConcernsCard firstName={firstName} concerns={nextStudent.concerns} />
+    <TopFirmCard /* ... */ />
+    <StrategiesCard firstName={firstName} strategies={nextStudent.strategies} />
+  </div>
+  <div className="mt-7 grid grid-cols-[1fr_360px] gap-7">
+    <TodaySchedule schedule={schedule} nextStudentId={nextStudent.id} />
+    <UpdatesFeed updates={updates} />
+  </div>
+  <AlumniRadar alumniRadar={alumniRadar} />
+  <DemoGuide key="advisor" steps={ADVISOR_STEPS} intro />
+</AppShell>
+```
+
+**Result.** The page drops from 521 to 123 lines, and the largest section file is 81 lines. The JSX was moved by line range, not retyped. `AdvisorDashboard.test.jsx` (a render test that also checks the three walkthrough targets, a walkthrough interaction test, and a failed-load test) was committed first, against the unchanged page, and passes unchanged after the split. The rendered DOM for the fixture dashboard was captured before and after and is byte-identical, so the console looks the same. `npm run lint` and `npm run build` pass with no new warnings.
