@@ -33,6 +33,19 @@ class DemoFixturesTest {
     }
 
     @Test
+    void usersAreShownUnderTheFixtureIdentities() {
+        // Arrange: fresh fixtures from setUp
+
+        // Act
+        List<Identity> shown = fixtures.users().stream()
+            .map(user -> new Identity(user.displayName(), user.initials()))
+            .toList();
+
+        // Assert
+        assertEquals(List.of(DemoFixtures.MORGAN, DemoFixtures.BILL), shown);
+    }
+
+    @Test
     void profilesAreShownUnderTheIdentityPassedIn() {
         // Arrange
         Identity alex = new Identity("Alex Rivera", "AR");

@@ -28,6 +28,40 @@ const DEMO_ACCOUNTS = [
   },
 ];
 
+const MODE_COPY = {
+  signup: {
+    eyebrow: "sign up",
+    heading: "Create your account",
+    lede: "Takes a moment. Streetcar builds the rest from your record.",
+    switchLabel: "Already have an account? Sign in",
+    switchTo: "signin",
+  },
+  signin: {
+    eyebrow: "sign in",
+    heading: "Welcome back",
+    lede: "Use your Tulane credentials to continue.",
+    switchLabel: "Need an account? Create one",
+    switchTo: "signup",
+  },
+};
+
+const ROLE_COPY = {
+  STUDENT: {
+    label: "Student",
+    notThisRole: "Not a student?",
+    wrongAccount: "That is an advisor account. Choose Advisor, or use student credentials.",
+    signingIn: "Opening your path",
+    signingUp: "Setting up your account",
+  },
+  ADVISOR: {
+    label: "Advisor",
+    notThisRole: "Not an advisor?",
+    wrongAccount: "That is a student account. Choose Student, or use advisor credentials.",
+    signingIn: "Opening your console",
+    signingUp: "Setting up your console",
+  },
+};
+
 export function LoginPage() {
   const { login, logout, register } = useAuth();
   const { run } = useStageTransition();
@@ -49,24 +83,17 @@ export function LoginPage() {
       const session = await login(email, password);
       if (role && session.role !== role) {
         logout();
-        setError(
-          role === "ADVISOR"
-            ? "That is a student account. Choose Student, or use advisor credentials."
-            : "That is an advisor account. Choose Advisor, or use student credentials.",
-        );
+        setError(ROLE_COPY[role].wrongAccount);
         setPending(false);
         return;
       }
-      await run(
-        session.role === "ADVISOR" ? "Opening your console" : "Opening your path",
-        () => {
-          if (session.role === "ADVISOR") {
-            navigate("/advisor", { replace: true });
-          } else {
-            navigate(session.onboarded ? "/student" : "/onboarding", { replace: true });
-          }
-        },
-      );
+      await run(ROLE_COPY[session.role].signingIn, () => {
+        if (session.role === "ADVISOR") {
+          navigate("/advisor", { replace: true });
+        } else {
+          navigate(session.onboarded ? "/student" : "/onboarding", { replace: true });
+        }
+      });
     } catch {
       setError("That email and password combination is not recognized.");
       setPending(false);
@@ -83,12 +110,9 @@ export function LoginPage() {
     setPending(true);
     try {
       await register({ name, email, password, role });
-      await run(
-        role === "ADVISOR" ? "Setting up your console" : "Setting up your account",
-        () => {
-          navigate("/welcome", { replace: true });
-        },
-      );
+      await run(ROLE_COPY[role].signingUp, () => {
+        navigate("/welcome", { replace: true });
+      });
     } catch {
       setError("That email is already registered. Try signing in instead.");
       setPending(false);
@@ -106,7 +130,8 @@ export function LoginPage() {
   }
 
   const accounts = DEMO_ACCOUNTS.filter((account) => account.role === role);
-  const roleLabel = role === "ADVISOR" ? "Advisor" : "Student";
+  const roleCopy = ROLE_COPY[role];
+  const modeCopy = MODE_COPY[mode];
 
   return (
     <div className="grid min-h-screen bg-canvas lg:grid-cols-[1.05fr_1fr]">
@@ -149,19 +174,15 @@ export function LoginPage() {
             className="flex items-center gap-1.5 text-[12px] font-medium text-muted-ink transition-colors hover:text-ink"
           >
             <ArrowLeft className="size-3.5" />
-            Not {roleLabel === "Advisor" ? "an advisor" : "a student"}?
+            {roleCopy.notThisRole}
           </button>
           <div className="mt-5 text-[11px] font-medium tracking-[0.14em] text-muted-ink-2 uppercase">
-            {roleLabel} {mode === "signup" ? "sign up" : "sign in"}
+            {roleCopy.label} {modeCopy.eyebrow}
           </div>
           <h2 className="mt-2.5 text-[26px] leading-tight font-semibold tracking-[-0.02em] text-ink">
-            {mode === "signup" ? "Create your account" : "Welcome back"}
+            {modeCopy.heading}
           </h2>
-          <p className="mt-2 text-[13.5px] text-muted-ink">
-            {mode === "signup"
-              ? "Takes a moment. Streetcar builds the rest from your record."
-              : "Use your Tulane credentials to continue."}
-          </p>
+          <p className="mt-2 text-[13.5px] text-muted-ink">{modeCopy.lede}</p>
 
           {mode === "signup" ? (
             <form onSubmit={handleSignUp} className="mt-7 flex flex-col gap-4">
@@ -324,14 +345,12 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => {
-                setMode(mode === "signup" ? "signin" : "signup");
+                setMode(modeCopy.switchTo);
                 setError(null);
               }}
               className="text-[12.5px] font-medium text-burgundy hover:underline"
             >
-              {mode === "signup"
-                ? "Already have an account? Sign in"
-                : "Need an account? Create one"}
+              {modeCopy.switchLabel}
             </button>
 
             {mode === "signin" && (

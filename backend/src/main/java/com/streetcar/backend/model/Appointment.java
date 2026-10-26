@@ -13,4 +13,19 @@ public record Appointment(
         String year,
         double gpa,
         String track,
-        List<String> tags) {}
+        List<String> tags) {
+
+    /** Takes the student's name and initials together, as the {@link Identity} they are shown under. */
+    public Appointment(
+            String id,
+            String studentId,
+            Identity student,
+            String time,
+            String major,
+            String year,
+            double gpa,
+            String track,
+            List<String> tags) {
+        this(id, studentId, student.name(), student.initials(), time, major, year, gpa, track, tags);
+    }
+}

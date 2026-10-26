@@ -11,4 +11,16 @@ public record DemoUser(
         String profileId,
         String displayName,
         String initials,
-        String subtitle) {}
+        String subtitle) {
+
+    /** Takes the display name and initials together, as the {@link Identity} they are shown under. */
+    public DemoUser(
+            String email,
+            String password,
+            String role,
+            String profileId,
+            Identity who,
+            String subtitle) {
+        this(email, password, role, profileId, who.name(), who.initials(), subtitle);
+    }
+}
