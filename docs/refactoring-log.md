@@ -153,7 +153,124 @@ public ResponseEntity<Void> reset() {
 
 **Result.** The rendered page is the same, and both existing `SubmissionsPage` test files pass unchanged. `SubmissionFields.test.jsx` adds a render test and an interaction test for the new component. The page drops from 147 to 135 lines, and the field markup now exists in one place.
 
-## 7. Replace `LoginPage`'s copy conditionals with lookup tables
+## 5. Split `StudentDashboard` into section components
+
+**Principle:** Single Responsibility · **Smell:** Large Class (God component), Long Method · **Move:** Extract Component (Extract Class) · **Jira:** SCRUM-79 · **Commit:** [`64392d8`](https://github.com/WeildTheSword/streetcar/commit/64392d8)
+
+**Before.** `StudentDashboard.jsx` was one 503-line function. It fetched the student, handled the loading and error states, and rendered every section of the page inline: the header, the match hero, four path cards, the course table, the alumni threads and the weekly checklist. Three private helpers (`SectionCard`, `CardCta`, `Panel`) and the conversation status map sat at the top of the same file. Changing one section meant reading past all the others, and the page had no tests.
+
+```jsx
+export function StudentDashboard() {
+  // ...fetch, error, loading...
+  return (
+    <AppShell ...>
+      <div className="mb-6 flex ...">            {/* page head, 18 lines */}
+      <div data-tour="hero" ...>                 {/* hero, 37 lines */}
+      <SectionCard eyebrow="My top firms">       {/* four cards, 90 lines */}
+      <Panel data-tour="courses" ...><table>     {/* course table, 57 lines */}
+      ...
+```
+
+**After.** Each section is its own component under `components/student/`, with its data passed in as props: `PathHeader`, `MatchHero`, `AdvisingMeetingCard`, `ConcernsCard`, `TopFirmsCard`, `StrategiesCard`, `CourseFitPanel`, `AlumniConversationsPanel` and `WeeklyActionsPanel`. The shared shells moved to `SectionCard.jsx` (with `CardCta`) and `Panel.jsx`. Helpers used by one section moved with it: `MindIcon` into `ConcernsCard`, the status map into `AlumniConversationsPanel`, the done count into `WeeklyActionsPanel`. The page now loads data, handles loading and error, and lays out the grid.
+
+```jsx
+<PathHeader firstName={student.name.split(" ")[0]} />
+<MatchHero matchPercent={student.matchPercent} ... />
+<div className="mt-3 grid grid-cols-4 gap-3">
+  <AdvisingMeetingCard />
+  <ConcernsCard concerns={student.concerns} />
+  <TopFirmsCard firms={student.firms} />
+  <StrategiesCard strategies={student.strategies} />
+</div>
+```
+
+**Result.** The page drops from 503 to 126 lines, and the largest section file is 84 lines. `StudentDashboard.test.jsx` (one render test, one walkthrough interaction test) was committed first, against the unchanged page, and passes unchanged after the split; the full suite passes, 33 of 33. The rendered DOM for the fixture student was captured before and after and is byte-identical, so there is no visual change.
+
+## 6. Extract one helper per list out of `DemoFixtures.morgan()`
+
+**Smell:** [Long Method](https://refactoring.guru/smells/long-method) · **Move:** Extract Method · **Jira:** SCRUM-74 · **Commit:** [`9df6c17`](https://github.com/WeildTheSword/streetcar/commit/9df6c17)
+
+**Before.** `morgan()` was 106 lines: one `new Student(...)` call that built eight unrelated lists inline, from career matches to weekly actions. Reading what a student is made of meant scrolling past every transcript row and alumni message, and the only way to tell where one list ended and the next began was to count parentheses.
+
+```java
+public Student morgan(Identity who, boolean onboarded) {
+    return new Student(
+        MORGAN_ID, who.name(), who.initials(), /* ...scalar fields... */ onboarded,
+        List.of(
+            new CareerMatch("Private Equity Analyst", 79),
+            // ...3 more
+        ),
+        List.of(
+            new Concern("The technical screen", /* ... */),
+            // ...3 more
+        ),
+        // ...six more inline lists, 80 more lines
+    );
+}
+```
+
+**After.** Each list is a private method named for what it holds, and `morgan()` reads as a table of contents.
+
+```java
+public Student morgan(Identity who, boolean onboarded) {
+    return new Student(
+        MORGAN_ID, who.name(), who.initials(), /* ...scalar fields... */ onboarded,
+        careerMatches(),
+        concerns(),
+        firms(),
+        strategies(),
+        transcript(),
+        recommendedCourses(),
+        alumniConversations(),
+        weeklyActions()
+    );
+}
+
+private static List<CareerMatch> careerMatches() {
+    return List.of(
+        new CareerMatch("Private Equity Analyst", 79),
+        // ...
+    );
+}
+```
+
+**Result.** `morgan()` drops from 106 lines to 24 and fits on one screen. The list contents were moved, not retyped, and the JSON from `GET /students/morgan-thibodaux`, `/advisors/bill-hudlow/dashboard` and both `/auth/login` accounts is byte-identical before and after. `./mvnw verify` passes all 51 tests with the service coverage gate met.
+
+## 7. Pass `Identity` instead of a separate name and initials
+
+**Smell:** [Data Clumps](https://refactoring.guru/smells/data-clumps) · **Move:** Introduce Parameter Object · **Jira:** SCRUM-77 · **Commit:** [`4edd427`](https://github.com/WeildTheSword/streetcar/commit/4edd427)
+
+**Before.** A person's name and initials always travelled together, but as two loose arguments. The `Identity` record already existed for the demo session state, yet `Student`, `Advisor`, `Appointment` and `DemoUser` all took the pair separately, so every call site unpacked it by hand, and sign-up packed it back up again.
+
+```java
+// DemoFixtures
+new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID,
+    MORGAN.name(), MORGAN.initials(), "Finance + CS · Junior")
+new Advisor(BILL_ID, who.name(), who.initials(), "Freeman · Consultant", 28, 7)
+new Appointment("appt-1", MORGAN_ID, morgan.name(), morgan.initials(), "11:30 AM", ...)
+
+// AuthService.signUp
+DemoUser user = new DemoUser(email, password, role, profileId, name, initialsOf(name), subtitle);
+session.setIdentity(user.profileId(), new Identity(name, user.initials()));
+```
+
+**After.** Each of the four records has a second constructor that takes an `Identity` and delegates to the canonical one. Callers pass the `Identity` whole, and sign-up builds it once and hands the same object to both the account and the session.
+
+```java
+// DemoFixtures
+new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID, MORGAN, "Finance + CS · Junior")
+new Advisor(BILL_ID, who, "Freeman · Consultant", 28, 7)
+new Appointment("appt-1", MORGAN_ID, morgan, "11:30 AM", ...)
+
+// AuthService.signUp
+Identity who = new Identity(name, initialsOf(name));
+DemoUser user = new DemoUser(email, password, role, profileId, who, subtitle);
+session.setIdentity(user.profileId(), who);
+```
+
+**Result.** No call in `DemoFixtures` or `AuthService` passes `x.name(), x.initials()` as a pair any more. The record components are unchanged, so the JSON stays flat, and the responses from `/students/morgan-thibodaux`, `/advisors/bill-hudlow/dashboard` and both `/auth/login` accounts are byte-identical before and after. `DemoFixturesTest` gains `usersAreShownUnderTheFixtureIdentities`, and `./mvnw verify` passes all 52 tests with the service coverage gate met.
+
+## 8. Replace `LoginPage`'s copy conditionals with lookup tables
 
 **Smell:** [Switch Statements](https://refactoring.guru/smells/switch-statements) (the same conditional repeated) · **Move:** Replace Conditional with a lookup table · **Jira:** SCRUM-75 · **Commit:** [`da766b0`](https://github.com/WeildTheSword/streetcar/commit/da766b0)
 
