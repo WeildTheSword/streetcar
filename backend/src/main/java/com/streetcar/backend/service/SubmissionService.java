@@ -23,25 +23,25 @@ public class SubmissionService {
     public Submission getById(long id) {
         return jdbc.sql("SELECT * FROM submissions WHERE id = ?")
                 .param(id).query(Submission.class).optional()
-                .orElseThrow(() -> new NoSuchElementException("Submission " + id + " not found"));
+                .orElseThrow(() -> notFound(id));
     }
 
     public Submission create(Submission input) {
+        Submission clean = input.normalized();
         var key = new GeneratedKeyHolder();
         jdbc.sql("INSERT INTO submissions (gpa, completed_courses, major, career_goal) VALUES (?, ?, ?, ?)")
-                .params(input.gpa(), input.completedCourses().strip(),
-                        input.major().strip(), input.careerGoal().strip())
+                .params(clean.gpa(), clean.completedCourses(), clean.major(), clean.careerGoal())
                 .update(key, "id");
         return getById(key.getKey().longValue());
     }
 
     public Submission update(long id, Submission input) {
+        Submission clean = input.normalized();
         int rows = jdbc.sql("UPDATE submissions SET gpa = ?, completed_courses = ?, major = ?, career_goal = ? WHERE id = ?")
-                .params(input.gpa(), input.completedCourses().strip(),
-                        input.major().strip(), input.careerGoal().strip(), id)
+                .params(clean.gpa(), clean.completedCourses(), clean.major(), clean.careerGoal(), id)
                 .update();
         if (rows == 0) {
-            throw new NoSuchElementException("Submission " + id + " not found");
+            throw notFound(id);
         }
         return getById(id);
     }
@@ -49,7 +49,11 @@ public class SubmissionService {
     public void delete(long id) {
         int rows = jdbc.sql("DELETE FROM submissions WHERE id = ?").param(id).update();
         if (rows == 0) {
-            throw new NoSuchElementException("Submission " + id + " not found");
+            throw notFound(id);
         }
+    }
+
+    private static NoSuchElementException notFound(long id) {
+        return new NoSuchElementException("Submission " + id + " not found");
     }
 }
