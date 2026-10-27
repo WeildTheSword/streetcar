@@ -17,6 +17,7 @@ import { FerpaDialog } from "@/components/FerpaDialog";
 import { DemoGuide } from "@/components/DemoGuide";
 import { PROFILE_STEPS, SCAN_STEPS, TRANSCRIPT_STEPS } from "@/data/guideSteps";
 import { fetchStudent } from "@/services/api";
+import { STAGE_MS, useTranscriptReveal } from "@/hooks/useTranscriptReveal";
 import { cn } from "@/lib/utils";
 
 const STAGES = [
@@ -25,9 +26,6 @@ const STAGES = [
   { label: "Scanning alumni graph", detail: "1,204 alumni · 38 in IB" },
   { label: "Assembling career fingerprint", detail: "5 signals weighted" },
 ];
-
-const STAGE_MS = 850;
-const ROW_MS = 130;
 
 const CAREER_GOALS = [
   "Investment Banking",
@@ -100,8 +98,6 @@ export function OnboardingPage() {
   const [gradTerm, setGradTerm] = useState(GRAD_TERMS[0]);
   const [goal, setGoal] = useState(CAREER_GOALS[0]);
   const [focus, setFocus] = useState("");
-  const [rows, setRows] = useState(0);
-  const [stage, setStage] = useState(0);
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -116,23 +112,12 @@ export function OnboardingPage() {
 
   const transcript = useMemo(() => student?.transcript ?? [], [student]);
 
-  // Stream transcript rows in once the record is pulled.
-  useEffect(() => {
-    if (phase !== "transcript" || rows >= transcript.length) return undefined;
-    const timer = setTimeout(() => setRows((current) => current + 1), ROW_MS);
-    return () => clearTimeout(timer);
-  }, [phase, rows, transcript.length]);
-
-  useEffect(() => {
-    if (phase !== "scan" || stage >= STAGES.length) return undefined;
-    const timer = setTimeout(() => setStage((current) => current + 1), STAGE_MS);
-    return () => clearTimeout(timer);
-  }, [phase, stage]);
-
-  const shown = transcript.slice(0, rows);
-  const credits = shown.reduce((total, entry) => total + entry.credits, 0);
-  const transcriptDone = transcript.length > 0 && rows >= transcript.length;
-  const scanComplete = stage >= STAGES.length;
+  const { shown, credits, transcriptDone, stage, scanComplete } = useTranscriptReveal({
+    transcript,
+    streaming: phase === "transcript",
+    scanning: phase === "scan",
+    stageCount: STAGES.length,
+  });
 
   async function handleContinue() {
     setPending(true);
@@ -448,7 +433,7 @@ export function OnboardingPage() {
                 className="absolute inset-x-0 h-px bg-brass shadow-[0_0_18px_4px_rgba(184,147,90,0.55)]"
                 style={{
                   top: `${(stage / STAGES.length) * 100}%`,
-                  transition: "top 850ms cubic-bezier(0.16, 1, 0.3, 1)",
+                  transition: `top ${STAGE_MS}ms cubic-bezier(0.16, 1, 0.3, 1)`,
                 }}
               />
             )}
