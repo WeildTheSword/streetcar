@@ -7,4 +7,10 @@ public record Advisor(
         String initials,
         String title,
         int studentCount,
-        int appointmentCount) {}
+        int appointmentCount) {
+
+    /** Takes the name and initials together, as the {@link Identity} they are shown under. */
+    public Advisor(String id, Identity who, String title, int studentCount, int appointmentCount) {
+        this(id, who.name(), who.initials(), title, studentCount, appointmentCount);
+    }
+}

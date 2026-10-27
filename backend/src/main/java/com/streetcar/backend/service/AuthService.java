@@ -56,17 +56,17 @@ public class AuthService {
 
         AccountRole role = AccountRole.fromRequest(request.role());
         String name = request.name().trim();
+        Identity who = new Identity(name, initialsOf(name));
         DemoUser user = new DemoUser(
             email,
             request.password(),
             role.name(),
             role.fixtureProfileId(),
-            name,
-            initialsOf(name),
+            who,
             role.defaultSubtitle());
         created.put(email, user);
         // Keep the fixture profile, wear the new name over it.
-        session.setIdentity(user.profileId(), new Identity(name, user.initials()));
+        session.setIdentity(user.profileId(), who);
         return Optional.of(toResponse(user));
     }
 
