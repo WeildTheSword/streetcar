@@ -151,6 +151,17 @@ Sprints run about two weeks, one per course module. The instructor is the produc
 
 **Code and documents go to GitHub, never to Canvas.** Canvas takes quiz answers and these text-box submissions only; attaching files or pasting code there is explicitly called out as wrong.
 
+### Code smells and refactoring
+
+The reference for code smells is **[refactoring.guru/refactoring/smells](https://refactoring.guru/refactoring/smells)**. Name each smell the way that catalogue does (Long Method, Large Class, Duplicate Code, Feature Envy, Data Clumps, and so on), and link the smell's page in its `docs/refactoring-log.md` entry.
+
+**Never force a smell.** A refactoring ticket fixes a smell that is actually in the code, and fixes it in proportion to its size. Before starting one:
+
+- Open the code and confirm the smell is there as the ticket describes. Tickets are written ahead of the work and can be wrong or out of date.
+- If the smell is not there, or is too small to be worth a change, do not invent one and do not reshape working code to fit the ticket. Say so on the ticket and pick a different smell that is real.
+- Keep the fix as small as the smell. Don't add layers, interfaces or patterns the code doesn't need just to show a refactoring mechanic.
+- Prove that behavior is unchanged. Write or confirm tests that pass on the old code, keep them unchanged through the refactor, and where possible compare the live output before and after.
+
 ### Standing project requirements
 
 These are graded across the whole semester, not per sprint: authentication and authorization with at least two roles enforced in both layers; full CRUD on a core resource through the API and the UI; a PostgreSQL database via JPA; **≥70% line coverage on service classes**; a CI pipeline running tests on every push; class, package and sequence diagrams kept **updated each module**; a refactoring log with at least five before/after entries and commit links; and a design-pattern register of at least three patterns documented in `README.md` with rationale.
