@@ -41,33 +41,38 @@ public class AuthService {
      * data to render — there is only one student and one advisor fixture.
      */
     public Optional<AuthResponse> signUp(SignupRequest request) {
-        if (request == null
-                || isBlank(request.name())
-                || isBlank(request.email())
-                || isBlank(request.password())
-                || isBlank(request.role())) {
+        if (!isComplete(request)) {
             return Optional.empty();
         }
         String email = request.email().trim().toLowerCase();
-        boolean taken = allUsers().anyMatch(user -> user.email().equals(email));
-        if (taken) {
+        if (isTaken(email)) {
             return Optional.empty();
         }
+        DemoUser user = newAccount(request, email);
+        created.put(email, user);
+        // Keep the fixture profile, wear the new name over it.
+        session.setIdentity(user.profileId(), new Identity(user.displayName(), user.initials()));
+        return Optional.of(toResponse(user));
+    }
 
+    private static boolean isComplete(SignupRequest request) {
+        return request != null
+            && !isBlank(request.name())
+            && !isBlank(request.email())
+            && !isBlank(request.password())
+            && !isBlank(request.role());
+    }
+
+    private boolean isTaken(String email) {
+        return allUsers().anyMatch(user -> user.email().equals(email));
+    }
+
+    private static DemoUser newAccount(SignupRequest request, String email) {
         AccountRole role = AccountRole.fromRequest(request.role());
         String name = request.name().trim();
         Identity who = new Identity(name, initialsOf(name));
-        DemoUser user = new DemoUser(
-            email,
-            request.password(),
-            role.name(),
-            role.fixtureProfileId(),
-            who,
-            role.defaultSubtitle());
-        created.put(email, user);
-        // Keep the fixture profile, wear the new name over it.
-        session.setIdentity(user.profileId(), who);
-        return Optional.of(toResponse(user));
+        return new DemoUser(email, request.password(), role.name(),
+            role.fixtureProfileId(), who, role.defaultSubtitle());
     }
 
     public void clearCreatedAccounts() {
