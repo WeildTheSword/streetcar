@@ -1,5 +1,6 @@
 package com.streetcar.backend.service;
 
+import com.streetcar.backend.model.Identity;
 import com.streetcar.backend.model.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class StudentServiceTest {
     @BeforeEach
     void setUp() {
         session = new DemoSessionState();
-        service = new StudentService(new DemoFixtures(), session);
+        service = new StudentService(new CurrentProfiles(new DemoFixtures(), session), session);
     }
 
     @Test
@@ -69,5 +70,19 @@ class StudentServiceTest {
         // Assert
         assertTrue(student.isEmpty());
         assertFalse(session.isOnboarded(id));
+    }
+
+    @Test
+    void getStudentShowsSignUpNameOverTheFixture() {
+        // Arrange
+        session.setIdentity("morgan-thibodaux", new Identity("Jordan Lee", "JL"));
+
+        // Act
+        Student student = service.getStudent("morgan-thibodaux").orElseThrow();
+
+        // Assert
+        assertEquals("Jordan Lee", student.name());
+        assertEquals("JL", student.initials());
+        assertFalse(student.onboarded());
     }
 }

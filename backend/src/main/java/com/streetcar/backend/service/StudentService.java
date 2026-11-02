@@ -5,17 +5,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.streetcar.backend.service.DemoFixtures.MORGAN;
 import static com.streetcar.backend.service.DemoFixtures.MORGAN_ID;
 
 @Service
 public class StudentService {
 
-    private final DemoFixtures fixtures;
+    private final CurrentProfiles profiles;
     private final DemoSessionState session;
 
-    public StudentService(DemoFixtures fixtures, DemoSessionState session) {
-        this.fixtures = fixtures;
+    public StudentService(CurrentProfiles profiles, DemoSessionState session) {
+        this.profiles = profiles;
         this.session = session;
     }
 
@@ -23,7 +22,7 @@ public class StudentService {
         if (!MORGAN_ID.equals(id)) {
             return Optional.empty();
         }
-        return Optional.of(fixtures.morgan(session.identityOr(MORGAN_ID, MORGAN), session.isOnboarded(MORGAN_ID)));
+        return Optional.of(profiles.morgan());
     }
 
     public Optional<Student> completeFingerprint(String id) {
