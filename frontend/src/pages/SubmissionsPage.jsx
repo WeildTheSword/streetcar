@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/auth/useAuth";
 import { createSubmission, deleteSubmission, fetchSubmissions, updateSubmission } from "../services/submissionService";
 import SubmissionFields from "../components/SubmissionFields";
 import { BLANK_FIELD_MESSAGE, hasBlankField, readSubmission } from "../lib/submissionForm";
 import "../App.css";
 
 export default function SubmissionsPage() {
+  const { session } = useAuth();
+  // The API decides what comes back; the heading only says which view this is.
+  const isAdvisor = session?.role === "ADVISOR";
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -95,7 +99,7 @@ export default function SubmissionsPage() {
       </form>
       {error && <p role="alert">{error}</p>}
       {message && <p role="status">{message}</p>}
-      <h2>Submitted Profiles</h2>
+      <h2>{isAdvisor ? "All Submitted Profiles" : "Your Submitted Profiles"}</h2>
       {loading && <p role="status">Loading submissions…</p>}
       {loadError && <p role="alert">{loadError}</p>}
       {!loading && !loadError && records.length === 0 && <p>No profiles submitted yet.</p>}
