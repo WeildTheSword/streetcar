@@ -1,148 +1,167 @@
 package com.streetcar.backend.service;
 
 import com.streetcar.backend.model.Submission;
+import com.streetcar.backend.repository.SubmissionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Sort;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SubmissionServiceTest {
+    private static final OffsetDateTime CREATED_AT = OffsetDateTime.parse("2026-10-26T12:00:00Z");
+
+    private SubmissionRepository repository;
     private SubmissionService service;
 
     @BeforeEach
     void setUp() {
-        // Fresh in-memory database per test so tests never see each other's rows
-        var dataSource = new DriverManagerDataSource(
-                "jdbc:h2:mem:" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1", "sa", "");
-        new ResourceDatabasePopulator(new ClassPathResource("schema.sql")).execute(dataSource);
-        service = new SubmissionService(JdbcClient.create(dataSource));
+        repository = mock(SubmissionRepository.class);
+        service = new SubmissionService(repository);
     }
 
     private Submission input(String gpa, String courses, String major, String goal) {
         return new Submission(null, new BigDecimal(gpa), courses, major, goal, null);
     }
 
-    @Test
-    void createSavesRecordAndReturnsItWithGeneratedFields() {
-        // Arrange
-        Submission input = input("3.50", "  CMPS 1500  ", " Computer Science ", " Software Engineer ");
-
-        // Act
-        Submission created = service.create(input);
-
-        // Assert
-        assertNotNull(created.id());
-        assertNotNull(created.createdAt());
-        assertEquals(0, new BigDecimal("3.5").compareTo(created.gpa()));
-        assertEquals("CMPS 1500", created.completedCourses());
-        assertEquals("Computer Science", created.major());
-        assertEquals("Software Engineer", created.careerGoal());
+    private Submission savedArgument() {
+        ArgumentCaptor<Submission> saved = ArgumentCaptor.forClass(Submission.class);
+        verify(repository).save(saved.capture());
+        return saved.getValue();
     }
 
     @Test
-    void getAllReturnsEmptyListWhenNoRecordsExist() {
-        // Arrange: empty database from setUp
+    void createSavesTheTrimmedRecordAndReturnsWhatTheRepositorySaved() {
+        // Arrange
+        Submission stored = new Submission(1L, new BigDecimal("3.50"), "CMPS 1500", "Computer Science",
+                "Software Engineer", CREATED_AT);
+        when(repository.save(any())).thenReturn(stored);
+
+        // Act
+        Submission created = service.create(input("3.5", "  CMPS 1500  ", " Computer Science ", " Software Engineer "));
+
+        // Assert
+        assertSame(stored, created);
+        Submission saved = savedArgument();
+        assertEquals(new BigDecimal("3.50"), saved.getGpa());
+        assertEquals("CMPS 1500", saved.getCompletedCourses());
+        assertEquals("Computer Science", saved.getMajor());
+        assertEquals("Software Engineer", saved.getCareerGoal());
+    }
+
+    @Test
+    void createIgnoresAnIdAndCreatedAtSentByTheClient() {
+        // Arrange
+        Submission fromClient = new Submission(5L, new BigDecimal("3.00"), "None", "Finance", "Analyst", CREATED_AT);
+
+        // Act
+        service.create(fromClient);
+
+        // Assert
+        Submission saved = savedArgument();
+        assertNull(saved.getId());
+        assertNull(saved.getCreatedAt());
+    }
+
+    @Test
+    void getAllAsksTheRepositoryForNewestFirst() {
+        // Arrange
+        List<Submission> rows = List.of(input("3.00", "None", "Finance", "Analyst"));
+        when(repository.findAll(Sort.by(Sort.Direction.DESC, "id"))).thenReturn(rows);
 
         // Act
         List<Submission> all = service.getAll();
 
         // Assert
-        assertTrue(all.isEmpty());
-    }
-
-    @Test
-    void getAllReturnsNewestRecordFirst() {
-        // Arrange
-        Submission first = service.create(input("3.00", "None", "Finance", "Analyst"));
-        Submission second = service.create(input("3.90", "CMPS 2200", "Computer Science", "Researcher"));
-
-        // Act
-        List<Submission> all = service.getAll();
-
-        // Assert
-        assertEquals(List.of(second.id(), first.id()), all.stream().map(Submission::id).toList());
+        assertSame(rows, all);
     }
 
     @Test
     void getByIdReturnsMatchingRecord() {
         // Arrange
-        Submission created = service.create(input("2.75", "BSAN 3010", "Business", "Consultant"));
+        Submission stored = input("2.75", "BSAN 3010", "Business", "Consultant");
+        when(repository.findById(7L)).thenReturn(Optional.of(stored));
 
         // Act
-        Submission found = service.getById(created.id());
+        Submission found = service.getById(7L);
 
         // Assert
-        assertEquals(created, found);
+        assertSame(stored, found);
     }
 
     @Test
     void getByIdThrowsWhenRecordDoesNotExist() {
         // Arrange
-        long missingId = 999L;
+        when(repository.findById(999L)).thenReturn(Optional.empty());
 
         // Act + Assert
-        assertThrows(NoSuchElementException.class, () -> service.getById(missingId));
+        assertThrows(NoSuchElementException.class, () -> service.getById(999L));
     }
 
     @Test
-    void updateChangesFieldsAndKeepsIdAndCreatedAt() {
+    void updateSavesTheChangesAndKeepsIdAndCreatedAt() {
         // Arrange
-        Submission created = service.create(input("3.00", "None", "Finance", "Analyst"));
+        Submission existing = new Submission(7L, new BigDecimal("3.00"), "None", "Finance", "Analyst", CREATED_AT);
+        when(repository.findById(7L)).thenReturn(Optional.of(existing));
         Submission changes = input("3.25", " CMPS 1500 ", " Computer Science ", " Data Engineer ");
 
         // Act
-        Submission updated = service.update(created.id(), changes);
+        service.update(7L, changes);
 
         // Assert
-        assertEquals(created.id(), updated.id());
-        assertEquals(created.createdAt(), updated.createdAt());
-        assertEquals(0, new BigDecimal("3.25").compareTo(updated.gpa()));
-        assertEquals("CMPS 1500", updated.completedCourses());
-        assertEquals("Computer Science", updated.major());
-        assertEquals("Data Engineer", updated.careerGoal());
-        assertEquals(updated, service.getById(created.id()));
+        Submission saved = savedArgument();
+        assertEquals(7L, saved.getId());
+        assertEquals(CREATED_AT, saved.getCreatedAt());
+        assertEquals(new BigDecimal("3.25"), saved.getGpa());
+        assertEquals("CMPS 1500", saved.getCompletedCourses());
+        assertEquals("Computer Science", saved.getMajor());
+        assertEquals("Data Engineer", saved.getCareerGoal());
     }
 
     @Test
-    void updateThrowsWhenRecordDoesNotExist() {
+    void updateThrowsAndSavesNothingWhenRecordDoesNotExist() {
         // Arrange
+        when(repository.findById(999L)).thenReturn(Optional.empty());
         Submission changes = input("3.25", "None", "Finance", "Analyst");
 
         // Act + Assert
         assertThrows(NoSuchElementException.class, () -> service.update(999L, changes));
+        verify(repository, never()).save(any());
     }
 
     @Test
-    void deleteRemovesOnlyTheTargetRecord() {
+    void deleteRemovesTheTargetRecord() {
         // Arrange
-        Submission kept = service.create(input("3.00", "None", "Finance", "Analyst"));
-        Submission removed = service.create(input("3.90", "CMPS 2200", "Computer Science", "Researcher"));
+        when(repository.existsById(7L)).thenReturn(true);
 
         // Act
-        service.delete(removed.id());
+        service.delete(7L);
 
         // Assert
-        assertEquals(List.of(kept), service.getAll());
-        assertThrows(NoSuchElementException.class, () -> service.getById(removed.id()));
+        verify(repository).deleteById(7L);
     }
 
     @Test
-    void deleteThrowsWhenRecordDoesNotExist() {
+    void deleteThrowsAndRemovesNothingWhenRecordDoesNotExist() {
         // Arrange
-        long missingId = 999L;
+        when(repository.existsById(999L)).thenReturn(false);
 
         // Act + Assert
-        assertThrows(NoSuchElementException.class, () -> service.delete(missingId));
+        assertThrows(NoSuchElementException.class, () -> service.delete(999L));
+        verify(repository, never()).deleteById(any());
     }
 }

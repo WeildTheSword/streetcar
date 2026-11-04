@@ -23,10 +23,10 @@ public class SubmissionValidator {
 
     /** Throws {@link IllegalArgumentException} if the submission breaks any rule. */
     public void validate(Submission input) {
-        if (!validGpa(input.gpa())
-                || !validText(input.completedCourses(), MAX_COURSES)
-                || !validText(input.major(), MAX_MAJOR)
-                || !validText(input.careerGoal(), MAX_CAREER_GOAL)) {
+        if (!validGpa(input.getGpa())
+                || !validText(input.getCompletedCourses(), MAX_COURSES)
+                || !validText(input.getMajor(), MAX_MAJOR)
+                || !validText(input.getCareerGoal(), MAX_CAREER_GOAL)) {
             throw new IllegalArgumentException(RULES);
         }
     }
