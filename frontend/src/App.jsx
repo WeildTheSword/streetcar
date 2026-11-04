@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { TransitionProvider } from "@/transition/TransitionProvider";
 import { RequireAuth } from "@/auth/RequireAuth";
+import { sessionRole } from "@/auth/sessionRole";
 import { useAuth } from "@/auth/useAuth";
 import { AdvisorDashboard } from "@/pages/AdvisorDashboard";
 import { LoginPage } from "@/pages/LoginPage";
@@ -14,7 +15,7 @@ import { WelcomePage } from "@/pages/WelcomePage";
 function LandingRedirect() {
   const { session } = useAuth();
   if (!session) return <Navigate to="/sign-in" replace />;
-  if (session.role === "ADVISOR") return <Navigate to="/advisor" replace />;
+  if (sessionRole(session) === "ADVISOR") return <Navigate to="/advisor" replace />;
   return <Navigate to={session.onboarded ? "/student" : "/onboarding"} replace />;
 }
 
@@ -26,10 +27,10 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingRedirect />} />
           <Route path="/sign-in" element={<LoginPage />} />
-          <Route path="/profiles" element={<SubmissionsPage />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/welcome" element={<WelcomePage />} />
+            <Route path="/profiles" element={<SubmissionsPage />} />
           </Route>
 
           <Route element={<RequireAuth role="STUDENT" />}>
