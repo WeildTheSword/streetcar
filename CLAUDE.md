@@ -68,12 +68,12 @@ Layering is `controller/` → `service/` → `repository/` / `model/`, with `con
 - **Demo data is hardcoded.** `DemoFixtures` holds the fixtures and is stateless; `DemoSessionState` holds the demo's only mutable state (who has onboarded, and the name a sign-up wears over a fixture profile) in memory, reset on restart. `AuthService`, `StudentService` and `AdvisorService` build on those two. `CourseService` reads through the `CourseRepository` interface, implemented today by `InMemoryCourseRepository`. There is no persistence behind any of them.
 - **Submissions are persisted.** `SubmissionService` uses the JPA `SubmissionRepository` against H2, with tables created from `backend/src/main/resources/schema.sql` at startup. The default is a file database at `backend/data/streetcar` (gitignored); `backend/src/test/resources/application.properties` points tests at an in-memory one so the tests cannot collide with a running dev server or write into local demo data.
 
-**Authentication is fake on purpose.** Passwords are plain text and the session token is a label. Nothing in `AuthService` should be reused as an auth system.
+**Every endpoint outside `/auth/**` needs a valid JWT**, checked by `JwtVerifier` and `SecurityConfig`; deleting a submission also needs the ADVISOR role. A token is HS256-signed with `JWT_SECRET`, expires, and carries the numeric user id as `sub` and the role as `role`.
 
 ### Constraints worth knowing before you change things
 
 - **Ports must stay in sync between the frontend and the backend.** Every frontend call goes through `services/httpClient.js`, which reads `VITE_API_URL` and falls back to `http://localhost:8080`; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.
-- **Env vars are opt-in and documented by example files**, `backend/.env.example` (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_ADDRESS`) and `frontend/.env.example` (`VITE_API_URL`). Spring does not load `.env` files; export the variables yourself.
+- **Env vars are documented by example files**, `backend/.env.example` (`JWT_SECRET`, which is required, plus the optional `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_ADDRESS`) and `frontend/.env.example` (`VITE_API_URL`). Spring does not load `.env` files; export the variables yourself.
 - **Coverage is gated.** JaCoCo requires 70% line coverage on `com.streetcar.backend.service`, checked in the `verify` phase. Adding service code without tests fails the build.
 - **Model classes are immutable** — records or getter-only POJOs, serialized by Jackson.
 

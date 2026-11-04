@@ -1,14 +1,18 @@
 package com.streetcar.backend.controller;
 
 import com.jayway.jsonpath.JsonPath;
+import com.streetcar.backend.TestTokens;
 import com.streetcar.backend.repository.SubmissionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,20 +25,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /** The real entity mapping against the real schema.sql, which the mocked service tests can't reach. */
 @SpringBootTest
-@AutoConfigureMockMvc
 class SubmissionApiTest {
     private static final String BODY =
             "{\"gpa\":3.5,\"completedCourses\":\" CMPS 1500 \",\"major\":\" CS \",\"careerGoal\":\" SWE \"}";
 
     @Autowired
-    private MockMvc mvc;
+    private WebApplicationContext context;
 
     @Autowired
     private SubmissionRepository repository;
 
+    private MockMvc mvc;
+
     @BeforeEach
-    void emptyTheTable() {
+    void emptyTheTableAndSignInAsAnAdvisor() {
         repository.deleteAll();
+        // An advisor may make every call here; who may do what is SecurityConfigTest's job.
+        mvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .defaultRequest(get("/").header(HttpHeaders.AUTHORIZATION, TestTokens.bearer(1, "ADVISOR")))
+                .build();
     }
 
     private String read(long id) throws Exception {
@@ -50,7 +60,7 @@ class SubmissionApiTest {
 
     @Test
     void createReturnsExactlyWhatALaterReadReturns() throws Exception {
-        // Arrange: empty table from emptyTheTable
+        // Arrange: empty table from setup
 
         // Act
         String created = mvc.perform(post("/submissions").contentType(MediaType.APPLICATION_JSON).content(BODY))
