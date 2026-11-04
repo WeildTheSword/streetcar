@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { AuthContext } from "@/auth/authContext";
 import SubmissionsPage from "./SubmissionsPage";
 import {
   createSubmission,
@@ -7,6 +8,13 @@ import {
 } from "../services/submissionService";
 
 vi.mock("../services/submissionService");
+
+const renderPage = (role = "STUDENT") =>
+  render(
+    <AuthContext.Provider value={{ session: { role } }}>
+      <SubmissionsPage />
+    </AuthContext.Provider>,
+  );
 
 const fill = () => {
   fireEvent.change(screen.getByLabelText("GPA (0–4)"), { target: { value: "3.5" } });
@@ -25,7 +33,7 @@ describe("SubmissionsPage — the create form", () => {
 
   test("renders every required field and the submit button", async () => {
     // Arrange
-    render(<SubmissionsPage />);
+    renderPage();
 
     // Act — nothing to act on; this checks what rendered
     // Assert
@@ -47,7 +55,7 @@ describe("SubmissionsPage — the create form", () => {
       careerGoal: "Data analyst",
       createdAt: "2026-09-28T12:00:00Z",
     });
-    render(<SubmissionsPage />);
+    renderPage();
     await screen.findByText("No profiles submitted yet.");
     fill();
 
@@ -68,7 +76,7 @@ describe("SubmissionsPage — the create form", () => {
 
   test("a blank major is rejected in the browser, before any request is made", async () => {
     // Arrange
-    render(<SubmissionsPage />);
+    renderPage();
     await screen.findByText("No profiles submitted yet.");
     fill();
     fireEvent.change(screen.getByLabelText("Major"), { target: { value: "   " } });
@@ -86,7 +94,7 @@ describe("SubmissionsPage — the create form", () => {
   test("an API failure surfaces the service's message instead of a saved confirmation", async () => {
     // Arrange
     createSubmission.mockRejectedValue(new Error("Unable to reach the server."));
-    render(<SubmissionsPage />);
+    renderPage();
     await screen.findByText("No profiles submitted yet.");
     fill();
 

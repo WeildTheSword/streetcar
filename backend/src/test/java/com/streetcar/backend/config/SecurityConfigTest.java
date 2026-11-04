@@ -2,6 +2,10 @@ package com.streetcar.backend.config;
 
 import com.jayway.jsonpath.JsonPath;
 import com.streetcar.backend.TestTokens;
+import com.streetcar.backend.model.User;
+import com.streetcar.backend.repository.SubmissionRepository;
+import com.streetcar.backend.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,15 +27,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class SecurityConfigTest {
     private static final String ORIGIN = "http://localhost:5173";
-    private static final String STUDENT = TestTokens.bearer(1, "STUDENT");
-    private static final String ADVISOR = TestTokens.bearer(2, "ADVISOR");
-
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private SubmissionRepository submissions;
+
+    @Autowired
+    private UserRepository users;
+
+    private String student;
+    private String advisor;
+
+    @BeforeEach
+    void createOneUserOfEachRole() {
+        submissions.deleteAll();
+        users.deleteAll();
+        student = TestTokens.bearer(users.save(new User("student@example.com", "STUDENT")).getId(), "STUDENT");
+        advisor = TestTokens.bearer(users.save(new User("advisor@example.com", "ADVISOR")).getId(), "ADVISOR");
+    }
+
     private long createSubmission() throws Exception {
         String json = mvc.perform(post("/submissions")
-                        .header(HttpHeaders.AUTHORIZATION, STUDENT)
+                        .header(HttpHeaders.AUTHORIZATION, student)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"gpa\":3,\"completedCourses\":\"A\",\"major\":\"B\",\"careerGoal\":\"C\"}"))
                 .andExpect(status().isCreated())
@@ -73,7 +91,7 @@ class SecurityConfigTest {
         // Arrange: a student token
 
         // Act + Assert
-        mvc.perform(get("/courses").header(HttpHeaders.AUTHORIZATION, STUDENT))
+        mvc.perform(get("/courses").header(HttpHeaders.AUTHORIZATION, student))
                 .andExpect(status().isOk());
     }
 
@@ -97,12 +115,12 @@ class SecurityConfigTest {
         long id = createSubmission();
 
         // Act
-        mvc.perform(delete("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, STUDENT))
+        mvc.perform(delete("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, student))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").isNotEmpty());
 
         // Assert
-        mvc.perform(get("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, STUDENT))
+        mvc.perform(get("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, student))
                 .andExpect(status().isOk());
     }
 
@@ -112,11 +130,11 @@ class SecurityConfigTest {
         long id = createSubmission();
 
         // Act
-        mvc.perform(delete("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, ADVISOR))
+        mvc.perform(delete("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, advisor))
                 .andExpect(status().isNoContent());
 
         // Assert
-        mvc.perform(get("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, ADVISOR))
+        mvc.perform(get("/submissions/" + id).header(HttpHeaders.AUTHORIZATION, advisor))
                 .andExpect(status().isNotFound());
     }
 

@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { AuthContext } from "@/auth/authContext";
 import SubmissionsPage from "./SubmissionsPage";
 import {
   deleteSubmission,
@@ -8,6 +9,13 @@ import {
 } from "../services/submissionService";
 
 vi.mock("../services/submissionService");
+
+const renderPage = (role = "STUDENT") =>
+  render(
+    <AuthContext.Provider value={{ session: { role } }}>
+      <SubmissionsPage />
+    </AuthContext.Provider>,
+  );
 
 const record = {
   id: 7,
@@ -20,7 +28,7 @@ const record = {
 
 const renderWithRecord = async () => {
   fetchSubmissions.mockResolvedValue([record]);
-  render(<SubmissionsPage />);
+  renderPage();
   await screen.findByText("Computer Science — Data analyst");
 };
 
@@ -41,6 +49,28 @@ describe("SubmissionsPage — the submitted list", () => {
     expect(screen.getByText(/GPA: 3.5/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  test("a student's list is headed as their own", async () => {
+    // Arrange
+    fetchSubmissions.mockResolvedValue([record]);
+
+    // Act
+    renderPage("STUDENT");
+
+    // Assert
+    expect(await screen.findByRole("heading", { name: "Your Submitted Profiles" })).toBeInTheDocument();
+  });
+
+  test("an advisor's list is headed as everyone's", async () => {
+    // Arrange
+    fetchSubmissions.mockResolvedValue([record]);
+
+    // Act
+    renderPage("ADVISOR");
+
+    // Assert
+    expect(await screen.findByRole("heading", { name: "All Submitted Profiles" })).toBeInTheDocument();
   });
 
   test("editing sends the changed values to PUT and updates the row in place", async () => {
