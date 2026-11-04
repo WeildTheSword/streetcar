@@ -26,9 +26,9 @@ const record = {
   createdAt: "2026-09-28T12:00:00Z",
 };
 
-const renderWithRecord = async () => {
+const renderWithRecord = async (role = "ADVISOR") => {
   fetchSubmissions.mockResolvedValue([record]);
-  renderPage();
+  renderPage(role);
   await screen.findByText("Computer Science — Data analyst");
 };
 
@@ -49,6 +49,29 @@ describe("SubmissionsPage — the submitted list", () => {
     expect(screen.getByText(/GPA: 3.5/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  test("a student is not offered the delete control", async () => {
+    // Arrange + Act
+    await renderWithRecord("STUDENT");
+
+    // Assert
+    expect(screen.queryByRole("button", { name: "Delete" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+  });
+
+  test("the API's refusal of a delete is shown to the user", async () => {
+    // Arrange
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    await renderWithRecord("ADVISOR");
+    deleteSubmission.mockRejectedValue(new Error("You do not have permission to do that."));
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+    // Assert
+    expect(await screen.findByRole("alert")).toHaveTextContent("You do not have permission to do that.");
+    expect(screen.getByText("Computer Science — Data analyst")).toBeInTheDocument();
   });
 
   test("a student's list is headed as their own", async () => {
