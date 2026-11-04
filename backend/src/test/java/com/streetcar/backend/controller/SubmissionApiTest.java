@@ -2,7 +2,9 @@ package com.streetcar.backend.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.streetcar.backend.TestTokens;
+import com.streetcar.backend.model.User;
 import com.streetcar.backend.repository.SubmissionRepository;
+import com.streetcar.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,16 +37,37 @@ class SubmissionApiTest {
     @Autowired
     private SubmissionRepository repository;
 
+    @Autowired
+    private UserRepository users;
+
     private MockMvc mvc;
+    private String alex;
+    private String jordan;
 
     @BeforeEach
     void emptyTheTableAndSignInAsAnAdvisor() {
         repository.deleteAll();
-        // An advisor may make every call here; who may do what is SecurityConfigTest's job.
+        users.deleteAll();
+        alex = bearerFor("alex@example.com", "STUDENT");
+        jordan = bearerFor("jordan@example.com", "STUDENT");
+        String advisor = bearerFor("sarah@example.com", "ADVISOR");
+        // Requests run as the advisor unless a test says otherwise.
         mvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
-                .defaultRequest(get("/").header(HttpHeaders.AUTHORIZATION, TestTokens.bearer(1, "ADVISOR")))
+                .defaultRequest(get("/").header(HttpHeaders.AUTHORIZATION, advisor))
                 .build();
+    }
+
+    private String bearerFor(String email, String role) {
+        return TestTokens.bearer(users.save(new User(email, role)).getId(), role);
+    }
+
+    private long createAs(String bearer) throws Exception {
+        String json = mvc.perform(post("/submissions").header(HttpHeaders.AUTHORIZATION, bearer)
+                        .contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return ((Number) JsonPath.read(json, "$.id")).longValue();
     }
 
     private String read(long id) throws Exception {
@@ -132,6 +155,67 @@ class SubmissionApiTest {
         mvc.perform(put("/submissions/999999").contentType(MediaType.APPLICATION_JSON).content(changes))
                 .andExpect(status().isNotFound());
         mvc.perform(delete("/submissions/999999")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void twoStudentsEachSeeOnlyTheirOwnAndTheAdvisorSeesBoth() throws Exception {
+        // Arrange
+        long alexs = createAs(alex);
+        long jordans = createAs(jordan);
+
+        // Act + Assert
+        mvc.perform(get("/submissions").header(HttpHeaders.AUTHORIZATION, alex))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(alexs));
+        mvc.perform(get("/submissions").header(HttpHeaders.AUTHORIZATION, jordan))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(jordans));
+        mvc.perform(get("/submissions")).andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    void aStudentCannotReadOrEditAnotherStudentsRecordById() throws Exception {
+        // Arrange
+        long alexs = createAs(alex);
+        String changes = "{\"gpa\":1,\"completedCourses\":\"X\",\"major\":\"Y\",\"careerGoal\":\"Z\"}";
+
+        // Act + Assert
+        mvc.perform(get("/submissions/" + alexs).header(HttpHeaders.AUTHORIZATION, jordan))
+                .andExpect(status().isNotFound());
+        mvc.perform(put("/submissions/" + alexs).header(HttpHeaders.AUTHORIZATION, jordan)
+                        .contentType(MediaType.APPLICATION_JSON).content(changes))
+                .andExpect(status().isNotFound());
+        mvc.perform(get("/submissions/" + alexs).header(HttpHeaders.AUTHORIZATION, alex))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.major").value("CS"));
+    }
+
+    @Test
+    void aStudentCanReadAndEditTheirOwnRecordById() throws Exception {
+        // Arrange
+        long alexs = createAs(alex);
+        String changes = "{\"gpa\":1,\"completedCourses\":\"X\",\"major\":\"Y\",\"careerGoal\":\"Z\"}";
+
+        // Act
+        mvc.perform(put("/submissions/" + alexs).header(HttpHeaders.AUTHORIZATION, alex)
+                        .contentType(MediaType.APPLICATION_JSON).content(changes))
+                .andExpect(status().isOk());
+
+        // Assert: still Alex's after the edit
+        mvc.perform(get("/submissions").header(HttpHeaders.AUTHORIZATION, alex))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].major").value("Y"));
+    }
+
+    @Test
+    void theOwnerIsNeverSentToTheBrowser() throws Exception {
+        // Arrange
+        long alexs = createAs(alex);
+
+        // Act + Assert
+        mvc.perform(get("/submissions/" + alexs))
+                .andExpect(jsonPath("$.user").doesNotExist())
+                .andExpect(jsonPath("$.userId").doesNotExist());
     }
 
     @Test

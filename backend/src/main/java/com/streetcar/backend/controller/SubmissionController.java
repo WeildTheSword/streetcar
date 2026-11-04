@@ -1,5 +1,6 @@
 package com.streetcar.backend.controller;
 
+import com.streetcar.backend.model.AuthenticatedUser;
 import com.streetcar.backend.model.Submission;
 import com.streetcar.backend.service.SubmissionService;
 import com.streetcar.backend.service.SubmissionValidator;
@@ -7,6 +8,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -24,26 +26,27 @@ public class SubmissionController {
     }
 
     @GetMapping
-    public List<Submission> getAll() {
-        return service.getAll();
+    public List<Submission> getAll(@AuthenticationPrincipal AuthenticatedUser who) {
+        return service.getAll(who);
     }
 
     @GetMapping("/{id}")
-    public Submission getById(@PathVariable long id) {
-        return service.getById(id);
+    public Submission getById(@PathVariable long id, @AuthenticationPrincipal AuthenticatedUser who) {
+        return service.getById(id, who);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Submission create(@RequestBody Submission input) {
+    public Submission create(@RequestBody Submission input, @AuthenticationPrincipal AuthenticatedUser who) {
         validator.validate(input);
-        return service.create(input);
+        return service.create(input, who);
     }
 
     @PutMapping("/{id}")
-    public Submission update(@PathVariable long id, @RequestBody Submission input) {
+    public Submission update(@PathVariable long id, @RequestBody Submission input,
+                             @AuthenticationPrincipal AuthenticatedUser who) {
         validator.validate(input);
-        return service.update(id, input);
+        return service.update(id, input, who);
     }
 
     @DeleteMapping("/{id}")
