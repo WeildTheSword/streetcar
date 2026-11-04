@@ -55,7 +55,7 @@ Two workflows run on every push and pull request. `.github/workflows/ci.yml` has
 
 ### Frontend
 
-`App.jsx` wraps everything in `AuthProvider` and `TransitionProvider` and routes with `react-router-dom`: `/sign-in`, `/welcome`, `/onboarding`, `/student`, `/advisor`, and `/profiles`. `RequireAuth` gates routes by role (`STUDENT` / `ADVISOR`); **`/profiles` sits outside it and is reachable without signing in**, which matches a backend that has no authentication on any endpoint.
+`App.jsx` wraps everything in `AuthProvider` and `TransitionProvider` and routes with `react-router-dom`: `/sign-in`, `/welcome`, `/onboarding`, `/student`, `/advisor`, and `/profiles`. `RequireAuth` gates routes by role (`STUDENT` / `ADVISOR`); `/profiles` sits behind it for any signed-in role. The role comes from the JWT via `auth/sessionRole.js`, for display only; the backend enforces every rule. A 401 from the API signs the user out.
 
 All `fetch` calls go through `services/httpClient.js` (the Facade in the pattern register); the services on top of it are `api.js` (auth, student, advisor), `courseService.js` and `submissionService.js`. `api.js` falls back to the generated fixtures in `src/data/fallback.js` when the backend is unreachable, so a dead API degrades the demo rather than ending it.
 

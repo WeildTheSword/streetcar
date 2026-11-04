@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { sessionRole } from "@/auth/sessionRole";
 import { useAuth } from "@/auth/useAuth";
 
 /**
@@ -13,13 +14,14 @@ export function RequireAuth({ role }) {
     return <Navigate to="/sign-in" replace state={{ from: location }} />;
   }
 
-  if (role && session.role !== role) {
-    return <Navigate to={session.role === "ADVISOR" ? "/advisor" : "/student"} replace />;
+  const currentRole = sessionRole(session);
+  if (role && currentRole !== role) {
+    return <Navigate to={currentRole === "ADVISOR" ? "/advisor" : "/student"} replace />;
   }
 
   // /welcome runs before onboarding, so it is exempt from the gate.
   const preOnboarding = ["/onboarding", "/welcome"];
-  const needsOnboarding = session.role === "STUDENT" && !session.onboarded;
+  const needsOnboarding = currentRole === "STUDENT" && !session.onboarded;
   if (needsOnboarding && !preOnboarding.includes(location.pathname)) {
     return <Navigate to="/onboarding" replace />;
   }

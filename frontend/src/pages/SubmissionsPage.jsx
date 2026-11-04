@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { sessionRole } from "@/auth/sessionRole";
 import { useAuth } from "@/auth/useAuth";
 import { createSubmission, deleteSubmission, fetchSubmissions, updateSubmission } from "../services/submissionService";
 import SubmissionFields from "../components/SubmissionFields";
@@ -7,8 +8,8 @@ import "../App.css";
 
 export default function SubmissionsPage() {
   const { session } = useAuth();
-  // The API decides what comes back; the heading only says which view this is.
-  const isAdvisor = session?.role === "ADVISOR";
+  // The API enforces both of these; the UI only avoids offering what it would refuse.
+  const isAdvisor = sessionRole(session) === "ADVISOR";
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -125,9 +126,11 @@ export default function SubmissionsPage() {
                 <small>Submitted {new Date(record.createdAt).toLocaleString()}</small>
                 <div className="actions">
                   <button type="button" disabled={busyId === record.id} onClick={() => { setEditingId(record.id); setListError(""); }}>Edit</button>
-                  <button type="button" disabled={busyId === record.id} onClick={() => remove(record.id)}>
-                    {busyId === record.id ? "Deleting…" : "Delete"}
-                  </button>
+                  {isAdvisor && (
+                    <button type="button" disabled={busyId === record.id} onClick={() => remove(record.id)}>
+                      {busyId === record.id ? "Deleting…" : "Delete"}
+                    </button>
+                  )}
                 </div>
               </>
             )}
