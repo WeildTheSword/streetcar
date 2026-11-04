@@ -23,6 +23,7 @@ out of scope, and none of which should be read back into the MVP.
 ## Running it
 
 ```bash
+export JWT_SECRET=$(openssl rand -base64 48)  # required, or the backend will not start
 cd backend  && ./mvnw spring-boot:run    # :8080
 cd frontend && npm install && npm run dev # :5173, or :5174 if 5173 is taken
 ```
