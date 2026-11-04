@@ -66,7 +66,7 @@ Layering is `controller/` → `service/` → `repository/` / `model/`, with `con
 **Two kinds of data live here, and they behave differently:**
 
 - **Demo data is hardcoded.** `DemoFixtures` holds the fixtures and is stateless; `DemoSessionState` holds the demo's only mutable state (who has onboarded, and the name a sign-up wears over a fixture profile) in memory, reset on restart. `AuthService`, `StudentService` and `AdvisorService` build on those two. `CourseService` reads through the `CourseRepository` interface, implemented today by `InMemoryCourseRepository`. There is no persistence behind any of them.
-- **Submissions are persisted.** `SubmissionService` uses `JdbcClient` against H2, created from `backend/src/main/resources/schema.sql` at startup. The default is a file database at `backend/data/streetcar` (gitignored); `backend/src/test/resources/application.properties` points tests at an in-memory one so the tests cannot collide with a running dev server or write into local demo data.
+- **Submissions are persisted.** `SubmissionService` uses the JPA `SubmissionRepository` against H2, with tables created from `backend/src/main/resources/schema.sql` at startup. The default is a file database at `backend/data/streetcar` (gitignored); `backend/src/test/resources/application.properties` points tests at an in-memory one so the tests cannot collide with a running dev server or write into local demo data.
 
 **Authentication is fake on purpose.** Passwords are plain text and the session token is a label. Nothing in `AuthService` should be reused as an auth system.
 
@@ -168,6 +168,6 @@ These are graded across the whole semester, not per sprint: authentication and a
 
 Test conventions the course grades: every test is written **Arrange-Act-Assert**, backend service tests isolate the service (Mockito mocks where a dependency would otherwise be real), and frontend components get **Vitest** plus React Testing Library — one render test and one interaction test each, in a `*.test.jsx` file beside the component, run by an `npm test` script and by their own `.github/workflows/frontend.yml`. The frontend tooling is in place, but only `pages/SubmissionsPage` has tests so far (`SubmissionsPage.form.test.jsx` and `SubmissionsPage.list.test.jsx`). Other components still need theirs.
 
-Two knowing divergences from the course guides, both fine but worth not "correcting" by accident: the course toolchain guide specifies **Java 21** while this project targets **Java 17** in both `pom.xml` and CI, and the course expects **PostgreSQL via JPA** while submissions currently use **H2 via `JdbcClient`**.
+Two knowing divergences from the course guides, both fine but worth not "correcting" by accident: the course toolchain guide specifies **Java 21** while this project targets **Java 17** in both `pom.xml` and CI, and the course expects **PostgreSQL via JPA** while submissions currently use **H2**.
 
 `.claude/` is gitignored except `.claude/skills/`, which holds shared team skills (such as `/scrum-init`) so everyone gets them from `main`. This `CLAUDE.md` is tracked.
