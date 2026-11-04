@@ -23,6 +23,16 @@ export class NetworkError extends Error {
   }
 }
 
+let unauthorizedListener = () => {};
+
+/** Registers who to tell when the API rejects the session. Returns a function that unregisters it. */
+export function onUnauthorized(listener) {
+  unauthorizedListener = listener;
+  return () => {
+    unauthorizedListener = () => {};
+  };
+}
+
 /**
  * Sends a request to the API and returns its parsed JSON, or null for 204.
  * `body`, when given, is sent as JSON.
@@ -40,6 +50,10 @@ export async function request(path, { method = "GET", body } = {}) {
     throw new NetworkError(error);
   }
   if (!response.ok) {
+    // A 401 from /auth/ is a wrong password, not an expired session.
+    if (response.status === 401 && !path.startsWith("/auth/")) {
+      unauthorizedListener();
+    }
     const errorBody = await response.json().catch(() => ({}));
     throw new HttpError(response.status, errorBody);
   }
