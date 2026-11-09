@@ -23,9 +23,26 @@ export class NetworkError extends Error {
   }
 }
 
+// The signed-in user's JWT. AuthProvider sets it on sign-in and clears it on
+// sign-out, so every request below carries it without each service asking.
+let authToken = null;
+
+/** Sets the token sent as `Authorization: Bearer`, or stops sending one when given null. */
+export function setAuthToken(token) {
+  authToken = token || null;
+}
+
+function headersFor(hasBody) {
+  const headers = {};
+  if (hasBody) headers["Content-Type"] = "application/json";
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  return Object.keys(headers).length > 0 ? headers : undefined;
+}
+
 /**
  * Sends a request to the API and returns its parsed JSON, or null for 204.
- * `body`, when given, is sent as JSON.
+ * `body`, when given, is sent as JSON. The signed-in user's token, if any, is
+ * attached as a Bearer header.
  */
 export async function request(path, { method = "GET", body } = {}) {
   const hasBody = body !== undefined;
@@ -33,7 +50,7 @@ export async function request(path, { method = "GET", body } = {}) {
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      headers: headersFor(hasBody),
       body: hasBody ? JSON.stringify(body) : undefined,
     });
   } catch (error) {
