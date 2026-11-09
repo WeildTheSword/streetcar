@@ -1,3 +1,12 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    -- A BCrypt hash. The plain-text password is never stored.
+    password_hash VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('STUDENT', 'ADVISOR')),
+    display_name VARCHAR(120) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS submissions (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     gpa NUMERIC(3,2) NOT NULL CHECK (gpa BETWEEN 0 AND 4),
