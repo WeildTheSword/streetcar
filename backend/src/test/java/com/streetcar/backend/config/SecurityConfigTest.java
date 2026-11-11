@@ -43,8 +43,8 @@ class SecurityConfigTest {
     void createOneUserOfEachRole() {
         submissions.deleteAll();
         users.deleteAll();
-        student = TestTokens.bearer(users.save(new User("student@example.com", "STUDENT")).getId(), "STUDENT");
-        advisor = TestTokens.bearer(users.save(new User("advisor@example.com", "ADVISOR")).getId(), "ADVISOR");
+        student = TestTokens.bearer(users.save(new User("student@example.com", "not-a-real-hash", "STUDENT", "Test Student")).getId(), "STUDENT");
+        advisor = TestTokens.bearer(users.save(new User("advisor@example.com", "not-a-real-hash", "ADVISOR", "Test Advisor")).getId(), "ADVISOR");
     }
 
     private long createSubmission() throws Exception {

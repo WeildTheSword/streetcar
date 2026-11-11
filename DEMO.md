@@ -10,7 +10,7 @@ out of scope, and none of which should be read back into the MVP.
 
 ## The walkthrough
 
-1. **Sign in** — a fake auth portal, two demo accounts.
+1. **Sign in** — real accounts with hashed passwords, plus two built-in demo accounts.
 2. **Fingerprint onboarding** — a student's first sign-in assembles their career fingerprint.
    Shown once; completing it is remembered server side.
 3. **Student dashboard** — target role and match score, adjacent paths, courses ranked by fit
@@ -47,9 +47,10 @@ layer. Note this follows the `ui_kits/` product language, **not** the heritage p
 documented in [`README.md`](README.md); that divergence is deliberate.
 
 Spring Boot serves the demo data — `/auth/login`, `/students/{id}`, `/advisors/{id}/dashboard` —
-alongside the original `/courses`. There is no database and no real authentication: passwords are
-plain text and the session token is a label, both on purpose. Nothing here should be reused as an
-auth system.
+alongside the original `/courses`. Accounts are real: `/auth/signup` stores a BCrypt hash in the
+`users` table, and `/auth/login` returns a signed JWT carrying the user's id and role. The two
+demo accounts above are added at startup if missing. The dashboards behind them are still the
+demo's fixtures: a new account wears its own name over its role's fixture profile.
 
 The frontend keeps a generated copy of the fixtures and falls back to them if the API is
 unreachable, so a dead backend degrades the demo rather than ending it mid-pitch.

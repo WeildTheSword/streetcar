@@ -59,7 +59,7 @@ class SubmissionApiTest {
     }
 
     private String bearerFor(String email, String role) {
-        return TestTokens.bearer(users.save(new User(email, role)).getId(), role);
+        return TestTokens.bearer(users.save(new User(email, "not-a-real-hash", role, "Test User")).getId(), role);
     }
 
     private long createAs(String bearer) throws Exception {

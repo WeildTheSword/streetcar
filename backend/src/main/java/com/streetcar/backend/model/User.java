@@ -8,8 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Placeholder so a submission has an owner to point at. SCRUM-89 owns the real
- * user entity and should replace this one, keeping the "users" table and its id.
+ * A sign-in account, stored in the "users" table. The password is kept only as
+ * a BCrypt hash. The numeric id is what a JWT carries as its subject.
  */
 @Entity
 @Table(name = "users")
@@ -21,26 +21,29 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    /** STUDENT or ADVISOR, the name of an {@code AccountRole}. */
     @Column(nullable = false)
     private String role;
+
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
 
     /** For Hibernate only. */
     protected User() {}
 
-    public User(String email, String role) {
+    public User(String email, String passwordHash, String role, String displayName) {
         this.email = email;
+        this.passwordHash = passwordHash;
         this.role = role;
+        this.displayName = displayName;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
-    }
+    public Long getId() { return id; }
+    public String getEmail() { return email; }
+    public String getPasswordHash() { return passwordHash; }
+    public String getRole() { return role; }
+    public String getDisplayName() { return displayName; }
 }

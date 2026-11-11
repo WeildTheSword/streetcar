@@ -49,7 +49,7 @@ class SubmissionServiceTest {
     }
 
     private User user(long id) {
-        User user = new User("user" + id + "@example.com", "STUDENT");
+        User user = new User("user" + id + "@example.com", "not-a-real-hash", "STUDENT", "Test User");
         ReflectionTestUtils.setField(user, "id", id);
         return user;
     }

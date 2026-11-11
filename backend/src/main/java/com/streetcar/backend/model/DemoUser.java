@@ -1,8 +1,9 @@
 package com.streetcar.backend.model;
 
 /**
- * A demo account. Passwords are plain text on purpose — this is a fake auth
- * portal for the pitch demo, not an authentication system.
+ * A built-in demo account, as listed in DEMO.md. The password here is only the
+ * seed: {@code AuthService.ensureDemoAccounts} stores its BCrypt hash in the
+ * "users" table, and sign-in checks against that.
  */
 public record DemoUser(
         String email,
