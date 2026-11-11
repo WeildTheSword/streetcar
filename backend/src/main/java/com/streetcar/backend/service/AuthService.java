@@ -5,54 +5,102 @@ import com.streetcar.backend.model.AuthResponse;
 import com.streetcar.backend.model.DemoUser;
 import com.streetcar.backend.model.Identity;
 import com.streetcar.backend.model.SignupRequest;
+import com.streetcar.backend.model.User;
+import com.streetcar.backend.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
- * Fake sign-in for the demo. Credentials are compared against hardcoded demo
- * accounts and the returned token is a label, not a credential — nothing here
- * is real authentication and it must not be reused as such.
+ * Sign-up and sign-in against the "users" table. Passwords are stored as
+ * BCrypt hashes, and a successful sign-in returns a signed JWT carrying the
+ * user's id and role.
+ *
+ * <p>Accounts are real, but the dashboards are still the demo's: each role
+ * points at its fixture profile, and the signed-in user's name is worn over it.
  */
 @Service
 public class AuthService {
 
+    private final UserRepository users;
+    private final PasswordEncoder passwords;
+    private final JwtIssuer tokens;
     private final DemoFixtures fixtures;
     private final DemoSessionState session;
 
-    public AuthService(DemoFixtures fixtures, DemoSessionState session) {
+    public AuthService(UserRepository users, PasswordEncoder passwords, JwtIssuer tokens,
+                       DemoFixtures fixtures, DemoSessionState session) {
+        this.users = users;
+        this.passwords = passwords;
+        this.tokens = tokens;
         this.fixtures = fixtures;
         this.session = session;
     }
 
-    /**
-     * Accounts created during the demo. Held in memory only — they disappear on
-     * restart, which is what /auth/reset relies on.
-     */
-    private final Map<String, DemoUser> created = new ConcurrentHashMap<>();
-
-    /**
-     * Creates a demo account. The new user gets the name and email they typed,
-     * but is pointed at an existing demo profile so the dashboards still have
-     * data to render — there is only one student and one advisor fixture.
-     */
+    /** Creates an account and signs it in, or returns empty if a field is blank or the email is taken. */
     public Optional<AuthResponse> signUp(SignupRequest request) {
         if (!isComplete(request)) {
             return Optional.empty();
         }
-        String email = request.email().trim().toLowerCase();
-        if (isTaken(email)) {
+        String email = normalize(request.email());
+        if (users.existsByEmail(email)) {
             return Optional.empty();
         }
-        DemoUser user = newAccount(request, email);
-        created.put(email, user);
-        // Keep the fixture profile, wear the new name over it.
-        session.setIdentity(user.profileId(), new Identity(user.displayName(), user.initials()));
-        return Optional.of(toResponse(user));
+        AccountRole role = AccountRole.fromRequest(request.role());
+        User user;
+        try {
+            user = users.save(new User(email, passwords.encode(request.password()),
+                role.name(), request.name().trim()));
+        } catch (DataIntegrityViolationException takenMeanwhile) {
+            // Another sign-up claimed the email between the check and the insert.
+            return Optional.empty();
+        }
+        return Optional.of(startSession(user));
+    }
+
+    /** Signs in with an email and password, or returns empty if they don't match an account. */
+    public Optional<AuthResponse> signIn(AuthRequest request) {
+        if (request == null || request.email() == null || request.password() == null) {
+            return Optional.empty();
+        }
+        return users.findByEmail(normalize(request.email()))
+            .filter(user -> passwords.matches(request.password(), user.getPasswordHash()))
+            .map(this::startSession);
+    }
+
+    /** Adds the built-in demo accounts from {@link DemoFixtures} if they are missing. */
+    public void ensureDemoAccounts() {
+        for (DemoUser demo : fixtures.users()) {
+            if (!users.existsByEmail(demo.email())) {
+                users.save(new User(demo.email(), passwords.encode(demo.password()),
+                    demo.role(), demo.displayName()));
+            }
+        }
+    }
+
+    /** Deletes every account except the built-in demo ones, for /auth/reset. */
+    public void clearCreatedAccounts() {
+        users.deleteAllExcept(fixtures.users().stream().map(DemoUser::email).toList());
+    }
+
+    /** Wears the user's name over their role's fixture profile and builds the signed-in session. */
+    private AuthResponse startSession(User user) {
+        AccountRole role = AccountRole.valueOf(user.getRole());
+        String profileId = role.fixtureProfileId();
+        Identity who = new Identity(user.getDisplayName(), initialsOf(user.getDisplayName()));
+        session.setIdentity(profileId, who);
+        return new AuthResponse(
+            tokens.issue(user),
+            role.name(),
+            profileId,
+            who.name(),
+            who.initials(),
+            role.defaultSubtitle(),
+            role.isOnboarded(profileId, session));
     }
 
     private static boolean isComplete(SignupRequest request) {
@@ -63,24 +111,8 @@ public class AuthService {
             && !isBlank(request.role());
     }
 
-    private boolean isTaken(String email) {
-        return allUsers().anyMatch(user -> user.email().equals(email));
-    }
-
-    private static DemoUser newAccount(SignupRequest request, String email) {
-        AccountRole role = AccountRole.fromRequest(request.role());
-        String name = request.name().trim();
-        Identity who = new Identity(name, initialsOf(name));
-        return new DemoUser(email, request.password(), role.name(),
-            role.fixtureProfileId(), who, role.defaultSubtitle());
-    }
-
-    public void clearCreatedAccounts() {
-        created.clear();
-    }
-
-    private Stream<DemoUser> allUsers() {
-        return Stream.concat(fixtures.users().stream(), created.values().stream());
+    private static String normalize(String email) {
+        return email.trim().toLowerCase();
     }
 
     private static boolean isBlank(String value) {
@@ -95,29 +127,5 @@ public class AuthService {
         String first = parts.get(0).substring(0, 1);
         String last = parts.size() > 1 ? parts.get(parts.size() - 1).substring(0, 1) : "";
         return (first + last).toUpperCase();
-    }
-
-    public Optional<AuthResponse> signIn(AuthRequest request) {
-        if (request == null || request.email() == null || request.password() == null) {
-            return Optional.empty();
-        }
-        String email = request.email().trim().toLowerCase();
-        return allUsers()
-            .filter(user -> user.email().equals(email))
-            .filter(user -> user.password().equals(request.password()))
-            .findFirst()
-            .map(this::toResponse);
-    }
-
-    private AuthResponse toResponse(DemoUser user) {
-        boolean onboarded = AccountRole.valueOf(user.role()).isOnboarded(user.profileId(), session);
-        return new AuthResponse(
-            "demo-" + user.profileId(),
-            user.role(),
-            user.profileId(),
-            user.displayName(),
-            user.initials(),
-            user.subtitle(),
-            onboarded);
     }
 }

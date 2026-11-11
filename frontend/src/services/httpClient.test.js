@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { API_URL, HttpError, NetworkError, onUnauthorized, request } from "./httpClient";
+import { API_URL, HttpError, NetworkError, onUnauthorized, request, setAuthToken } from "./httpClient";
 
 const respond = (status, body) =>
   vi.fn().mockResolvedValue({
@@ -9,7 +9,10 @@ const respond = (status, body) =>
   });
 
 describe("httpClient", () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    setAuthToken(null);
+  });
 
   test("a 401 tells the listener and still rejects", async () => {
     // Arrange
@@ -132,6 +135,40 @@ describe("httpClient", () => {
     // Assert
     expect(error).toBeInstanceOf(HttpError);
     expect(error.body).toEqual({});
+  });
+
+  test("once a token is set, every request carries it as a Bearer header", async () => {
+    // Arrange
+    const fetchMock = respond(201, { id: 4 });
+    vi.stubGlobal("fetch", fetchMock);
+    setAuthToken("header.payload.signature");
+
+    // Act
+    await request("/courses");
+    await request("/submissions", { method: "POST", body: { major: "Finance" } });
+
+    // Assert
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({
+      Authorization: "Bearer header.payload.signature",
+    });
+    expect(fetchMock.mock.calls[1][1].headers).toEqual({
+      "Content-Type": "application/json",
+      Authorization: "Bearer header.payload.signature",
+    });
+  });
+
+  test("clearing the token stops sending the header", async () => {
+    // Arrange
+    const fetchMock = respond(200, []);
+    vi.stubGlobal("fetch", fetchMock);
+    setAuthToken("header.payload.signature");
+
+    // Act
+    setAuthToken(null);
+    await request("/courses");
+
+    // Assert
+    expect(fetchMock.mock.calls[0][1].headers).toBeUndefined();
   });
 
   test("an unreachable server throws NetworkError instead of fetch's TypeError", async () => {

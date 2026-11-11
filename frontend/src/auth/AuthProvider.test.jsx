@@ -1,63 +1,95 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { AuthProvider } from "@/auth/AuthProvider";
-import { useAuth } from "@/auth/useAuth";
-import { request } from "@/services/httpClient";
+import { AuthProvider } from "./AuthProvider";
+import { useAuth } from "./useAuth";
+import { signIn } from "@/services/api";
+import { request, setAuthToken } from "@/services/httpClient";
 
-const STORAGE_KEY = "streetcar.session";
+vi.mock("@/services/api");
 
-function ShowSession() {
-  const { session } = useAuth();
-  return <p>{session ? `Signed in as ${session.displayName}` : "Signed out"}</p>;
+// A JWT-shaped token whose role claim is ADVISOR; the signature is never checked client side.
+const ADVISOR_JWT = ["e30", btoa(JSON.stringify({ sub: "2", role: "ADVISOR" })).replace(/=+$/, ""), "sig"].join(".");
+
+function Probe() {
+  const { session, login, logout } = useAuth();
+  return (
+    <div>
+      <p data-testid="role">{session ? session.role : "signed out"}</p>
+      <button onClick={() => login("bill.hudlow@tulane.edu", "streetcar")}>Sign in</button>
+      <button onClick={logout}>Sign out</button>
+    </div>
+  );
 }
 
-const respondWith = (status) =>
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-    ok: false,
-    status,
-    json: () => Promise.resolve({ message: "No" }),
-  }));
-
 describe("AuthProvider", () => {
+  let fetchMock;
+
   beforeEach(() => {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ displayName: "Alex", role: "STUDENT" }));
+    sessionStorage.clear();
+    setAuthToken(null);
+    fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve([]) });
+    vi.stubGlobal("fetch", fetchMock);
   });
 
   afterEach(() => {
-    sessionStorage.clear();
     vi.unstubAllGlobals();
+    vi.resetAllMocks();
   });
 
-  test("restores the stored session on render", () => {
+  test("renders signed out when nothing is stored", () => {
     // Arrange + Act
-    render(<AuthProvider><ShowSession /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
 
     // Assert
-    expect(screen.getByText("Signed in as Alex")).toBeInTheDocument();
+    expect(screen.getByTestId("role")).toHaveTextContent("signed out");
   });
 
-  test("a 401 from the API signs the user out", async () => {
-    // Arrange
-    render(<AuthProvider><ShowSession /></AuthProvider>);
-    respondWith(401);
+  test("signing in keeps the JWT, takes the role from it, and sends it until sign-out", async () => {
+    // Arrange: the response's role disagrees with the token, to show the token wins
+    signIn.mockResolvedValue({ token: ADVISOR_JWT, role: "STUDENT", profileId: "bill-hudlow" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
 
     // Act
-    await act(() => request("/submissions").catch(() => {}));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Sign in" })));
+    await request("/courses");
 
     // Assert
-    expect(screen.getByText("Signed out")).toBeInTheDocument();
-    expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(screen.getByTestId("role")).toHaveTextContent("ADVISOR");
+    expect(JSON.parse(sessionStorage.getItem("streetcar.session")).token).toBe(ADVISOR_JWT);
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: `Bearer ${ADVISOR_JWT}` });
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    await request("/courses");
+
+    // Assert
+    expect(screen.getByTestId("role")).toHaveTextContent("signed out");
+    expect(sessionStorage.getItem("streetcar.session")).toBeNull();
+    expect(fetchMock.mock.calls[1][1].headers).toBeUndefined();
   });
 
-  test("a 403 from the API leaves the user signed in", async () => {
+  test("a stored session's token is sent again after a reload", async () => {
     // Arrange
-    render(<AuthProvider><ShowSession /></AuthProvider>);
-    respondWith(403);
+    sessionStorage.setItem("streetcar.session", JSON.stringify({ token: ADVISOR_JWT, role: "ADVISOR" }));
 
     // Act
-    await act(() => request("/submissions/1", { method: "DELETE" }).catch(() => {}));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await request("/courses");
 
     // Assert
-    expect(screen.getByText("Signed in as Alex")).toBeInTheDocument();
+    expect(screen.getByTestId("role")).toHaveTextContent("ADVISOR");
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: `Bearer ${ADVISOR_JWT}` });
   });
 });

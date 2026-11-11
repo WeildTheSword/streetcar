@@ -1,7 +1,10 @@
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    role VARCHAR(20) NOT NULL
+    -- A BCrypt hash. The plain-text password is never stored.
+    password_hash VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('STUDENT', 'ADVISOR')),
+    display_name VARCHAR(120) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS submissions (
@@ -14,6 +17,29 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 
 -- A separate statement so databases created before this column get it too.
--- Nullable because those older rows have no owner to point at.
-ALTER TABLE submissions ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users (id);
+-- Nullable because those older rows have no owner to point at. Deleting an
+-- account deletes its submissions, so the demo reset can remove sign-ups.
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users (id) ON DELETE CASCADE;
 CREATE INDEX IF NOT EXISTS submissions_user_id_idx ON submissions (user_id);
+
+CREATE TABLE IF NOT EXISTS courses (
+    id INT PRIMARY KEY,
+    code VARCHAR(20) NOT NULL UNIQUE,
+    title VARCHAR(200) NOT NULL,
+    description VARCHAR(1000) NOT NULL
+);
+
+-- The demo catalogue. Each row is inserted only if missing, so a restart keeps
+-- what is already there. This form runs on both H2 and PostgreSQL.
+INSERT INTO courses (id, code, title, description)
+SELECT 1, 'CMPS 1500', 'Introduction to Computer Science',
+    'Foundational programming concepts. Recommended for students pursuing software engineering.'
+WHERE NOT EXISTS (SELECT 1 FROM courses WHERE id = 1);
+INSERT INTO courses (id, code, title, description)
+SELECT 2, 'CMPS 2200', 'Data Structures and Algorithms',
+    'Core data structures and algorithmic analysis. Frequently required for technical interviews.'
+WHERE NOT EXISTS (SELECT 1 FROM courses WHERE id = 2);
+INSERT INTO courses (id, code, title, description)
+SELECT 3, 'BSAN 3010', 'Business Analytics',
+    'Data-driven decision making. Suits students exploring analytics career paths.'
+WHERE NOT EXISTS (SELECT 1 FROM courses WHERE id = 3);
