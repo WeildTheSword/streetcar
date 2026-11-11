@@ -6,9 +6,11 @@ categories table is needed until accounts or managed categories exist; therefore
 there are no foreign keys in this first schema. Do not enter real student data
 in this unauthenticated classroom demo.
 
-Use file-backed H2 with the existing Java/Spring Boot backend: no database server
-is needed. `backend/src/main/resources/schema.sql` creates the table on startup
-without deleting existing records.
+The database is Supabase PostgreSQL, selected by the `DB_URL`, `DB_USERNAME` and
+`DB_PASSWORD` environment variables (SCRUM-85; see `backend/.env.example`). With
+none of them set, the backend falls back to file-backed H2, so the demo and the
+tests need no database server. `backend/src/main/resources/schema.sql` creates the
+table on startup without deleting existing records, and must stay valid on both.
 
 | Field | Type | Constraint |
 | --- | --- | --- |
