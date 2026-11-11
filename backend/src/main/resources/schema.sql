@@ -17,8 +17,9 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 
 -- A separate statement so databases created before this column get it too.
--- Nullable because those older rows have no owner to point at.
-ALTER TABLE submissions ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users (id);
+-- Nullable because those older rows have no owner to point at. Deleting an
+-- account deletes its submissions, so the demo reset can remove sign-ups.
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users (id) ON DELETE CASCADE;
 CREATE INDEX IF NOT EXISTS submissions_user_id_idx ON submissions (user_id);
 
 CREATE TABLE IF NOT EXISTS courses (
