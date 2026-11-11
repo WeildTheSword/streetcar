@@ -88,6 +88,25 @@ describe("LoginPage", () => {
     expect(transition.run).not.toHaveBeenCalled();
   });
 
+  test("a rejected sign-in says so and goes nowhere", async () => {
+    // Arrange
+    auth.login.mockRejectedValue(Object.assign(new Error("Request failed: 401"), { status: 401 }));
+    renderAs("Student");
+    fireEvent.click(screen.getByRole("button", { name: "Already have an account? Sign in" }));
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "morgan@tulane.edu" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "wrong" } });
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    // Assert
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "That email and password combination is not recognized.",
+    );
+    expect(auth.login).toHaveBeenCalledWith("morgan@tulane.edu", "wrong");
+    expect(transition.run).not.toHaveBeenCalled();
+  });
+
   test("a matching sign-in plays the role's transition", async () => {
     // Arrange
     auth.login.mockResolvedValue({ role: "ADVISOR", onboarded: true });
