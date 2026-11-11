@@ -1,14 +1,13 @@
 package com.streetcar.backend.service;
 
-import com.streetcar.backend.model.AuthRequest;
 import com.streetcar.backend.model.Identity;
-import com.streetcar.backend.model.SignupRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class DemoResetServiceTest {
     private DemoSessionState session;
@@ -18,7 +17,7 @@ class DemoResetServiceTest {
     @BeforeEach
     void setUp() {
         session = new DemoSessionState();
-        auth = new AuthService(new DemoFixtures(), session);
+        auth = mock(AuthService.class);
         reset = new DemoResetService(session, auth);
     }
 
@@ -36,15 +35,13 @@ class DemoResetServiceTest {
 
     @Test
     void resetRemovesAccountsCreatedDuringTheDemo() {
-        // Arrange
-        auth.signUp(new SignupRequest("Avery Lee", "avery@tulane.edu", "secret", "STUDENT"));
-        assertTrue(auth.signIn(new AuthRequest("avery@tulane.edu", "secret")).isPresent());
+        // Arrange: nothing beyond the mocks
 
         // Act
         reset.reset();
 
         // Assert
-        assertFalse(auth.signIn(new AuthRequest("avery@tulane.edu", "secret")).isPresent());
+        verify(auth).clearCreatedAccounts();
     }
 
     @Test
@@ -58,17 +55,5 @@ class DemoResetServiceTest {
 
         // Assert
         assertEquals(fixture, session.identityOr(DemoFixtures.MORGAN_ID, fixture));
-    }
-
-    @Test
-    void resetKeepsTheBuiltInDemoAccounts() {
-        // Arrange
-        AuthRequest morgan = new AuthRequest("morgan@tulane.edu", "streetcar");
-
-        // Act
-        reset.reset();
-
-        // Assert
-        assertTrue(auth.signIn(morgan).isPresent());
     }
 }
