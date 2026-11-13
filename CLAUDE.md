@@ -70,6 +70,8 @@ Layering is `controller/` → `service/` → `repository/` / `model/`, with `con
 
 **Accounts are real; the profiles behind them are not.** `AuthService` stores users in the `users` table with BCrypt password hashes, and a successful `/auth/login` or `/auth/signup` returns a JWT from `JwtIssuer`: HS256-signed with `JWT_SECRET`, with the numeric user id as `sub`, the role as `role`, and an 8-hour `exp`. `DemoAccountSeeder` adds the two `DEMO.md` accounts at startup. Each role still points at its fixture profile, with the signed-in user's name worn over it.
 
+**Every endpoint outside `/auth/**` needs a valid JWT**, checked by `JwtVerifier` and `SecurityConfig`; deleting a submission also needs the ADVISOR role. A token is HS256-signed with `JWT_SECRET`, expires, and carries the numeric user id as `sub` and the role as `role`.
+
 ### Constraints worth knowing before you change things
 
 - **Ports must stay in sync between the frontend and the backend.** Every frontend call goes through `services/httpClient.js`, which reads `VITE_API_URL` and falls back to `http://localhost:8080`; `config/CorsConfig.java` allows exactly `http://localhost:5173` and `http://localhost:5174`, for GET, POST, PUT and DELETE. There is no Vite proxy.

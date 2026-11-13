@@ -41,9 +41,12 @@ class AuthApiTest {
     @Autowired
     private AuthService auth;
 
+    // Other test classes share this database and may have deleted every user,
+    // so put the demo accounts back as well as clearing the ones tests created.
     @BeforeEach
     void keepOnlyTheDemoAccounts() {
         auth.clearCreatedAccounts();
+        auth.ensureDemoAccounts();
     }
 
     private ResultActions postJson(String path, String json) throws Exception {

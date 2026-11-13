@@ -1,9 +1,11 @@
 package com.streetcar.backend.controller;
 
+import com.streetcar.backend.TestTokens;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,10 +34,11 @@ class CourseApiTest {
 
     @Test
     void getCoursesReturnsTheSameCatalogueAsBeforeReadFromTheDatabase() throws Exception {
-        // Arrange: schema.sql seeded the courses table at startup
+        // Arrange: schema.sql seeded the courses table at startup, and every route outside /auth needs a token
+        String student = TestTokens.bearer(1L, "STUDENT");
 
         // Act + Assert
-        mvc.perform(get("/courses"))
+        mvc.perform(get("/courses").header(HttpHeaders.AUTHORIZATION, student))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(content().json(CATALOGUE_BEFORE_THE_DATABASE, JsonCompareMode.STRICT));
