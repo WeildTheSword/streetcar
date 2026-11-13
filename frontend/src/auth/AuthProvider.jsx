@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "@/auth/authContext";
 import { roleFromToken } from "@/auth/tokenClaims";
 import { completeFingerprint, resetDemo, signIn, signUp } from "@/services/api";
-import { setAuthToken } from "@/services/httpClient";
+import { onUnauthorized, setAuthToken } from "@/services/httpClient";
 
 const STORAGE_KEY = "streetcar.session";
 
@@ -72,6 +72,9 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     remember(null);
   }, [remember]);
+
+  // The token was rejected, so RequireAuth should send the user back to sign in.
+  useEffect(() => onUnauthorized(logout), [logout]);
 
   const finishOnboarding = useCallback(async () => {
     if (!session) return;

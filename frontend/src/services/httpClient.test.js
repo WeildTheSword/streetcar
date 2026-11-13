@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { API_URL, HttpError, NetworkError, request, setAuthToken } from "./httpClient";
+import { API_URL, HttpError, NetworkError, onUnauthorized, request, setAuthToken } from "./httpClient";
 
 const respond = (status, body) =>
   vi.fn().mockResolvedValue({
@@ -12,6 +12,64 @@ describe("httpClient", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     setAuthToken(null);
+  });
+
+  test("a 401 tells the listener and still rejects", async () => {
+    // Arrange
+    vi.stubGlobal("fetch", respond(401, { message: "Please sign in." }));
+    const listener = vi.fn();
+    const stop = onUnauthorized(listener);
+
+    // Act
+    const result = request("/submissions");
+
+    // Assert
+    await expect(result).rejects.toBeInstanceOf(HttpError);
+    expect(listener).toHaveBeenCalledTimes(1);
+    stop();
+  });
+
+  test("a wrong password at /auth/login does not count as an expired session", async () => {
+    // Arrange
+    vi.stubGlobal("fetch", respond(401));
+    const listener = vi.fn();
+    const stop = onUnauthorized(listener);
+
+    // Act
+    const result = request("/auth/login", { method: "POST", body: {} });
+
+    // Assert
+    await expect(result).rejects.toBeInstanceOf(HttpError);
+    expect(listener).not.toHaveBeenCalled();
+    stop();
+  });
+
+  test("a 403 does not tell the listener", async () => {
+    // Arrange
+    vi.stubGlobal("fetch", respond(403, { message: "No." }));
+    const listener = vi.fn();
+    const stop = onUnauthorized(listener);
+
+    // Act
+    const result = request("/submissions/1", { method: "DELETE" });
+
+    // Assert
+    await expect(result).rejects.toBeInstanceOf(HttpError);
+    expect(listener).not.toHaveBeenCalled();
+    stop();
+  });
+
+  test("a listener that has stopped is no longer told", async () => {
+    // Arrange
+    vi.stubGlobal("fetch", respond(401));
+    const listener = vi.fn();
+    onUnauthorized(listener)();
+
+    // Act
+    await request("/submissions").catch(() => {});
+
+    // Assert
+    expect(listener).not.toHaveBeenCalled();
   });
 
   test("GET joins the path onto the one base URL and returns the parsed JSON", async () => {
