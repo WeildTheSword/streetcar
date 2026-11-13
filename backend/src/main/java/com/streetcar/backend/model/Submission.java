@@ -1,12 +1,16 @@
 package com.streetcar.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -39,6 +43,12 @@ public class Submission {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    /** Null only on rows saved before submissions had owners. Never sent to the browser. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 
     /** For Hibernate only. */
     protected Submission() {}
@@ -80,15 +90,25 @@ public class Submission {
         return createdAt;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public boolean isOwnedBy(long userId) {
+        return user != null && user.getId() == userId;
+    }
+
     /** A copy with the text fields trimmed and the GPA at the column's scale, as they are stored. */
     public Submission normalized() {
         return new Submission(id, gpa.setScale(2, RoundingMode.HALF_UP), completedCourses.strip(),
                 major.strip(), careerGoal.strip(), createdAt);
     }
 
-    /** The same values under a server-assigned identity; nothing a client sends can set these two. */
-    public Submission withIdentity(Long newId, OffsetDateTime newCreatedAt) {
-        return new Submission(newId, gpa, completedCourses, major, careerGoal, newCreatedAt);
+    /** The same values under a server-assigned identity; nothing a client sends can set these three. */
+    public Submission withIdentity(Long newId, OffsetDateTime newCreatedAt, User owner) {
+        Submission copy = new Submission(newId, gpa, completedCourses, major, careerGoal, newCreatedAt);
+        copy.user = owner;
+        return copy;
     }
 
     @PrePersist

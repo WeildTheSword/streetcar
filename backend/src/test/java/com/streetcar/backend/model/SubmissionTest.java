@@ -41,17 +41,19 @@ class SubmissionTest {
     }
 
     @Test
-    void withIdentityReplacesTheIdAndCreatedAtOnly() {
+    void withIdentityReplacesTheIdCreatedAtAndOwnerOnly() {
         // Arrange
         OffsetDateTime createdAt = OffsetDateTime.parse("2026-10-26T12:00:00Z");
         Submission raw = new Submission(1L, new BigDecimal("3.50"), "None", "Finance", "Analyst", null);
+        User owner = new User("alex@example.com", "not-a-real-hash", "STUDENT", "Alex Rivera");
 
         // Act
-        Submission changed = raw.withIdentity(9L, createdAt);
+        Submission changed = raw.withIdentity(9L, createdAt, owner);
 
         // Assert
         assertEquals(9L, changed.getId());
         assertEquals(createdAt, changed.getCreatedAt());
+        assertEquals(owner, changed.getUser());
         assertEquals("Finance", changed.getMajor());
     }
 }
