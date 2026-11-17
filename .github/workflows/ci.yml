@@ -74,6 +74,8 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run lint
+      # Also run here (not only in frontend.yml) so the deploy jobs can wait on the tests.
+      - run: npm test
       - run: npm run build
   # -------------------------------------------------------------------------------------------
   # DOCKER SECTION (SCRUM-97): build the backend image Render deploys and prove it starts.
@@ -104,4 +106,39 @@ jobs:
       - name: Container logs
         if: always()
         run: docker logs streetcar-backend || true
+  # -------------------------------------------------------------------------------------------
+  # DEPLOY SECTION (SCRUM-103): only a push to main, and only after every check above passes.
+  # Each job POSTs a deploy hook stored as a GitHub secret. Until a hook exists the secret is
+  # empty, and the job skips with a notice instead of failing. See docs/deployment.md.
+  deploy-backend:
+    needs: [backend, frontend, docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Render deploy hook
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::notice title=Backend deploy skipped::RENDER_DEPLOY_HOOK_URL is not set. See docs/deployment.md."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK_URL" > /dev/null
+          echo "Render deploy triggered."
+
+  deploy-frontend:
+    needs: [backend, frontend, docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Vercel deploy hook
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::notice title=Frontend deploy skipped::VERCEL_DEPLOY_HOOK_URL is not set. See docs/deployment.md."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK_URL" > /dev/null
+          echo "Vercel deploy triggered."
   # -------------------------------------------------------------------------------------------
