@@ -20,6 +20,13 @@ public enum AccountRole {
         public boolean mustOnboard() {
             return false;
         }
+    },
+    /** A graduate. Alumni have no demo dashboard behind them, only their account page. */
+    ALUMNI(null, "Tulane alum") {
+        @Override
+        public boolean mustOnboard() {
+            return false;
+        }
     };
 
     private final String fixtureProfileId;
@@ -30,7 +37,7 @@ public enum AccountRole {
         this.defaultSubtitle = defaultSubtitle;
     }
 
-    /** The demo profile a new account of this role is pointed at. */
+    /** The demo profile a new account of this role is pointed at, or null for alumni. */
     public String fixtureProfileId() {
         return fixtureProfileId;
     }

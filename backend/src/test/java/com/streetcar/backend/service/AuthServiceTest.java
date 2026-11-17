@@ -216,13 +216,15 @@ class AuthServiceTest {
     }
 
     @Test
-    void clearCreatedAccountsKeepsTheDemoAccounts() {
+    void clearCreatedAccountsKeepsTheDemoAndSeededAccounts() {
         // Arrange: nothing beyond the mocks
 
         // Act
         service.clearCreatedAccounts();
 
         // Assert
-        verify(users).deleteAllExcept(List.of("morgan@tulane.edu", "bill.hudlow@tulane.edu"));
+        List<String> kept = new java.util.ArrayList<>(List.of("morgan@tulane.edu", "bill.hudlow@tulane.edu"));
+        kept.addAll(DirectorySeedData.emails());
+        verify(users).deleteAllExcept(kept);
     }
 }

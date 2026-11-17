@@ -82,17 +82,20 @@ public class AuthService {
         }
     }
 
-    /** Deletes every account except the built-in demo ones, for /auth/reset. */
+    /** Deletes every account except the built-in demo ones and the seeded directory, for /auth/reset. */
     public void clearCreatedAccounts() {
-        users.deleteAllExcept(fixtures.users().stream().map(DemoUser::email).toList());
+        users.deleteAllExcept(Stream.concat(fixtures.users().stream().map(DemoUser::email),
+                DirectorySeedData.emails().stream()).toList());
     }
 
     /** Wears the user's name over their role's fixture profile and builds the signed-in session. */
     private AuthResponse startSession(User user) {
         AccountRole role = AccountRole.valueOf(user.getRole());
         String profileId = role.fixtureProfileId();
-        Identity who = new Identity(user.getDisplayName(), initialsOf(user.getDisplayName()));
-        session.setIdentity(profileId, who);
+        Identity who = new Identity(user.getDisplayName(), Names.initials(user.getDisplayName()));
+        if (profileId != null) {
+            session.setIdentity(profileId, who);
+        }
         return new AuthResponse(
             tokens.issue(user),
             role.name(),
@@ -119,13 +122,4 @@ public class AuthService {
         return value == null || value.trim().isEmpty();
     }
 
-    private static String initialsOf(String name) {
-        List<String> parts = Stream.of(name.trim().split("\\s+"))
-            .filter(part -> !part.isEmpty())
-            .toList();
-        if (parts.isEmpty()) return "?";
-        String first = parts.get(0).substring(0, 1);
-        String last = parts.size() > 1 ? parts.get(parts.size() - 1).substring(0, 1) : "";
-        return (first + last).toUpperCase();
-    }
 }
