@@ -76,3 +76,32 @@ jobs:
       - run: npm run lint
       - run: npm run build
   # -------------------------------------------------------------------------------------------
+  # DOCKER SECTION (SCRUM-97): build the backend image Render deploys and prove it starts.
+  # A 401 from /courses means the app is up, reachable from outside the container on PORT,
+  # and enforcing auth. The secret here is a throwaway value for this check only.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t streetcar-backend backend
+      - run: >-
+          docker run -d --name streetcar-backend -p 9000:9000
+          -e PORT=9000
+          -e JWT_SECRET=ci-only-dummy-secret-0123456789abcdef0123456789
+          streetcar-backend
+      - name: Wait for the API to answer 401 on /courses
+        run: |
+          for i in $(seq 1 45); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:9000/courses || true)
+            if [ "$status" = "401" ]; then
+              echo "API is up: GET /courses returned 401 after about $((i * 2)) seconds."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API did not return 401 within 90 seconds (last status: $status)."
+          exit 1
+      - name: Container logs
+        if: always()
+        run: docker logs streetcar-backend || true
+  # -------------------------------------------------------------------------------------------
