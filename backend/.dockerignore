@@ -1,0 +1,10 @@
+# Keep the build context small and free of local state and secrets.
+target/
+data/
+.env
+.env.*
+!.env.example
+*.mv.db
+*.trace.db
+.idea/
+.vscode/
