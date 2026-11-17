@@ -11,9 +11,20 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    // Playwright writes HTML reports here. Watching them makes the dev server
+    // reload any open page, including one an e2e test is driving.
+    watch: {
+      ignored: ['**/playwright-report/**', '**/test-results/**', '**/blob-report/**'],
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/setupTests.js',
+    // Unit tests live beside the code in src/. The Playwright specs in e2e/ need a
+    // running stack and their own runner, so Vitest must never collect them.
+    include: ['src/**/*.test.{js,jsx}'],
+    exclude: ['node_modules/**', 'dist/**', 'e2e/**'],
   },
 })
