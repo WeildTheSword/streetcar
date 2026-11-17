@@ -4,8 +4,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { StudentDashboard } from "./StudentDashboard";
 import { fetchStudent } from "@/services/api";
 import { FALLBACK_STUDENT } from "@/data/fallback";
+import { fetchSummary } from "@/services/studentService";
 
 vi.mock("@/services/api");
+vi.mock("@/services/studentService");
 vi.mock("@/auth/useAuth", () => ({
   useAuth: () => ({
     session: {
@@ -60,6 +62,19 @@ describe("StudentDashboard", () => {
     expect(screen.getByText(FALLBACK_STUDENT.courses[0].title)).toBeInTheDocument();
     expect(screen.getByText(FALLBACK_STUDENT.firms[0].name)).toBeInTheDocument();
     expect(screen.getByText(FALLBACK_STUDENT.conversations[0].name)).toBeInTheDocument();
+  });
+
+  test("the sidebar counts come from the student's summary", async () => {
+    // Arrange
+    fetchSummary.mockResolvedValue({ alumni: 2, appointments: 1, applications: 6 });
+
+    // Act
+    await renderDashboard();
+
+    // Assert
+    expect(await screen.findByRole("link", { name: /Applications\s*6/ })).toHaveAttribute("href", "/student/applications");
+    expect(screen.getByRole("link", { name: /Alumni\s*2/ })).toHaveAttribute("href", "/student/alumni");
+    expect(screen.getByRole("link", { name: /Appointments\s*1/ })).toBeInTheDocument();
   });
 
   test("advancing the walkthrough moves it from the match score to the courses", async () => {

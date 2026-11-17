@@ -4,32 +4,49 @@ import {
   Fingerprint,
   Home,
   ListOrdered,
+  ScrollText,
   UserRound,
   Users,
 } from "lucide-react";
 
-/** The student sidebar, shared by the dashboard and the account page. */
-export function studentSections(active) {
+/**
+ * The student console's sidebar, shared by every student page. `active` is the
+ * key of the page being shown: path, courses, alumni, appointments,
+ * applications, fingerprint, resume or account. `counts` is GET /me/summary;
+ * the badges stay hidden until it has loaded.
+ */
+export function studentSections(active, counts) {
+  const item = (key, icon, label, to, count) => ({ icon, label, to, active: active === key, count });
   return [
     {
-      items: [{ icon: Home, label: "My Path", to: "/student", active: active === "path" }],
+      items: [item("path", Home, "My Path", "/student")],
     },
     {
       label: "Plan",
       items: [
-        { icon: ListOrdered, label: "Courses" },
-        { icon: Users, label: "Alumni", count: 3 },
-        { icon: CalendarDays, label: "Appointments", count: 1 },
-        { icon: FileText, label: "Applications", count: 14 },
+        item("courses", ListOrdered, "Courses", "/student/courses"),
+        item("alumni", Users, "Alumni", "/student/alumni", counts?.alumni),
+        item("appointments", CalendarDays, "Appointments", "/student/appointments", counts?.appointments),
+        item("applications", FileText, "Applications", "/student/applications", counts?.applications),
       ],
     },
     {
       label: "Me",
       items: [
-        { icon: Fingerprint, label: "Fingerprint" },
-        { icon: FileText, label: "Resume" },
-        { icon: UserRound, label: "My Account", to: "/account", active: active === "account" },
+        item("fingerprint", Fingerprint, "Fingerprint", "/student/fingerprint"),
+        item("resume", ScrollText, "Resume", "/student/resume"),
+        item("account", UserRound, "My Account", "/account"),
       ],
     },
   ];
+}
+
+/** The account chip at the foot of the student sidebar. */
+export function studentShellUser(session) {
+  return {
+    name: session.displayName,
+    subtitle: session.subtitle,
+    initials: session.initials,
+    email: session.email ?? "morgan@tulane.edu",
+  };
 }

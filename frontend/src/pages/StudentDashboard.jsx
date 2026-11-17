@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/useAuth";
 import { AppShell } from "@/components/AppShell";
-import { studentSections } from "@/components/student/studentNav";
+import { studentSections, studentShellUser } from "@/components/student/studentNav";
 import { DemoGuide } from "@/components/DemoGuide";
 import { STUDENT_STEPS } from "@/data/guideSteps";
 import { AdvisingMeetingCard } from "@/components/student/AdvisingMeetingCard";
@@ -13,12 +13,14 @@ import { PathHeader } from "@/components/student/PathHeader";
 import { StrategiesCard } from "@/components/student/StrategiesCard";
 import { TopFirmsCard } from "@/components/student/TopFirmsCard";
 import { WeeklyActionsPanel } from "@/components/student/WeeklyActionsPanel";
+import { useStudentCounts } from "@/hooks/useStudentCounts";
 import { fetchStudent } from "@/services/api";
 
 export function StudentDashboard() {
   const { session, logout, restartDemo } = useAuth();
   const [student, setStudent] = useState(null);
   const [error, setError] = useState(null);
+  const { counts } = useStudentCounts();
 
   useEffect(() => {
     let cancelled = false;
@@ -30,14 +32,8 @@ export function StudentDashboard() {
     };
   }, [session.profileId]);
 
-  const sections = studentSections("path");
-
-  const shellUser = {
-    name: session.displayName,
-    subtitle: session.subtitle,
-    initials: session.initials,
-    email: "morgan@tulane.edu",
-  };
+  const sections = studentSections("path", counts);
+  const shellUser = studentShellUser(session);
 
   if (error) {
     return (
