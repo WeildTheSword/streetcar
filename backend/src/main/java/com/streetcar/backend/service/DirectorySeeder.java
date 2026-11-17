@@ -3,18 +3,24 @@ package com.streetcar.backend.service;
 import com.streetcar.backend.model.AdvisingAppointment;
 import com.streetcar.backend.model.AlumniProfile;
 import com.streetcar.backend.model.Conversation;
+import com.streetcar.backend.model.JobApplication;
+import com.streetcar.backend.model.Resume;
 import com.streetcar.backend.model.StudentProfile;
 import com.streetcar.backend.model.Submission;
 import com.streetcar.backend.model.User;
 import com.streetcar.backend.repository.AlumniProfileRepository;
 import com.streetcar.backend.repository.AppointmentRepository;
 import com.streetcar.backend.repository.ConversationRepository;
+import com.streetcar.backend.repository.JobApplicationRepository;
+import com.streetcar.backend.repository.ResumeRepository;
 import com.streetcar.backend.repository.StudentProfileRepository;
 import com.streetcar.backend.repository.SubmissionRepository;
 import com.streetcar.backend.repository.UserRepository;
 import com.streetcar.backend.service.DirectorySeedData.Alum;
+import com.streetcar.backend.service.DirectorySeedData.SeedApplication;
 import com.streetcar.backend.service.DirectorySeedData.SeedAppointment;
 import com.streetcar.backend.service.DirectorySeedData.SeedConversation;
+import com.streetcar.backend.service.DirectorySeedData.SeedResume;
 import com.streetcar.backend.service.DirectorySeedData.SeedStudent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Writes {@link DirectorySeedData} into the database at startup. Every step
@@ -37,6 +47,8 @@ public class DirectorySeeder {
     private final SubmissionRepository submissions;
     private final ConversationRepository conversations;
     private final AppointmentRepository appointments;
+    private final JobApplicationRepository applications;
+    private final ResumeRepository resumes;
     private final AppointmentService schedule;
     private final PasswordEncoder passwords;
     private final Clock clock;
@@ -44,6 +56,7 @@ public class DirectorySeeder {
     public DirectorySeeder(UserRepository users, AlumniProfileRepository alumniProfiles,
                            StudentProfileRepository studentProfiles, SubmissionRepository submissions,
                            ConversationRepository conversations, AppointmentRepository appointments,
+                           JobApplicationRepository applications, ResumeRepository resumes,
                            AppointmentService schedule, PasswordEncoder passwords, Clock clock) {
         this.users = users;
         this.alumniProfiles = alumniProfiles;
@@ -51,6 +64,8 @@ public class DirectorySeeder {
         this.submissions = submissions;
         this.conversations = conversations;
         this.appointments = appointments;
+        this.applications = applications;
+        this.resumes = resumes;
         this.schedule = schedule;
         this.passwords = passwords;
         this.clock = clock;
@@ -83,6 +98,7 @@ public class DirectorySeeder {
                         now.minusMinutes(seed.minutesAgo()), seed.unread()));
             }
         }
+        ensureApplicationsAndResumes(now);
         users.findByEmail(advisorEmail).ifPresent(advisor -> {
             if (schedule.today(advisor.getId()).isEmpty()) {
                 LocalDate today = LocalDate.now(clock);
@@ -93,6 +109,33 @@ public class DirectorySeeder {
                 }
             }
         });
+    }
+
+    /** Each student's seeded applications go in only if they have none, and a resume only if they have none. */
+    private void ensureApplicationsAndResumes(OffsetDateTime now) {
+        OffsetDateTime stamp = now.truncatedTo(ChronoUnit.MICROS);
+        LocalDate today = LocalDate.now(clock);
+        Map<String, List<SeedApplication>> byStudent = DirectorySeedData.APPLICATIONS.stream()
+                .collect(Collectors.groupingBy(SeedApplication::studentEmail));
+        byStudent.forEach((email, seeds) -> {
+            User student = users.findByEmail(email).orElseThrow();
+            if (!applications.existsByStudentId(student.getId())) {
+                for (SeedApplication seed : seeds) {
+                    LocalDate appliedOn = today.minusDays(seed.daysAgo());
+                    // Last touched mid-morning on the day applied, so the activity log reads as a history.
+                    OffsetDateTime touched = appliedOn.atTime(10, 0).atZone(clock.getZone()).toOffsetDateTime();
+                    applications.save(new JobApplication(null, student, seed.company(), seed.roleTitle(),
+                            seed.status(), appliedOn, seed.notes(), touched));
+                }
+            }
+        });
+        for (SeedResume seed : DirectorySeedData.RESUMES) {
+            User student = users.findByEmail(seed.studentEmail()).orElseThrow();
+            if (!resumes.existsById(student.getId())) {
+                resumes.save(new Resume(student, seed.headline(), seed.summary(), seed.experience(), seed.skills(),
+                        stamp));
+            }
+        }
     }
 
     /** The account with this email, created with the demo password if it is missing. */

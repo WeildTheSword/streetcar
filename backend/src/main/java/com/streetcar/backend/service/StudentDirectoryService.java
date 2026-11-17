@@ -27,13 +27,18 @@ public class StudentDirectoryService {
     private final StudentProfileRepository studentProfiles;
     private final AlumniService alumni;
     private final AppointmentService appointments;
+    private final ApplicationService applications;
+    private final ResumeService resumes;
 
     public StudentDirectoryService(UserRepository users, StudentProfileRepository studentProfiles,
-                                   AlumniService alumni, AppointmentService appointments) {
+                                   AlumniService alumni, AppointmentService appointments,
+                                   ApplicationService applications, ResumeService resumes) {
         this.users = users;
         this.studentProfiles = studentProfiles;
         this.alumni = alumni;
         this.appointments = appointments;
+        this.applications = applications;
+        this.resumes = resumes;
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +57,7 @@ public class StudentDirectoryService {
                 .orElseThrow(() -> new NoSuchElementException("Student " + id + " not found"));
         return new StudentAccount(user.getId(), user.getDisplayName(), user.getEmail(),
                 studentProfiles.findById(id).map(profile -> profile.getClassYear()).orElse(null),
-                List.copyOf(user.getSubmissions()), alumni.conversationsFor(id), appointments.forStudent(id));
+                List.copyOf(user.getSubmissions()), alumni.conversationsFor(id), appointments.forStudent(id),
+                applications.forStudent(id), resumes.find(id).orElse(null));
     }
 }

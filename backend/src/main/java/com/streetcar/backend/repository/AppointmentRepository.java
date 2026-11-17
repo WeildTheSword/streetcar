@@ -11,6 +11,9 @@ public interface AppointmentRepository extends JpaRepository<AdvisingAppointment
 
     List<AdvisingAppointment> findByStudentIdOrderByStartsAtAsc(Long studentId);
 
+    /** A student's appointments from {@code from} on, such as those still to come. */
+    long countByStudentIdAndStartsAtGreaterThanEqual(Long studentId, OffsetDateTime from);
+
     /** From {@code from} inclusive to {@code to} exclusive, such as one day. */
     List<AdvisingAppointment> findByAdvisorIdAndStartsAtGreaterThanEqualAndStartsAtLessThanOrderByStartsAtAsc(
             Long advisorId, OffsetDateTime from, OffsetDateTime to);

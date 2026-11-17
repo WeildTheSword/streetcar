@@ -1,7 +1,9 @@
 package com.streetcar.backend.service;
 
 import com.streetcar.backend.model.AlumniConversation;
+import com.streetcar.backend.model.ApplicationEntry;
 import com.streetcar.backend.model.AppointmentEntry;
+import com.streetcar.backend.model.ResumeEntry;
 import com.streetcar.backend.model.StudentAccount;
 import com.streetcar.backend.model.StudentProfile;
 import com.streetcar.backend.model.StudentSummary;
@@ -15,12 +17,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,6 +36,8 @@ class StudentDirectoryServiceTest {
     private StudentProfileRepository profiles;
     private AlumniService alumni;
     private AppointmentService appointments;
+    private ApplicationService applications;
+    private ResumeService resumes;
     private StudentDirectoryService service;
 
     @BeforeEach
@@ -40,7 +46,9 @@ class StudentDirectoryServiceTest {
         profiles = mock(StudentProfileRepository.class);
         alumni = mock(AlumniService.class);
         appointments = mock(AppointmentService.class);
-        service = new StudentDirectoryService(users, profiles, alumni, appointments);
+        applications = mock(ApplicationService.class);
+        resumes = mock(ResumeService.class);
+        service = new StudentDirectoryService(users, profiles, alumni, appointments, applications, resumes);
     }
 
     private static User user(long id, String role, String name, Submission... submissions) {
@@ -85,6 +93,12 @@ class StudentDirectoryServiceTest {
                 OffsetDateTime.parse("2026-11-17T17:30:00Z"), List.of("First session"));
         when(alumni.conversationsFor(4)).thenReturn(List.of(thread));
         when(appointments.forStudent(4)).thenReturn(List.of(session));
+        ApplicationEntry goldman = new ApplicationEntry(7, "Goldman Sachs", "IB Summer Analyst", "interview",
+                LocalDate.parse("2026-11-01"), null, OffsetDateTime.parse("2026-11-01T16:00:00Z"));
+        ResumeEntry resume = new ResumeEntry("Finance + CS", "Junior", "Fund analyst", "Excel",
+                OffsetDateTime.parse("2026-11-10T16:00:00Z"));
+        when(applications.forStudent(4)).thenReturn(List.of(goldman));
+        when(resumes.find(4)).thenReturn(Optional.of(resume));
 
         // Act
         StudentAccount chris = service.getStudent(4);
@@ -97,6 +111,24 @@ class StudentDirectoryServiceTest {
         assertEquals(List.of(newest, older), chris.submissions());
         assertEquals(List.of(thread), chris.conversations());
         assertEquals(List.of(session), chris.appointments());
+        assertEquals(List.of(goldman), chris.applications());
+        assertEquals(resume, chris.resume());
+    }
+
+    @Test
+    void getStudentWithoutAResumeSendsNull() {
+        // Arrange
+        when(users.findById(4L)).thenReturn(Optional.of(user(4, "STUDENT", "Chris Boudreaux")));
+        when(profiles.findById(4L)).thenReturn(Optional.empty());
+        when(resumes.find(4)).thenReturn(Optional.empty());
+
+        // Act
+        StudentAccount chris = service.getStudent(4);
+
+        // Assert
+        assertNull(chris.resume());
+        assertNull(chris.classYear());
+        assertEquals(List.of(), chris.applications());
     }
 
     @Test
