@@ -26,6 +26,12 @@ public final class DirectorySeedData {
 
     public record SeedAppointment(String studentEmail, LocalTime time, String tags) {}
 
+    public record SeedApplication(String studentEmail, String company, String roleTitle, String status,
+                                  int daysAgo, String notes) {}
+
+    public record SeedResume(String studentEmail, String headline, String summary, String experience,
+                             String skills) {}
+
     public static final List<Alum> ALUMNI = List.of(
         new Alum("Sarah Kim", "sarah.kim@alumni.tulane.edu", "Freeman · Finance", 2016,
             "Goldman Sachs IBD", "New York, NY"),
@@ -86,6 +92,33 @@ public final class DirectorySeedData {
         new SeedAppointment("jasmine.okoye@tulane.edu", LocalTime.of(13, 0), "Undecided between 2 offers"),
         new SeedAppointment("diego.ramirez@tulane.edu", LocalTime.of(14, 15), "First session, Needs fingerprint"),
         new SeedAppointment("alex.park@tulane.edu", LocalTime.of(15, 45), "1 alumni match"));
+
+    /** Applications, dated relative to the day the app starts. Diego has none yet. */
+    public static final List<SeedApplication> APPLICATIONS = List.of(
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "Goldman Sachs", "IB Summer Analyst", "interview", 40,
+            "Superday invite — prep the LBO walk-through with Sarah Kim."),
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "JPMorgan", "IB Summer Analyst", "applied", 35, null),
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "Evercore", "M&A Summer Analyst", "interview", 28,
+            "First round with two associates; Rachel Pham offered a mock."),
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "Lazard", "Restructuring Summer Analyst", "rejected", 21, null),
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "Moelis", "Summer Analyst", "applied", 12, null),
+        new SeedApplication(DemoFixtures.MORGAN_EMAIL, "Houlihan Lokey", "Summer Analyst", "offer", 6,
+            "Exploding offer — decision due in two weeks."),
+        new SeedApplication("jasmine.okoye@tulane.edu", "McKinsey", "Business Analyst, Health", "offer", 38, null),
+        new SeedApplication("jasmine.okoye@tulane.edu", "Deloitte", "Health Consulting Analyst", "offer", 30, null),
+        new SeedApplication("alex.park@tulane.edu", "Anthropic", "APM Intern", "applied", 9, null),
+        new SeedApplication("alex.park@tulane.edu", "Stripe", "PM Intern", "interview", 18,
+            "Product sense round next week."));
+
+    public static final List<SeedResume> RESUMES = List.of(
+        new SeedResume(DemoFixtures.MORGAN_EMAIL,
+            "Finance + CS at Tulane, Class of '27 — aspiring investment banking analyst",
+            "Junior in the Freeman School pairing finance with computer science. I build models in Excel and "
+                + "Python, and I want to bring that rigour to an M&A or restructuring team.",
+            "Freeman Investment Fund — Analyst, TMT sector (2025–present): pitched two long ideas and built the "
+                + "DCF templates the fund now uses.\nTulane Computer Science — Teaching Assistant, CMPS 2200 "
+                + "(2025): ran weekly data-structures labs for 40 students.",
+            "Financial modelling, DCF and LBO analysis, Excel, Python, SQL, PowerPoint"));
 
     /** Every account this class adds. */
     public static List<String> emails() {

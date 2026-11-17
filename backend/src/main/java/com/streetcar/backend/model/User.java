@@ -9,6 +9,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,10 @@ public class User {
     @Column(name = "display_name", nullable = false)
     private String displayName;
 
+    /** Set by the database when the row is inserted, so Hibernate never writes it. */
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
     /**
      * The other side of Submission.user: one account owns many submissions,
      * through submissions.user_id. Newest first. Lazy, so read it inside a transaction.
@@ -60,5 +65,6 @@ public class User {
     public String getPasswordHash() { return passwordHash; }
     public String getRole() { return role; }
     public String getDisplayName() { return displayName; }
+    public OffsetDateTime getCreatedAt() { return createdAt; }
     public List<Submission> getSubmissions() { return Collections.unmodifiableList(submissions); }
 }

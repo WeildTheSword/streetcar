@@ -2,11 +2,15 @@ package com.streetcar.backend.service;
 
 import com.streetcar.backend.model.AdvisingAppointment;
 import com.streetcar.backend.model.Appointment;
+import com.streetcar.backend.model.JobApplication;
+import com.streetcar.backend.model.Resume;
 import com.streetcar.backend.model.Submission;
 import com.streetcar.backend.model.User;
 import com.streetcar.backend.repository.AlumniProfileRepository;
 import com.streetcar.backend.repository.AppointmentRepository;
 import com.streetcar.backend.repository.ConversationRepository;
+import com.streetcar.backend.repository.JobApplicationRepository;
+import com.streetcar.backend.repository.ResumeRepository;
 import com.streetcar.backend.repository.StudentProfileRepository;
 import com.streetcar.backend.repository.SubmissionRepository;
 import com.streetcar.backend.repository.UserRepository;
@@ -19,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -46,6 +51,8 @@ class DirectorySeederTest {
     private SubmissionRepository submissions;
     private ConversationRepository conversations;
     private AppointmentRepository appointments;
+    private JobApplicationRepository applications;
+    private ResumeRepository resumes;
     private AppointmentService schedule;
     private DirectorySeeder seeder;
 
@@ -61,13 +68,15 @@ class DirectorySeederTest {
         submissions = mock(SubmissionRepository.class);
         conversations = mock(ConversationRepository.class);
         appointments = mock(AppointmentRepository.class);
+        applications = mock(JobApplicationRepository.class);
+        resumes = mock(ResumeRepository.class);
         schedule = mock(AppointmentService.class);
         PasswordEncoder passwords = mock(PasswordEncoder.class);
         when(passwords.encode(anyString())).thenReturn("hashed");
         when(users.findByEmail(anyString())).thenAnswer(call -> Optional.ofNullable(accounts.get(call.<String>getArgument(0))));
         when(users.save(any(User.class))).thenAnswer(call -> store(call.getArgument(0)));
         seeder = new DirectorySeeder(users, alumniProfiles, studentProfiles, submissions, conversations,
-                appointments, schedule, passwords, CLOCK);
+                appointments, applications, resumes, schedule, passwords, CLOCK);
     }
 
     private User store(User user) {
@@ -104,6 +113,28 @@ class DirectorySeederTest {
         assertEquals(bill, first.getAdvisor());
         assertEquals("ALUMNI", accounts.get("sarah.kim@alumni.tulane.edu").getRole());
         assertEquals("STUDENT", accounts.get("alex.park@tulane.edu").getRole());
+        ArgumentCaptor<JobApplication> applied = ArgumentCaptor.forClass(JobApplication.class);
+        verify(applications, times(DirectorySeedData.APPLICATIONS.size())).save(applied.capture());
+        verify(resumes, times(DirectorySeedData.RESUMES.size())).save(any(Resume.class));
+        JobApplication goldman = applied.getAllValues().stream()
+                .filter(a -> a.getCompany().equals("Goldman Sachs")).findFirst().orElseThrow();
+        assertEquals("interview", goldman.getStatus());
+        assertEquals(LocalDate.parse("2026-10-08"), goldman.getAppliedOn());
+        assertEquals(accounts.get("morgan@tulane.edu"), goldman.getStudent());
+    }
+
+    @Test
+    void diegoGetsNoApplicationsAndOnlyMorganGetsAResume() {
+        // Act
+        List<String> applicants = DirectorySeedData.APPLICATIONS.stream()
+                .map(DirectorySeedData.SeedApplication::studentEmail).distinct().toList();
+
+        // Assert
+        assertEquals(false, applicants.contains("diego.ramirez@tulane.edu"));
+        assertEquals(List.of("morgan@tulane.edu"),
+                DirectorySeedData.RESUMES.stream().map(DirectorySeedData.SeedResume::studentEmail).toList());
+        assertEquals(6, DirectorySeedData.APPLICATIONS.stream()
+                .filter(a -> a.studentEmail().equals("morgan@tulane.edu")).count());
     }
 
     @Test
@@ -119,6 +150,8 @@ class DirectorySeederTest {
         when(alumniProfiles.existsById(anyLong())).thenReturn(true);
         when(studentProfiles.existsById(anyLong())).thenReturn(true);
         when(conversations.existsByStudentIdAndAlumnusId(anyLong(), anyLong())).thenReturn(true);
+        when(applications.existsByStudentId(anyLong())).thenReturn(true);
+        when(resumes.existsById(anyLong())).thenReturn(true);
         when(schedule.today(bill.getId())).thenReturn(List.of(new Appointment("1", "2", "Morgan", "MT", "11:30 AM",
                 "Finance", "Junior", 3.8, "IB", List.of())));
 
@@ -132,6 +165,8 @@ class DirectorySeederTest {
         verify(submissions, never()).save(any());
         verify(conversations, never()).save(any());
         verify(appointments, never()).save(any());
+        verify(applications, never()).save(any());
+        verify(resumes, never()).save(any());
     }
 
     @Test

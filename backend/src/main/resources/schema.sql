@@ -88,3 +88,30 @@ CREATE TABLE IF NOT EXISTS conversations (
 );
 CREATE INDEX IF NOT EXISTS conversations_student_idx ON conversations (student_id);
 CREATE INDEX IF NOT EXISTS conversations_alumnus_idx ON conversations (alumnus_id);
+
+-- When each account was created, for the advisor's activity log. Rows that
+-- predate the column take the time it was added.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+
+-- A job or internship a student has applied to, tracked through its stages.
+CREATE TABLE IF NOT EXISTS applications (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    student_id BIGINT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    company VARCHAR(120) NOT NULL,
+    role_title VARCHAR(160) NOT NULL,
+    status VARCHAR(12) NOT NULL CHECK (status IN ('applied', 'interview', 'offer', 'rejected')),
+    applied_on DATE NOT NULL,
+    notes VARCHAR(500),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX IF NOT EXISTS applications_student_idx ON applications (student_id);
+
+-- A student's resume: one-to-one with the account, keyed by the same id.
+CREATE TABLE IF NOT EXISTS resumes (
+    user_id BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+    headline VARCHAR(200) NOT NULL,
+    summary VARCHAR(2000) NOT NULL,
+    experience VARCHAR(4000) NOT NULL,
+    skills VARCHAR(1000) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+);

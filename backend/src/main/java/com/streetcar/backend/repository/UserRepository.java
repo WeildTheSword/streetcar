@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Every account with this role, for the advisor's student list. */
     List<User> findByRole(String role, Sort sort);
 
+    long countByRole(String role);
+
 }

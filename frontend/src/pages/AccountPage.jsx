@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { advisorSections, advisorShellUser } from "@/components/advisor/advisorNav";
 import { studentSections } from "@/components/student/studentNav";
 import { Initials, PageHeading, Panel, Pill } from "@/components/PagePanel";
+import { useStudentCounts } from "@/hooks/useStudentCounts";
 import { formatDateTime, initialsOf } from "@/lib/format";
 import { fetchAccount } from "@/services/advisorService";
 
@@ -16,7 +17,7 @@ const ALUMNI_SECTIONS = [
 ];
 
 /** The sidebar and account chip for whichever role is signed in. */
-function chromeFor(role, session) {
+function chromeFor(role, session, counts) {
   const user = {
     name: session.displayName,
     subtitle: session.subtitle,
@@ -24,7 +25,7 @@ function chromeFor(role, session) {
     email: session.email ?? "",
   };
   if (role === "ADVISOR") return { sections: advisorSections("account"), user: advisorShellUser(session) };
-  if (role === "STUDENT") return { sections: studentSections("account"), user };
+  if (role === "STUDENT") return { sections: studentSections("account", counts), user };
   return { sections: ALUMNI_SECTIONS, user };
 }
 
@@ -43,6 +44,7 @@ export function AccountPage() {
   const role = sessionRole(session);
   const [account, setAccount] = useState(null);
   const [error, setError] = useState(null);
+  const { counts } = useStudentCounts(role === "STUDENT");
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +56,7 @@ export function AccountPage() {
     };
   }, []);
 
-  const { sections, user } = chromeFor(role, session);
+  const { sections, user } = chromeFor(role, session, counts);
 
   return (
     <AppShell sections={sections} user={user} onSignOut={logout} onRestart={restartDemo}>

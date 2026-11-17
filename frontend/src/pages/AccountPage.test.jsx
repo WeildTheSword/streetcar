@@ -4,8 +4,10 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { AccountPage } from "./AccountPage";
 import { useAuth } from "@/auth/useAuth";
 import { fetchAccount } from "@/services/advisorService";
+import { fetchSummary } from "@/services/studentService";
 
 vi.mock("@/services/advisorService");
+vi.mock("@/services/studentService");
 vi.mock("@/auth/useAuth");
 
 const logout = vi.fn();
@@ -61,6 +63,7 @@ describe("AccountPage", () => {
   test("a student sees their account under the student sidebar", async () => {
     // Arrange
     signedInAs("STUDENT", "Morgan Thibodaux");
+    fetchSummary.mockResolvedValue({ alumni: 0, appointments: 1, applications: 4 });
     fetchAccount.mockResolvedValue({
       id: 2,
       name: "Morgan Thibodaux",
@@ -82,6 +85,7 @@ describe("AccountPage", () => {
     expect(within(details).getByText("2027")).toBeInTheDocument();
     expect(within(details).getByText("3")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /My Path/ })).toHaveAttribute("href", "/student");
+    expect(await screen.findByRole("link", { name: /Applications\s*4/ })).toBeInTheDocument();
   });
 
   test("an advisor gets the advisor sidebar with My Account marked current", async () => {
@@ -105,6 +109,7 @@ describe("AccountPage", () => {
 
     // Assert
     expect(screen.getByRole("link", { name: /My Account/ })).toHaveAttribute("aria-current", "page");
+    expect(fetchSummary).not.toHaveBeenCalled();
     const details = screen.getByText("Role").closest("dl");
     expect(within(details).getByText("Advisor")).toBeInTheDocument();
   });

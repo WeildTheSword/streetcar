@@ -44,3 +44,23 @@ export const fetchAlumni = () =>
 /** The signed-in user's own account, for any role. */
 export const fetchAccount = () =>
   call("/account", undefined, "Unable to load your account. Please try again.");
+
+/** Where students are applying, and where alumni work and live. */
+export const fetchHiringTrends = () =>
+  call("/advisor/insights/hiring", undefined, "Unable to load hiring trends. Please try again.");
+
+/** The signed-in advisor's appointment numbers and the eight-week trend. */
+export const fetchPerformance = () =>
+  call("/advisor/insights/performance", undefined, "Unable to load performance. Please try again.");
+
+/** The application funnel across every student, with offers and a per-student breakdown. */
+export const fetchOutcomes = () =>
+  call("/advisor/insights/outcomes", undefined, "Unable to load outcomes. Please try again.");
+
+/** One reporting row per student account. */
+export const fetchStudentReports = () =>
+  call("/advisor/reports/students", undefined, "Unable to load the student report. Please try again.");
+
+/** Recent activity across the platform, newest first. */
+export const fetchLogs = () =>
+  call("/advisor/logs", undefined, "Unable to load the activity log. Please try again.");

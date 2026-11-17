@@ -11,4 +11,6 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     List<Conversation> findByAlumnusIdOrderByUpdatedAtDesc(Long alumnusId);
 
     boolean existsByStudentIdAndAlumnusId(Long studentId, Long alumnusId);
+
+    long countByStudentId(Long studentId);
 }

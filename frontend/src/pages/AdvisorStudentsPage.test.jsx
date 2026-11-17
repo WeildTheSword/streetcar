@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { AdvisorStudentsPage } from "./AdvisorStudentsPage";
@@ -50,11 +50,24 @@ const CHRIS = {
   appointments: [
     { id: 3, studentId: 4, studentName: "Chris Boudreaux", initials: "CB", startsAt: "2026-11-18T17:30:00Z", tags: ["First session"] },
   ],
+  applications: [
+    {
+      id: 21, company: "Evercore", roleTitle: "M&A Summer Analyst", status: "interview",
+      appliedOn: "2026-10-20", notes: "Superday next week", updatedAt: "2026-11-01T15:00:00Z",
+    },
+  ],
+  resume: {
+    headline: "Finance at Freeman, Tulane '27",
+    summary: "Junior focused on M&A.",
+    experience: "Summer intern, Hancock Whitney",
+    skills: "Excel, PowerPoint",
+    updatedAt: "2026-11-12T15:00:00Z",
+  },
 };
 
-const renderPage = () =>
+const renderPage = (entry = "/advisor/students") =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[entry]}>
       <AdvisorStudentsPage />
     </MemoryRouter>,
   );
@@ -93,6 +106,51 @@ describe("AdvisorStudentsPage", () => {
     expect(screen.getByText("Finance — Analyst")).toBeInTheDocument();
     expect(screen.getByText("Sarah Kim")).toBeInTheDocument();
     expect(screen.getByText("First session")).toBeInTheDocument();
+  });
+
+  test("a student's record shows their applications and resume", async () => {
+    // Arrange
+    fetchStudents.mockResolvedValue(STUDENTS);
+    fetchStudentAccount.mockResolvedValue(CHRIS);
+    renderPage();
+
+    // Act
+    fireEvent.click(await screen.findByRole("button", { name: /Chris Boudreaux/ }));
+
+    // Assert
+    const application = (await screen.findByText("Evercore · M&A Summer Analyst")).closest("li");
+    expect(within(application).getByText("Interview")).toBeInTheDocument();
+    expect(within(application).getByText("Superday next week")).toBeInTheDocument();
+    expect(screen.getByText("Finance at Freeman, Tulane '27")).toBeInTheDocument();
+    expect(screen.getByText("Summer intern, Hancock Whitney")).toBeInTheDocument();
+  });
+
+  test("a student with no resume or applications says so", async () => {
+    // Arrange
+    fetchStudents.mockResolvedValue(STUDENTS);
+    fetchStudentAccount.mockResolvedValue({ ...CHRIS, applications: [], resume: null });
+    renderPage();
+
+    // Act
+    fireEvent.click(await screen.findByRole("button", { name: /Chris Boudreaux/ }));
+
+    // Assert
+    expect(await screen.findByText("No resume on file.")).toBeInTheDocument();
+    expect(screen.getByText("No applications tracked yet.")).toBeInTheDocument();
+  });
+
+  test("a ?student= link opens that student's record on arrival", async () => {
+    // Arrange
+    fetchStudents.mockResolvedValue(STUDENTS);
+    fetchStudentAccount.mockResolvedValue(CHRIS);
+
+    // Act
+    renderPage("/advisor/students?student=4");
+
+    // Assert
+    expect(await screen.findByRole("heading", { name: "Chris Boudreaux" })).toBeInTheDocument();
+    expect(fetchStudentAccount).toHaveBeenCalledWith(4);
+    expect(screen.getByRole("button", { name: /Chris Boudreaux/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   test("a failed load says so", async () => {

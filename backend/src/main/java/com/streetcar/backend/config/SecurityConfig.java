@@ -36,6 +36,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/submissions/**").hasRole("ADVISOR")
                         .requestMatchers("/advisor/**").hasRole("ADVISOR")
+                        // A student's own tabs: advisors and alumni have none.
+                        .requestMatchers("/me/**").hasRole("STUDENT")
                         .anyRequest().authenticated())
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint((request, response, denied) -> reject(response,
