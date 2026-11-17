@@ -1,0 +1,195 @@
+{
+  "sprint": "Module 6",
+  "team": [
+    "Michael Weild",
+    "Qixuan Liu"
+  ],
+  "stories": [
+    {
+      "title": "SCRUM-93 — User Story 1, Deploy to Production (https://streetcarnola.atlassian.net/browse/SCRUM-93)",
+      "tasks": [
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-97",
+          "title": "Containerize the backend for Render",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "Dockerfile for the Spring Boot backend, bind 0.0.0.0 and read Render's PORT; runs in a container locally, local dev unchanged, ./mvnw verify green."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-98",
+          "title": "Create the Render web service on Supabase",
+          "assignee": "Qixuan Liu",
+          "points": 3,
+          "description": "Render web service with Supabase and JWT env vars set in Render; schema.sql creates the tables in Supabase and a live sign-in plus submission write persists; no secrets committed."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-99",
+          "title": "Read allowed CORS origins from configuration",
+          "assignee": "Qixuan Liu",
+          "points": 2,
+          "description": "CorsConfig reads ALLOWED_ORIGINS (localhost by default) so the deployed frontend is allowed and other origins are refused; covered by a test."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-100",
+          "title": "Lock down the demo reset on the live app",
+          "assignee": "Michael Weild",
+          "points": 2,
+          "description": "POST /auth/reset requires a signed-in user (401 without a token) and no longer deletes accounts, so new sign-ups and their submissions survive a reset and stay visible to advisors; tests cover both."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-101",
+          "title": "Deploy the frontend pointed at the live backend",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "React build hosted with VITE_API_URL set to the Render URL and an SPA rewrite; sign-in calls the live backend and deep links like /student load directly."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-102",
+          "title": "Show when the app is on fixture data or waking the server",
+          "assignee": "Qixuan Liu",
+          "points": 3,
+          "description": "A visible notice when the app falls back to sample data and a waking-the-server state during Render cold starts; Vitest render and interaction tests pass."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-103",
+          "title": "Deploy automatically from GitHub Actions after the tests pass",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "Deploy jobs in ci.yml call the Render and frontend deploy hooks only after every test job passes on a push to main; branches and PRs never deploy."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-104",
+          "title": "Verify the semester requirements on the live app and document the deployment",
+          "assignee": "Qixuan Liu",
+          "points": 2,
+          "description": "Full CRUD and both roles checked on the live app, JaCoCo service coverage still 70%+, README and DEMO.md link the live app and describe the deployment."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-105",
+          "title": "Update the class, package and sequence diagrams",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "Diagrams in docs/ updated for User, JPA, JWT auth and the deployment topology, each with a fresh PNG export."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-120",
+          "title": "Write the Sprint 5 retrospective and record the Sprint 6 plan in docs",
+          "assignee": "Michael Weild",
+          "points": 1,
+          "description": "docs/sprint5-retro.md with Start, Stop, Continue and owned, dated action items; docs/sprint-6-plan.md and .json match the Jira board."
+        }
+      ]
+    },
+    {
+      "title": "SCRUM-94 — User Story 2 (Extra Credit), Playwright E2E Tests in CI (https://streetcarnola.atlassian.net/browse/SCRUM-94)",
+      "tasks": [
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-107",
+          "title": "Set up Playwright and a CI job that runs it against the full stack",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "Playwright config and a CI job that starts the backend and frontend and runs the suite on every push; deploy waits on it; report uploaded."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-108",
+          "title": "Playwright tests for the student flows",
+          "assignee": "Michael Weild",
+          "points": 3,
+          "description": "Three E2E tests: student sign-in, sign-up with onboarding, and creating then editing a submission; pass in CI and rerun cleanly."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-109",
+          "title": "Playwright tests for the advisor flows",
+          "assignee": "Qixuan Liu",
+          "points": 3,
+          "description": "Three E2E tests: advisor sign-in and dashboard, advisor deleting a submission, and a student blocked from delete and /advisor; pass in CI."
+        }
+      ]
+    },
+    {
+      "title": "SCRUM-95 — User Story 3 (Extra Credit), Mobile Deployment (https://streetcarnola.atlassian.net/browse/SCRUM-95)",
+      "tasks": [
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-110",
+          "title": "Scaffold the Expo app with sign-in against the live backend",
+          "assignee": "Qixuan Liu",
+          "points": 5,
+          "description": "Expo app in mobile/ that signs in against the live backend, stores the JWT in SecureStore and routes by role in Expo Go."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-111",
+          "title": "Mobile student screens: recommendations and submissions",
+          "assignee": "Michael Weild",
+          "points": 5,
+          "description": "Student recommendations and submissions screens on the live API; a submission created on the phone appears in the web app."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-112",
+          "title": "Mobile advisor screen, sign-out on 401, and Expo Go demo instructions",
+          "assignee": "Qixuan Liu",
+          "points": 3,
+          "description": "Advisor dashboard screen, sign-out on 401, and README instructions with a QR code for opening the app in Expo Go."
+        }
+      ]
+    },
+    {
+      "title": "SCRUM-96 — User Story 4 (Extra Credit), Advisors work from real student, alumni and appointment records (https://streetcarnola.atlassian.net/browse/SCRUM-96)",
+      "tasks": [
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-113",
+          "title": "Decide the additional feature and get instructor approval",
+          "assignee": "Michael Weild",
+          "points": 1,
+          "description": "Feature chosen Nov 17: advisors look up any student and see real alumni, appointments and conversations; the story and its tasks were rewritten with that scope."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-114",
+          "title": "Backend: alumni, appointments and conversations tables with advisor and account endpoints",
+          "assignee": "Michael Weild",
+          "points": 5,
+          "description": "student_profiles, alumni_profiles, appointments and conversations tables with foreign keys to users and JPA relationships; advisor-only /advisor/students, /advisor/appointments and /advisor/alumni plus GET /account; students get 403 and missing tokens 401; coverage stays 70%+."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-115",
+          "title": "Frontend: My Students, Appointments, Alumni Database and My Account pages, plus alumni sign-in",
+          "assignee": "Michael Weild",
+          "points": 5,
+          "description": "Advisor sidebar items become real pages showing live Supabase data, a My Account page for every role and an alumni sign-in card; each page has Vitest render and interaction tests."
+        }
+      ]
+    },
+    {
+      "title": "SCRUM-106 — User Story 5 (Extra Credit), Google Sign-In via Supabase (https://streetcarnola.atlassian.net/browse/SCRUM-106)",
+      "tasks": [
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-116",
+          "title": "Configure Google OAuth and Supabase Auth",
+          "assignee": "Qixuan Liu",
+          "points": 2,
+          "description": "Google OAuth client and Supabase Google provider with live and local redirect URLs; asymmetric JWT signing keys so the JWKS URL lists a key; Supabase keys set on Render, never committed."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-117",
+          "title": "Verify every request against Supabase's JWKS, with roles in a Profile table",
+          "assignee": "Michael Weild",
+          "points": 8,
+          "description": "spring-boot-starter-oauth2-resource-server checks every token against Supabase's JWKS; roles come from a users/Profile row keyed by sub, created on first sight; GET /auth/me returns the role; bad tokens get 401, students get 403 on delete."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-119",
+          "title": "Proxy email/password sign-up and sign-in to Supabase Auth",
+          "assignee": "Qixuan Liu",
+          "points": 5,
+          "description": "Backend forwards /auth/signup and /auth/login to Supabase Auth and returns Supabase's access token, so email/password and Google share one JWKS check; BCrypt removed; demo accounts seeded in Supabase."
+        },
+        {
+          "key": "https://streetcarnola.atlassian.net/browse/SCRUM-118",
+          "title": "Frontend Google sign-in, redirect handling, and role from /auth/me",
+          "assignee": "Qixuan Liu",
+          "points": 3,
+          "description": "Continue with Google does a real browser redirect to Supabase; the callback clears the token from the URL and signs in; the role comes from GET /auth/me; Vitest tests pass."
+        }
+      ]
+    }
+  ]
+}
