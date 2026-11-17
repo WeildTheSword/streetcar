@@ -1,0 +1,29 @@
+# SCRUM-103: Render Blueprint for the StreetCar API. See docs/deployment.md.
+services:
+  - type: web
+    name: streetcar-backend
+    runtime: docker
+    plan: free
+    # Paths below are relative to rootDir.
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    # GitHub Actions deploys through the deploy hook once CI passes, so Render
+    # must not also deploy on every commit.
+    autoDeploy: false
+    # No healthCheckPath on purpose: Render needs a 2xx or 3xx answer, and every
+    # GET outside /auth/** returns 401 without a token (/auth/login is POST only).
+    # Render falls back to checking that the port accepts connections.
+    envVars:
+      # sync: false means Render asks for the value when the Blueprint is
+      # created and nothing is committed here.
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
