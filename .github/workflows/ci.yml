@@ -74,6 +74,8 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run lint
+      # Also run here (not only in frontend.yml) so the deploy jobs can wait on the tests.
+      - run: npm test
       - run: npm run build
   # -------------------------------------------------------------------------------------------
   # END-TO-END SECTION: Playwright drives the real app against the real API.
@@ -103,4 +105,68 @@ jobs:
         with:
           name: playwright-report
           path: frontend/playwright-report
+  # -------------------------------------------------------------------------------------------
+  # DOCKER SECTION (SCRUM-97): build the backend image Render deploys and prove it starts.
+  # A 401 from /courses means the app is up, reachable from outside the container on PORT,
+  # and enforcing auth. The secret here is a throwaway value for this check only.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t streetcar-backend backend
+      - run: >-
+          docker run -d --name streetcar-backend -p 9000:9000
+          -e PORT=9000
+          -e JWT_SECRET=ci-only-dummy-secret-0123456789abcdef0123456789
+          streetcar-backend
+      - name: Wait for the API to answer 401 on /courses
+        run: |
+          for i in $(seq 1 45); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:9000/courses || true)
+            if [ "$status" = "401" ]; then
+              echo "API is up: GET /courses returned 401 after about $((i * 2)) seconds."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API did not return 401 within 90 seconds (last status: $status)."
+          exit 1
+      - name: Container logs
+        if: always()
+        run: docker logs streetcar-backend || true
+  # -------------------------------------------------------------------------------------------
+  # DEPLOY SECTION (SCRUM-103): only a push to main, and only after every check above passes.
+  # Each job POSTs a deploy hook stored as a GitHub secret. Until a hook exists the secret is
+  # empty, and the job skips with a notice instead of failing. See docs/deployment.md.
+  deploy-backend:
+    needs: [backend, frontend, docker, e2e]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Render deploy hook
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::notice title=Backend deploy skipped::RENDER_DEPLOY_HOOK_URL is not set. See docs/deployment.md."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK_URL" > /dev/null
+          echo "Render deploy triggered."
+
+  deploy-frontend:
+    needs: [backend, frontend, docker, e2e]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Vercel deploy hook
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::notice title=Frontend deploy skipped::VERCEL_DEPLOY_HOOK_URL is not set. See docs/deployment.md."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK_URL" > /dev/null
+          echo "Vercel deploy triggered."
   # -------------------------------------------------------------------------------------------
