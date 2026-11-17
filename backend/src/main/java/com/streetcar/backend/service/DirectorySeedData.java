@@ -87,7 +87,7 @@ public final class DirectorySeedData {
         new SeedAppointment("diego.ramirez@tulane.edu", LocalTime.of(14, 15), "First session, Needs fingerprint"),
         new SeedAppointment("alex.park@tulane.edu", LocalTime.of(15, 45), "1 alumni match"));
 
-    /** Every account this class adds, which the demo reset keeps. */
+    /** Every account this class adds. */
     public static List<String> emails() {
         return Stream.concat(ALUMNI.stream().map(Alum::email),
                 STUDENTS.stream().map(SeedStudent::email)).distinct().toList();

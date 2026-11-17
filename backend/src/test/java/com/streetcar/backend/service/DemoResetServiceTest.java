@@ -11,14 +11,12 @@ import static org.mockito.Mockito.verify;
 
 class DemoResetServiceTest {
     private DemoSessionState session;
-    private AuthService auth;
     private DemoResetService reset;
 
     @BeforeEach
     void setUp() {
         session = new DemoSessionState();
-        auth = mock(AuthService.class);
-        reset = new DemoResetService(session, auth);
+        reset = new DemoResetService(session);
     }
 
     @Test
@@ -31,17 +29,6 @@ class DemoResetServiceTest {
 
         // Assert
         assertFalse(session.isOnboarded(DemoFixtures.MORGAN_ID));
-    }
-
-    @Test
-    void resetRemovesAccountsCreatedDuringTheDemo() {
-        // Arrange: nothing beyond the mocks
-
-        // Act
-        reset.reset();
-
-        // Assert
-        verify(auth).clearCreatedAccounts();
     }
 
     @Test

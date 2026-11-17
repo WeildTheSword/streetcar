@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
 public class DemoResetService {
 
     private final DemoSessionState session;
-    private final AuthService auth;
 
-    public DemoResetService(DemoSessionState session, AuthService auth) {
+    public DemoResetService(DemoSessionState session) {
         this.session = session;
-        this.auth = auth;
     }
 
-    /** Clears onboarding, sign-up identities and accounts created during the demo. */
+    /**
+     * Clears onboarding and the names sign-ups wore over the fixtures. Accounts
+     * are real, so the reset never deletes them or anything they saved.
+     */
     public void reset() {
         session.reset();
-        auth.clearCreatedAccounts();
     }
 }

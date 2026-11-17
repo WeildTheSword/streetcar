@@ -82,11 +82,6 @@ public class AuthService {
         }
     }
 
-    /** Deletes every account except the built-in demo ones and the seeded directory, for /auth/reset. */
-    public void clearCreatedAccounts() {
-        users.deleteAllExcept(Stream.concat(fixtures.users().stream().map(DemoUser::email),
-                DirectorySeedData.emails().stream()).toList());
-    }
 
     /** Wears the user's name over their role's fixture profile and builds the signed-in session. */
     private AuthResponse startSession(User user) {

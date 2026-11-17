@@ -22,9 +22,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Every account with this role, for the advisor's student list. */
     List<User> findByRole(String role, Sort sort);
 
-    /** Removes every account except the ones with these emails. */
-    @Transactional
-    @Modifying
-    @Query("delete from User u where u.email not in :kept")
-    void deleteAllExcept(@Param("kept") Collection<String> kept);
 }

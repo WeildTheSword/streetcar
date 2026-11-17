@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         // Lets Spring's own error page render instead of turning a 404 into a 401.
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                        // Restarting the demo is for someone using it, not anyone on the public URL.
+                        .requestMatchers("/auth/reset").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/submissions/**").hasRole("ADVISOR")
                         .requestMatchers("/advisor/**").hasRole("ADVISOR")
