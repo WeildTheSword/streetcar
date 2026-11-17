@@ -1,4 +1,4 @@
-import { ChevronRight, GraduationCap, Users } from "lucide-react";
+import { Briefcase, ChevronRight, GraduationCap, Users } from "lucide-react";
 import {
   Card,
   CardAction,
@@ -29,6 +29,19 @@ const ROLES = [
       "Courses ranked to your goal",
       "Alumni already doing the work",
       "Sessions with your advisor",
+    ],
+  },
+  {
+    role: "ALUMNI",
+    icon: Briefcase,
+    title: "Alumni",
+    subtitle: "For Tulane graduates helping students",
+    accent: "#B8862B",
+    points: [
+      "Your alumni profile",
+      "Students you are talking to",
+      "Your account details",
+      "Sign in with university credentials",
     ],
   },
 ];
@@ -68,7 +81,7 @@ export function RoleChooser({ onSelect }) {
       </header>
 
       <main className="relative flex flex-1 items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[820px]">
+        <div className="w-full max-w-[1080px]">
           <div className="text-center">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-surface px-2.5 py-1 text-[11.5px] font-medium text-muted-ink">
               <span className="size-1.5 rounded-full bg-[#2F6B3E]" />
@@ -83,7 +96,7 @@ export function RoleChooser({ onSelect }) {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {ROLES.map((option) => (
               <button
                 key={option.role}

@@ -26,6 +26,14 @@ const DEMO_ACCOUNTS = [
     email: "bill.hudlow@tulane.edu",
     password: "streetcar",
   },
+  {
+    role: "ALUMNI",
+    label: "Alumni",
+    name: "Sarah Kim",
+    detail: "Freeman '16 · Goldman IBD",
+    email: "sarah.kim@alumni.tulane.edu",
+    password: "streetcar",
+  },
 ];
 
 const MODE_COPY = {
@@ -48,19 +56,43 @@ const MODE_COPY = {
 const ROLE_COPY = {
   STUDENT: {
     label: "Student",
+    kind: "a student",
+    noun: "student",
     notThisRole: "Not a student?",
-    wrongAccount: "That is an advisor account. Choose Advisor, or use student credentials.",
     signingIn: "Opening your path",
     signingUp: "Setting up your account",
   },
   ADVISOR: {
     label: "Advisor",
+    kind: "an advisor",
+    noun: "advisor",
     notThisRole: "Not an advisor?",
-    wrongAccount: "That is a student account. Choose Student, or use advisor credentials.",
     signingIn: "Opening your console",
     signingUp: "Setting up your console",
   },
+  ALUMNI: {
+    label: "Alumni",
+    kind: "an alumni",
+    noun: "alumni",
+    notThisRole: "Not an alum?",
+    signingIn: "Opening your account",
+    signInOnly: true,
+  },
 };
+
+/** Names the mismatch when an account signs in through another role's door. */
+function wrongAccountMessage(chosen, actual) {
+  const account = ROLE_COPY[actual];
+  if (!account) return `That account cannot sign in as ${ROLE_COPY[chosen].noun}.`;
+  return `That is ${account.kind} account. Choose ${account.label}, or use ${ROLE_COPY[chosen].noun} credentials.`;
+}
+
+/** Where each role lands after signing in. */
+function homeFor(session) {
+  if (session.role === "ADVISOR") return "/advisor";
+  if (session.role === "ALUMNI") return "/account";
+  return session.onboarded ? "/student" : "/onboarding";
+}
 
 export function LoginPage() {
   const { login, logout, register } = useAuth();
@@ -83,16 +115,12 @@ export function LoginPage() {
       const session = await login(email, password);
       if (role && session.role !== role) {
         logout();
-        setError(ROLE_COPY[role].wrongAccount);
+        setError(wrongAccountMessage(role, session.role));
         setPending(false);
         return;
       }
-      await run(ROLE_COPY[session.role].signingIn, () => {
-        if (session.role === "ADVISOR") {
-          navigate("/advisor", { replace: true });
-        } else {
-          navigate(session.onboarded ? "/student" : "/onboarding", { replace: true });
-        }
+      await run(ROLE_COPY[session.role]?.signingIn ?? "Signing you in", () => {
+        navigate(homeFor(session), { replace: true });
       });
     } catch {
       setError("That email and password combination is not recognized.");
@@ -125,8 +153,14 @@ export function LoginPage() {
     setError(null);
   }
 
+  function chooseRole(next) {
+    setRole(next);
+    // Alumni accounts are created by the university, so their door opens on sign-in.
+    if (ROLE_COPY[next].signInOnly) setMode("signin");
+  }
+
   if (!role) {
-    return <RoleChooser onSelect={setRole} />;
+    return <RoleChooser onSelect={chooseRole} />;
   }
 
   const accounts = DEMO_ACCOUNTS.filter((account) => account.role === role);
@@ -342,19 +376,21 @@ export function LoginPage() {
           )}
 
           <div className="mt-6 border-t border-hairline pt-5">
-            <button
-              type="button"
-              onClick={() => {
-                setMode(modeCopy.switchTo);
-                setError(null);
-              }}
-              className="text-[12.5px] font-medium text-burgundy hover:underline"
-            >
-              {modeCopy.switchLabel}
-            </button>
+            {!roleCopy.signInOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(modeCopy.switchTo);
+                  setError(null);
+                }}
+                className="text-[12.5px] font-medium text-burgundy hover:underline"
+              >
+                {modeCopy.switchLabel}
+              </button>
+            )}
 
             {mode === "signin" && (
-              <div className="mt-4">
+              <div className={roleCopy.signInOnly ? "" : "mt-4"}>
                 <div className="text-[11px] font-medium tracking-[0.12em] text-muted-ink-2 uppercase">
                   Demo account
                 </div>

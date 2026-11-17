@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { StudentDashboard } from "./StudentDashboard";
 import { fetchStudent } from "@/services/api";
@@ -23,7 +24,11 @@ const originalScrollIntoView = Element.prototype.scrollIntoView;
 
 const renderDashboard = async () => {
   fetchStudent.mockResolvedValue(FALLBACK_STUDENT);
-  render(<StudentDashboard />);
+  render(
+    <MemoryRouter>
+      <StudentDashboard />
+    </MemoryRouter>,
+  );
   await screen.findByText("Welcome back, Morgan.");
 };
 

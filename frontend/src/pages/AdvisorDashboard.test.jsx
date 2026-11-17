@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { AdvisorDashboard } from "./AdvisorDashboard";
 import { fetchAdvisorDashboard } from "@/services/api";
@@ -23,7 +24,11 @@ const originalScrollIntoView = Element.prototype.scrollIntoView;
 
 const renderDashboard = async () => {
   fetchAdvisorDashboard.mockResolvedValue(FALLBACK_ADVISOR_DASHBOARD);
-  const view = render(<AdvisorDashboard />);
+  const view = render(
+    <MemoryRouter>
+      <AdvisorDashboard />
+    </MemoryRouter>,
+  );
   await screen.findByRole("heading", { name: "Your next upcoming appointment" });
   return view;
 };
@@ -85,7 +90,11 @@ describe("AdvisorDashboard", () => {
     fetchAdvisorDashboard.mockRejectedValue(new Error("offline"));
 
     // Act
-    render(<AdvisorDashboard />);
+    render(
+    <MemoryRouter>
+      <AdvisorDashboard />
+    </MemoryRouter>,
+  );
 
     // Assert
     expect(await screen.findByText("Could not load your console.")).toBeInTheDocument();

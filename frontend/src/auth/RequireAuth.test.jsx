@@ -14,6 +14,7 @@ const renderAt = (path, session) =>
         <Routes>
           <Route path="/sign-in" element={<p>Sign-in page</p>} />
           <Route path="/onboarding" element={<p>Onboarding page</p>} />
+          <Route path="/account" element={<p>Account page</p>} />
           <Route element={<RequireAuth />}>
             <Route path="/profiles" element={<p>Profiles page</p>} />
           </Route>
@@ -70,5 +71,13 @@ describe("RequireAuth", () => {
 
     // Assert
     expect(screen.getByText("Onboarding page")).toBeInTheDocument();
+  });
+
+  test("sends an alumni token that reaches the advisor page to its account page", () => {
+    // Arrange + Act
+    renderAt("/advisor", { token: jwtWithRole("ALUMNI"), onboarded: true });
+
+    // Assert
+    expect(screen.getByText("Account page")).toBeInTheDocument();
   });
 });
