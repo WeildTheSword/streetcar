@@ -2,6 +2,9 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { sessionRole } from "@/auth/sessionRole";
 import { useAuth } from "@/auth/useAuth";
 
+// Where a signed-in user lands when they reach a page meant for another role.
+const HOME_BY_ROLE = { ADVISOR: "/advisor", STUDENT: "/student", ALUMNI: "/account" };
+
 /**
  * Gates the app behind sign-in, and holds students at the fingerprint splash
  * until they have completed it.
@@ -16,7 +19,7 @@ export function RequireAuth({ role }) {
 
   const currentRole = sessionRole(session);
   if (role && currentRole !== role) {
-    return <Navigate to={currentRole === "ADVISOR" ? "/advisor" : "/student"} replace />;
+    return <Navigate to={HOME_BY_ROLE[currentRole] ?? "/student"} replace />;
   }
 
   // /welcome runs before onboarding, so it is exempt from the gate.

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 /** Recent alumni role changes matched against open student tracks. */
@@ -13,9 +14,9 @@ export function AlumniRadar({ alumniRadar }) {
             Recent role announcements matching open student tracks
           </span>
         </div>
-        <button className="text-[12.5px] font-medium text-ink hover:underline">
+        <Link to="/advisor/alumni" className="text-[12.5px] font-medium text-ink hover:underline">
           View all →
-        </button>
+        </Link>
       </div>
 
       <table className="w-full border-collapse">

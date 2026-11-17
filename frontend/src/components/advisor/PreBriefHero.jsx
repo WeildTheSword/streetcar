@@ -17,8 +17,10 @@ export function PreBriefHero({ nextStudent, nextAppointment }) {
           </div>
           <p className="mt-2.5 text-[13.5px] text-muted-ink">
             Pre-brief for{" "}
-            <span className="font-semibold text-ink">{nextStudent.name}</span> ·{" "}
-            {nextAppointment.time} · {nextAppointment.year} · {nextAppointment.major}
+            <span className="font-semibold text-ink">{nextStudent.name}</span>
+            {nextAppointment
+              ? ` · ${nextAppointment.time} · ${nextAppointment.year} · ${nextAppointment.major}`
+              : " · No appointment booked today"}
           </p>
           <div className="mt-3 text-[42px] leading-[1.05] font-bold tracking-[-0.03em] text-ink uppercase">
             {nextStudent.targetRole}

@@ -125,4 +125,32 @@ describe("LoginPage", () => {
       expect(transition.run).toHaveBeenCalledWith("Opening your console", expect.any(Function)),
     );
   });
+
+  test("the alumni door opens straight on sign-in, with no sign-up offered", () => {
+    // Arrange
+    renderAs("Alumni");
+
+    // Act — nothing to act on; this checks what rendered
+    // Assert
+    expect(screen.getByText("Alumni sign in")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Need an account? Create one" })).not.toBeInTheDocument();
+    expect(screen.getByText("Sarah Kim")).toBeInTheDocument();
+  });
+
+  test("an alumni sign-in plays the alumni transition", async () => {
+    // Arrange
+    auth.login.mockResolvedValue({ role: "ALUMNI", onboarded: true });
+    renderAs("Alumni");
+    fireEvent.click(screen.getByRole("button", { name: /Sarah Kim/ }));
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    // Assert
+    await waitFor(() =>
+      expect(transition.run).toHaveBeenCalledWith("Opening your account", expect.any(Function)),
+    );
+    expect(auth.login).toHaveBeenCalledWith("sarah.kim@alumni.tulane.edu", "streetcar");
+  });
 });

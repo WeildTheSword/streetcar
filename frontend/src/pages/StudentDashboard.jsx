@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  CalendarDays,
-  FileText,
-  Fingerprint,
-  Home,
-  ListOrdered,
-  Settings,
-  Users,
-} from "lucide-react";
 import { useAuth } from "@/auth/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { studentSections } from "@/components/student/studentNav";
 import { DemoGuide } from "@/components/DemoGuide";
 import { STUDENT_STEPS } from "@/data/guideSteps";
 import { AdvisingMeetingCard } from "@/components/student/AdvisingMeetingCard";
@@ -38,28 +30,7 @@ export function StudentDashboard() {
     };
   }, [session.profileId]);
 
-  const sections = [
-    {
-      items: [{ icon: Home, label: "My Path", active: true }],
-    },
-    {
-      label: "Plan",
-      items: [
-        { icon: ListOrdered, label: "Courses" },
-        { icon: Users, label: "Alumni", count: 3 },
-        { icon: CalendarDays, label: "Appointments", count: 1 },
-        { icon: FileText, label: "Applications", count: 14 },
-      ],
-    },
-    {
-      label: "Me",
-      items: [
-        { icon: Fingerprint, label: "Fingerprint" },
-        { icon: FileText, label: "Resume" },
-        { icon: Settings, label: "Settings" },
-      ],
-    },
-  ];
+  const sections = studentSections("path");
 
   const shellUser = {
     name: session.displayName,

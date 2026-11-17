@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -25,20 +26,25 @@ export function TodaySchedule({ schedule, nextStudentId }) {
               ))}
             </TabsList>
           </Tabs>
-          <Button className="h-7 rounded-lg bg-ink text-[11.5px] hover:bg-ink-2">
-            <Plus className="size-3.5" />
-            New appointment
+          <Button asChild className="h-7 rounded-lg bg-ink text-[11.5px] hover:bg-ink-2">
+            <Link to="/advisor/appointments">
+              <Plus className="size-3.5" />
+              New appointment
+            </Link>
           </Button>
         </div>
       </div>
 
+      {schedule.length === 0 && (
+        <p className="mt-3.5 text-[13px] text-muted-ink">No appointments booked for today.</p>
+      )}
       <div className="mt-3.5 grid grid-cols-2 gap-3">
         {schedule.map((appointment) => (
           <div
             key={appointment.id}
             className={cn(
               "rounded-[10px] border bg-surface p-3.5",
-              appointment.studentId === nextStudentId
+              nextStudentId != null && String(appointment.studentId) === String(nextStudentId)
                 ? "border-brass/45"
                 : "border-hairline",
             )}

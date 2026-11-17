@@ -1,4 +1,5 @@
 import { ChevronsUpDown, LogOut, RotateCcw } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,17 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-function NavItem({ icon: Icon, label, count, active }) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        "flex w-full items-center gap-2.5 rounded-[7px] px-2.5 py-[7px] text-left",
-        "text-[13.5px] font-normal text-ink-2 transition-colors duration-150",
-        "hover:bg-[#efedea] focus-visible:ring-[3px] focus-visible:ring-burgundy/25 focus-visible:outline-none",
-        active && "bg-[#ebe9e5] font-medium",
-      )}
-    >
+function NavItem({ icon: Icon, label, count, active, to }) {
+  const className = cn(
+    "flex w-full items-center gap-2.5 rounded-[7px] px-2.5 py-[7px] text-left",
+    "text-[13.5px] font-normal text-ink-2 transition-colors duration-150",
+    "hover:bg-[#efedea] focus-visible:ring-[3px] focus-visible:ring-burgundy/25 focus-visible:outline-none",
+    active && "bg-[#ebe9e5] font-medium",
+  );
+  const content = (
+    <>
       <Icon
         className={cn("size-[17px] shrink-0", active ? "text-ink" : "text-muted-ink")}
         strokeWidth={1.6}
@@ -30,6 +29,20 @@ function NavItem({ icon: Icon, label, count, active }) {
           {count}
         </span>
       )}
+    </>
+  );
+
+  // Items with a destination are real links; the rest stay as placeholders.
+  if (to) {
+    return (
+      <Link to={to} className={className} aria-current={active ? "page" : undefined}>
+        {content}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" className={className}>
+      {content}
     </button>
   );
 }

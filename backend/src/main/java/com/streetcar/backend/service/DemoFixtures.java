@@ -16,13 +16,14 @@ public class DemoFixtures {
 
     public static final String MORGAN_ID = "morgan-thibodaux";
     public static final String BILL_ID = "bill-hudlow";
+    public static final String MORGAN_EMAIL = "morgan@tulane.edu";
 
     public static final Identity MORGAN = new Identity("Morgan A. Thibodaux", "MT");
     public static final Identity BILL = new Identity("Bill Hudlow", "BH");
 
     public List<DemoUser> users() {
         return List.of(
-            new DemoUser("morgan@tulane.edu", "streetcar", "STUDENT", MORGAN_ID,
+            new DemoUser(MORGAN_EMAIL, "streetcar", "STUDENT", MORGAN_ID,
                 MORGAN, "Finance + CS · Junior"),
             new DemoUser("bill.hudlow@tulane.edu", "streetcar", "ADVISOR", BILL_ID,
                 BILL, "Freeman · Consultant")

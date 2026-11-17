@@ -1,18 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  BarChart3,
-  CalendarDays,
-  Database,
-  Home,
-  LayoutGrid,
-  ScrollText,
-  Settings,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import predators from "@/assets/predators.png";
 import { useAuth } from "@/auth/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { advisorSections, advisorShellUser } from "@/components/advisor/advisorNav";
 import { DemoGuide } from "@/components/DemoGuide";
 import { ADVISOR_STEPS } from "@/data/guideSteps";
 import { AlumniRadar } from "@/components/advisor/AlumniRadar";
@@ -26,28 +15,7 @@ import { TopFirmCard } from "@/components/advisor/TopFirmCard";
 import { UpdatesFeed } from "@/components/advisor/UpdatesFeed";
 import { fetchAdvisorDashboard } from "@/services/api";
 
-const SECTIONS = [
-  { items: [{ icon: Home, label: "Advisor Portal", active: true }] },
-  {
-    label: "Navigate",
-    items: [
-      { icon: Users, label: "My Students", count: 28 },
-      { icon: Database, label: "Alumni Database" },
-      { icon: TrendingUp, label: "Internal Hiring Trends" },
-      { icon: CalendarDays, label: "Appointments", count: 7 },
-      { icon: BarChart3, label: "Performance" },
-    ],
-  },
-  {
-    label: "Manage",
-    items: [
-      { icon: BarChart3, label: "Outcomes" },
-      { icon: LayoutGrid, label: "Reports" },
-      { icon: ScrollText, label: "Logs" },
-      { icon: Settings, label: "Settings" },
-    ],
-  },
-];
+const SECTIONS = advisorSections("portal");
 
 export function AdvisorDashboard() {
   const { session, logout, restartDemo } = useAuth();
@@ -64,13 +32,7 @@ export function AdvisorDashboard() {
     };
   }, [session.profileId]);
 
-  const shellUser = {
-    name: session.displayName,
-    subtitle: session.subtitle,
-    initials: session.initials,
-    email: "bill.hudlow@tulane.edu",
-    badge: predators,
-  };
+  const shellUser = advisorShellUser(session);
 
   if (error) {
     return (
@@ -111,7 +73,7 @@ export function AdvisorDashboard() {
       </div>
 
       <div className="mt-7 grid grid-cols-[1fr_360px] gap-7">
-        <TodaySchedule schedule={schedule} nextStudentId={nextStudent.id} />
+        <TodaySchedule schedule={schedule} nextStudentId={nextAppointment?.studentId} />
         <UpdatesFeed updates={updates} />
       </div>
 

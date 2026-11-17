@@ -4,7 +4,11 @@ import { TransitionProvider } from "@/transition/TransitionProvider";
 import { RequireAuth } from "@/auth/RequireAuth";
 import { sessionRole } from "@/auth/sessionRole";
 import { useAuth } from "@/auth/useAuth";
+import { AccountPage } from "@/pages/AccountPage";
+import { AdvisorAppointmentsPage } from "@/pages/AdvisorAppointmentsPage";
 import { AdvisorDashboard } from "@/pages/AdvisorDashboard";
+import { AdvisorStudentsPage } from "@/pages/AdvisorStudentsPage";
+import { AlumniDirectoryPage } from "@/pages/AlumniDirectoryPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { OnboardingPage } from "@/pages/OnboardingPage";
 import { StudentDashboard } from "@/pages/StudentDashboard";
@@ -15,7 +19,9 @@ import { WelcomePage } from "@/pages/WelcomePage";
 function LandingRedirect() {
   const { session } = useAuth();
   if (!session) return <Navigate to="/sign-in" replace />;
-  if (sessionRole(session) === "ADVISOR") return <Navigate to="/advisor" replace />;
+  const role = sessionRole(session);
+  if (role === "ADVISOR") return <Navigate to="/advisor" replace />;
+  if (role === "ALUMNI") return <Navigate to="/account" replace />;
   return <Navigate to={session.onboarded ? "/student" : "/onboarding"} replace />;
 }
 
@@ -31,6 +37,7 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/profiles" element={<SubmissionsPage />} />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
 
           <Route element={<RequireAuth role="STUDENT" />}>
@@ -40,6 +47,9 @@ function App() {
 
           <Route element={<RequireAuth role="ADVISOR" />}>
             <Route path="/advisor" element={<AdvisorDashboard />} />
+            <Route path="/advisor/students" element={<AdvisorStudentsPage />} />
+            <Route path="/advisor/appointments" element={<AdvisorAppointmentsPage />} />
+            <Route path="/advisor/alumni" element={<AlumniDirectoryPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
