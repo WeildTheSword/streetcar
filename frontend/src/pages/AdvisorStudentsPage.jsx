@@ -1,15 +1,81 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/auth/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { advisorSections, advisorShellUser } from "@/components/advisor/advisorNav";
 import { Initials, PageHeading, Panel, Pill } from "@/components/PagePanel";
-import { formatDateTime, initialsOf } from "@/lib/format";
+import { applicationStatus } from "@/lib/applicationStatus";
+import { formatDate, formatDateTime, initialsOf } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { fetchStudentAccount, fetchStudents } from "@/services/advisorService";
 
 const SECTIONS = advisorSections("students");
 
-/** One student's account as the advisor sees it: details, submissions, conversations, appointments. */
+/** The student's tracked applications, most recently applied first. */
+function ApplicationsPanel({ applications }) {
+  return (
+    <Panel title="Applications" meta={`${applications.length} tracked`}>
+      {applications.length === 0 ? (
+        <p className="text-[13px] text-muted-ink">No applications tracked yet.</p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-hairline">
+          {applications.map((application) => {
+            const status = applicationStatus(application.status);
+            return (
+              <li key={application.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                <div className="min-w-0 flex-1 leading-tight">
+                  <div className="text-[13px] font-medium text-ink">
+                    {application.company} · {application.roleTitle}
+                  </div>
+                  {application.notes && (
+                    <p className="mt-0.5 line-clamp-1 text-[11.5px] text-muted-ink">{application.notes}</p>
+                  )}
+                </div>
+                <span className="text-[11.5px] text-muted-ink tnum">{formatDate(application.appliedOn)}</span>
+                <Pill tone={status.tone}>{status.label}</Pill>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Panel>
+  );
+}
+
+/** The student's resume, or a line saying there is none on file. */
+function ResumePanel({ resume }) {
+  return (
+    <Panel
+      title="Resume"
+      meta={resume?.updatedAt ? `Updated ${formatDateTime(resume.updatedAt)}` : undefined}
+    >
+      {!resume ? (
+        <p className="text-[13px] text-muted-ink">No resume on file.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <p className="text-[14px] font-semibold text-ink">{resume.headline}</p>
+          {[
+            ["Summary", resume.summary],
+            ["Experience", resume.experience],
+            ["Skills", resume.skills],
+          ]
+            .filter(([, text]) => text)
+            .map(([label, text]) => (
+              <div key={label}>
+                <h3 className="text-[10.5px] font-medium tracking-wide text-muted-ink-2 uppercase">{label}</h3>
+                <p className="mt-0.5 text-[12.5px] whitespace-pre-line text-ink-2">{text}</p>
+              </div>
+            ))}
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+/**
+ * One student's account as the advisor sees it: details, submissions,
+ * applications, resume, conversations and appointments.
+ */
 function StudentDetail({ student }) {
   return (
     <div className="flex flex-col gap-4">
@@ -47,6 +113,11 @@ function StudentDetail({ student }) {
           </ul>
         )}
       </Panel>
+
+      <div className="grid grid-cols-2 items-start gap-4">
+        <ApplicationsPanel applications={student.applications ?? []} />
+        <ResumePanel resume={student.resume ?? null} />
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <Panel title="Talking to" meta={`${student.conversations.length} alumni`}>
@@ -96,12 +167,18 @@ function StudentDetail({ student }) {
   );
 }
 
-/** My Students: every student account in the database, and any one of them opened in full. */
+/**
+ * My Students: every student account in the database, and any one of them
+ * opened in full. `?student=<id>` opens that student's record on arrival,
+ * which is how Reports and Outcomes link here.
+ */
 export function AdvisorStudentsPage() {
   const { session, logout, restartDemo } = useAuth();
+  const [searchParams] = useSearchParams();
+  const requestedId = Number(searchParams.get("student")) || null;
   const [students, setStudents] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(requestedId);
   const [selected, setSelected] = useState(null);
   const [detailError, setDetailError] = useState(null);
 
@@ -110,10 +187,16 @@ export function AdvisorStudentsPage() {
     fetchStudents()
       .then((list) => !cancelled && setStudents(list))
       .catch((err) => !cancelled && setError(err.message));
+    // A link from Reports or Outcomes names the student to open on arrival.
+    if (requestedId) {
+      fetchStudentAccount(requestedId)
+        .then((account) => !cancelled && setSelected(account))
+        .catch((err) => !cancelled && setDetailError(err.message));
+    }
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [requestedId]);
 
   async function open(id) {
     setSelectedId(id);
@@ -125,6 +208,7 @@ export function AdvisorStudentsPage() {
       setDetailError(err.message);
     }
   }
+
 
   return (
     <AppShell sections={SECTIONS} user={advisorShellUser(session)} onSignOut={logout} onRestart={restartDemo}>
