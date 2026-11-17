@@ -1,5 +1,6 @@
 package com.streetcar.backend.controller;
 
+import com.streetcar.backend.TestTokens;
 import com.jayway.jsonpath.JsonPath;
 import com.streetcar.backend.model.Submission;
 import com.streetcar.backend.model.User;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -50,10 +52,11 @@ class AuthApiTest {
     private SubmissionRepository submissions;
 
     // Other test classes share this database and may have deleted every user,
-    // so put the demo accounts back as well as clearing the ones tests created.
+    // so start from no accounts and put the demo ones back.
     @BeforeEach
     void keepOnlyTheDemoAccounts() {
-        auth.clearCreatedAccounts();
+        submissions.deleteAll();
+        users.deleteAll();
         auth.ensureDemoAccounts();
     }
 
@@ -138,7 +141,7 @@ class AuthApiTest {
     }
 
     @Test
-    void resettingTheDemoRemovesASignUpsAccountAndTheSubmissionsItMade() throws Exception {
+    void resettingTheDemoKeepsASignUpsAccountAndTheSubmissionsItMade() throws Exception {
         // Arrange: a sign-up that has saved a submission, so the submission points at the account
         postJson("/auth/signup", "{\"name\":\"Alex Rivera\",\"email\":\"alex@tulane.edu\",\"password\":\"s3cret\",\"role\":\"STUDENT\"}")
                 .andExpect(status().isOk());
@@ -147,10 +150,11 @@ class AuthApiTest {
                 "Software Engineer", null).withIdentity(null, OffsetDateTime.now(), alex));
 
         // Act
-        mvc.perform(post("/auth/reset")).andExpect(status().isNoContent());
+        mvc.perform(post("/auth/reset").header(HttpHeaders.AUTHORIZATION, TestTokens.bearer(alex.getId(), "STUDENT")))
+                .andExpect(status().isNoContent());
 
-        // Assert
-        assertFalse(users.existsByEmail("alex@tulane.edu"));
-        assertFalse(submissions.existsById(saved.getId()));
+        // Assert: accounts are real, so the demo reset never deletes them or what they saved
+        assertTrue(users.existsByEmail("alex@tulane.edu"));
+        assertTrue(submissions.existsById(saved.getId()));
     }
 }

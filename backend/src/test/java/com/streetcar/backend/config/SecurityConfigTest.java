@@ -106,7 +106,13 @@ class SecurityConfigTest {
                         .contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").doesNotExist());
-        mvc.perform(post("/auth/reset")).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void theDemoResetNeedsASignedInUser() throws Exception {
+        // Act + Assert
+        mvc.perform(post("/auth/reset")).andExpect(status().isUnauthorized());
+        mvc.perform(post("/auth/reset").header(HttpHeaders.AUTHORIZATION, student)).andExpect(status().isNoContent());
     }
 
     @Test

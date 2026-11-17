@@ -215,16 +215,4 @@ class AuthServiceTest {
         assertTrue(passwords.matches("streetcar", saved.getValue().getPasswordHash()));
     }
 
-    @Test
-    void clearCreatedAccountsKeepsTheDemoAndSeededAccounts() {
-        // Arrange: nothing beyond the mocks
-
-        // Act
-        service.clearCreatedAccounts();
-
-        // Assert
-        List<String> kept = new java.util.ArrayList<>(List.of("morgan@tulane.edu", "bill.hudlow@tulane.edu"));
-        kept.addAll(DirectorySeedData.emails());
-        verify(users).deleteAllExcept(kept);
-    }
 }
